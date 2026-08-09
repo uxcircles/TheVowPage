@@ -1,0 +1,329 @@
+"use client";
+
+import { useActionState, useRef, useState } from "react";
+import { updateWeddingContent } from "@/lib/actions/weddings";
+import { fetchGeocode } from "@/lib/create-wedding-client";
+import { toDatetimeLocalValue } from "@/lib/timezone";
+import { Toggle } from "@/components/ui/Toggle";
+import { ThemePicker } from "@/components/ui/ThemePicker";
+import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
+import { VenueMap } from "@/components/templates/classic/VenueMap";
+import type { Tables } from "@/lib/supabase/database.types";
+import type { ScheduleItem } from "@/components/templates/classic/types";
+
+const inputClass = "rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground";
+const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
+
+export function WeddingEditForm({
+  weddingId,
+  wedding,
+}: {
+  weddingId: string;
+  wedding: Tables<"weddings">;
+}) {
+  const action = updateWeddingContent.bind(null, weddingId);
+  const [state, formAction, pending] = useActionState(action, undefined);
+  const savedSchedule = wedding.schedule as ScheduleItem[] | null;
+  const [schedule, setSchedule] = useState<ScheduleItem[]>(
+    savedSchedule && savedSchedule.length > 0 ? savedSchedule : [{ time: "", event: "" }]
+  );
+  const [manualCoords, setManualCoords] = useState(false);
+  const [theme, setTheme] = useState(wedding.theme);
+  const [showFamily, setShowFamily] = useState(wedding.show_family);
+  const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
+  const [showRsvp, setShowRsvp] = useState(wedding.show_rsvp);
+
+  const venueNameRef = useRef<HTMLInputElement>(null);
+  const venueAddressRef = useRef<HTMLInputElement>(null);
+  const venueLatRef = useRef<HTMLInputElement>(null);
+  const venueLngRef = useRef<HTMLInputElement>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationPreview, setLocationPreview] = useState<{ lat: number; lng: number } | null>(null);
+  const [previewTimezone, setPreviewTimezone] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState("");
+  // Tracks the address we last auto-filled, so a re-search can still refresh
+  // it - but only while it still matches what we set (i.e. the user hasn't
+  // typed their own address over it since).
+  const lastAutoFilledAddressRef = useRef<string | null>(null);
+
+  async function locateVenue() {
+    setLocating(true);
+    setLocationError("");
+    const result = manualCoords
+      ? await fetchGeocode({
+          lat: Number(venueLatRef.current?.value ?? ""),
+          lng: Number(venueLngRef.current?.value ?? ""),
+        })
+      : await fetchGeocode({
+          venueName: venueNameRef.current?.value ?? "",
+          address: venueAddressRef.current?.value ?? "",
+        });
+    setLocating(false);
+    if (!result) {
+      setLocationPreview(null);
+      setLocationError("找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。");
+      return;
+    }
+    setLocationPreview({ lat: result.lat, lng: result.lng });
+    setPreviewTimezone(result.timezone);
+    // Offer Nominatim's own formatted address for free, but never overwrite
+    // an address the user typed themselves - only refresh it if it's still
+    // empty or still exactly what we auto-filled last time.
+    if (result.address && venueAddressRef.current) {
+      const current = venueAddressRef.current.value.trim();
+      if (!current || current === lastAutoFilledAddressRef.current) {
+        venueAddressRef.current.value = result.address;
+        lastAutoFilledAddressRef.current = result.address;
+      }
+    }
+  }
+
+  return (
+    <form action={formAction} className="flex flex-col gap-6 pb-24">
+      <EditorCard title="喜帖樣板">
+        <input type="hidden" name="theme" value={theme} />
+        <ThemePicker value={theme} onChange={setTheme} />
+      </EditorCard>
+
+      <EditorCard title="基本資訊">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className={labelClass}>
+            網址代稱（slug）
+            <input name="slug" defaultValue={wedding.slug} required className={inputClass} />
+          </label>
+          <div />
+          <label className={labelClass}>
+            新郎姓名
+            <input name="groomName" defaultValue={wedding.groom_name} className={inputClass} />
+          </label>
+          <label className={labelClass}>
+            新娘姓名
+            <input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />
+          </label>
+        </div>
+      </EditorCard>
+
+      <EditorCard
+        title="雙方家庭資訊"
+        action={<Toggle checked={showFamily} onChange={setShowFamily} label="顯示" />}
+      >
+        <input type="hidden" name="showFamily" value={showFamily ? "on" : "off"} />
+        {/* Fields stay mounted (just visually hidden) when the toggle is off,
+            so saving while hidden doesn't wipe out already-entered content -
+            hidden form fields still submit their value normally. */}
+        <div className={showFamily ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "hidden"}>
+          <label className={labelClass}>
+            新郎雙親
+            <input
+              name="groomParents"
+              defaultValue={wedding.groom_parents}
+              placeholder="林建平・王淑芬　之子"
+              className={inputClass}
+            />
+          </label>
+          <label className={labelClass}>
+            新娘雙親
+            <input
+              name="brideParents"
+              defaultValue={wedding.bride_parents}
+              placeholder="黃文昌・李美玲　之女"
+              className={inputClass}
+            />
+          </label>
+        </div>
+        {!showFamily && <HiddenSectionHint />}
+      </EditorCard>
+
+      <EditorCard title="場地">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className={labelClass}>
+            場地名稱
+            <input ref={venueNameRef} name="venueName" defaultValue={wedding.venue_name} className={inputClass} />
+          </label>
+          <label className={labelClass}>
+            廳別 / 樓層
+            <input name="venueHall" defaultValue={wedding.venue_hall} className={inputClass} />
+          </label>
+          <label className={`${labelClass} sm:col-span-2`}>
+            地址
+            <input
+              ref={venueAddressRef}
+              name="venueAddress"
+              defaultValue={wedding.venue_address}
+              className={inputClass}
+            />
+          </label>
+          <input type="hidden" name="manualCoords" value={manualCoords ? "on" : "off"} />
+          <p className="text-sm text-[var(--brand-ink-soft)] sm:col-span-2">
+            {!manualCoords ? (
+              <button
+                type="button"
+                onClick={() => setManualCoords(true)}
+                className="text-[var(--brand-gold)] underline"
+              >
+                地圖位置不正確？改成手動輸入座標
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setManualCoords(false)}
+                className="text-[var(--brand-gold)] underline"
+              >
+                改回自動定位
+              </button>
+            )}
+          </p>
+          {manualCoords && (
+            <>
+              <label className={labelClass}>
+                緯度
+                <input
+                  ref={venueLatRef}
+                  name="venueLat"
+                  type="number"
+                  step="any"
+                  defaultValue={wedding.venue_lat ?? ""}
+                  className={inputClass}
+                />
+              </label>
+              <label className={labelClass}>
+                經度
+                <input
+                  ref={venueLngRef}
+                  name="venueLng"
+                  type="number"
+                  step="any"
+                  defaultValue={wedding.venue_lng ?? ""}
+                  className={inputClass}
+                />
+              </label>
+            </>
+          )}
+          <div className="sm:col-span-2">
+            <button
+              type="button"
+              onClick={locateVenue}
+              disabled={locating}
+              className="rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] disabled:opacity-60"
+            >
+              {locating ? "定位中..." : "📍 確認地圖位置"}
+            </button>
+            {locationError && <p className="mt-2 text-sm text-red-600">{locationError}</p>}
+            {locationPreview && (
+              <div className="mt-3 flex flex-col gap-2">
+                <p className="text-sm text-[var(--brand-ink-soft)]">
+                  已定位，判斷時區為：<span className="font-medium text-foreground">{previewTimezone}</span>
+                </p>
+                <div className="h-48 overflow-hidden rounded border border-[var(--brand-line)]">
+                  <VenueMap
+                    lat={locationPreview.lat}
+                    lng={locationPreview.lng}
+                    label={wedding.venue_name || "場地"}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </EditorCard>
+
+      <EditorCard title="婚禮日期時間">
+        <label className={labelClass}>
+          日期與時間
+          <input
+            type="datetime-local"
+            name="eventDate"
+            defaultValue={toDatetimeLocalValue(wedding.event_date, wedding.timezone)}
+            className={inputClass}
+          />
+        </label>
+        <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
+          系統會依場地位置自動判斷時區，目前設定：<span className="font-medium text-foreground">{wedding.timezone}</span>
+          （儲存後會依最新的場地位置重新確認）
+        </p>
+      </EditorCard>
+
+      <EditorCard
+        title="婚宴流程"
+        action={<Toggle checked={showSchedule} onChange={setShowSchedule} label="顯示" />}
+      >
+        <input type="hidden" name="showSchedule" value={showSchedule ? "on" : "off"} />
+        {/* Same "stay mounted, just hidden" reasoning as the family section
+            above - the timeline row inputs must keep submitting even while
+            hidden, or a save while hidden would erase the schedule. */}
+        <div className={showSchedule ? "" : "hidden"}>
+          <div className="flex flex-col gap-2">
+            {schedule.map((item, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  name="scheduleTime"
+                  defaultValue={item.time}
+                  placeholder="18:00"
+                  className={`${inputClass} w-28`}
+                />
+                <input
+                  name="scheduleEvent"
+                  defaultValue={item.event}
+                  placeholder="Dinner & Ceremony"
+                  className={`${inputClass} flex-1`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
+                  className="rounded border border-[var(--brand-line)] px-3 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                >
+                  刪除
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setSchedule((s) => [...s, { time: "", event: "" }])}
+            className="mt-2 rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]"
+          >
+            + 新增流程項目
+          </button>
+        </div>
+        {!showSchedule && <HiddenSectionHint />}
+      </EditorCard>
+
+      <EditorCard
+        title="RSVP 回覆出席"
+        action={<Toggle checked={showRsvp} onChange={setShowRsvp} label="顯示" />}
+      >
+        <input type="hidden" name="showRsvp" value={showRsvp ? "on" : "off"} />
+        {showRsvp ? (
+          <p className="text-sm text-[var(--brand-ink-soft)]">
+            賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在「RSVP 回覆」頁面。
+          </p>
+        ) : (
+          <HiddenSectionHint />
+        )}
+      </EditorCard>
+
+      <EditorCard title="感謝詞">
+        <textarea
+          name="thanksMessage"
+          defaultValue={wedding.thanks_message}
+          rows={3}
+          className={`${inputClass} w-full`}
+        />
+      </EditorCard>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
+        <div className="mx-auto flex max-w-4xl flex-col gap-1 px-6 py-3">
+          {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {state?.success && <p className="text-sm text-green-700">已儲存</p>}
+          <button
+            type="submit"
+            disabled={pending}
+            className="self-start rounded bg-[var(--brand-gold)] px-6 py-2 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          >
+            {pending ? "儲存中..." : "儲存"}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
