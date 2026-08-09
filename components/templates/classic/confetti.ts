@@ -1,6 +1,6 @@
-const COLORS = ["#a3835a", "#c9a877", "#e7d2c6", "#6b6156", "#f1e9da"];
+const DEFAULT_COLORS = ["#a3835a", "#c9a877", "#e7d2c6", "#6b6156", "#f1e9da"];
 
-export function launchConfetti(layer: HTMLElement) {
+export function launchConfetti(layer: HTMLElement, colors: string[] = DEFAULT_COLORS) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const count = 460;
@@ -33,7 +33,7 @@ export function launchConfetti(layer: HTMLElement) {
     const h = 6 + Math.random() * 5;
     piece.style.width = `${w}px`;
     piece.style.height = `${h}px`;
-    inner.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
+    inner.style.background = colors[Math.floor(Math.random() * colors.length)];
     const delay = Math.random() * 2;
     piece.style.animationDelay = `${delay}s`;
     inner.style.animationDelay = piece.style.animationDelay;

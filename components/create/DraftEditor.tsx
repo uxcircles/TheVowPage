@@ -15,10 +15,13 @@ import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate"
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { Toggle } from "@/components/ui/Toggle";
 import { ThemePicker } from "@/components/ui/ThemePicker";
+import { SealPicker } from "@/components/ui/SealPicker";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
-import type {
-  ClassicTemplateData,
-  ScheduleItem,
+import {
+  emptySchedule,
+  SCHEDULE_PLACEHOLDERS,
+  type ClassicTemplateData,
+  type ScheduleItem,
 } from "@/components/templates/classic/types";
 import type { User } from "@supabase/supabase-js";
 
@@ -27,6 +30,7 @@ const DEFAULT_TIMEZONE = "Asia/Taipei";
 
 const EMPTY_DRAFT: DraftContent = {
   theme: "gold",
+  sealDesign: "calla",
   groomName: "",
   brideName: "",
   groomParents: "",
@@ -38,7 +42,7 @@ const EMPTY_DRAFT: DraftContent = {
   manualCoords: false,
   venueLat: "",
   venueLng: "",
-  schedule: [{ time: "", event: "" }],
+  schedule: emptySchedule(),
   thanksMessage: "",
   showFamily: true,
   showSchedule: true,
@@ -243,6 +247,7 @@ export function DraftEditor() {
     setPreviewData({
       weddingId: "",
       theme: draft.theme,
+      sealDesign: draft.sealDesign,
       groomName: draft.groomName,
       brideName: draft.brideName,
       groomParents: draft.groomParents,
@@ -324,7 +329,7 @@ export function DraftEditor() {
           已經有帳號？登入
         </Link>
       </header>
-      <div className="mx-auto max-w-4xl px-6 pt-10 pb-28">
+      <div className="mx-auto w-full max-w-4xl px-6 pt-10 pb-28">
         <h1 className="text-2xl font-medium">試做你的喜帖</h1>
         <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
           不用先註冊，直接填內容、選照片。準備好要儲存時再建立帳號，內容不會遺失。
@@ -395,6 +400,11 @@ export function DraftEditor() {
           <div className="flex flex-col gap-6">
             <EditorCard title="喜帖樣板">
               <ThemePicker value={draft.theme} onChange={(id) => update("theme", id)} />
+              <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
+              <SealPicker
+                value={draft.sealDesign}
+                onChange={(id) => update("sealDesign", id)}
+              />
             </EditorCard>
 
             <EditorCard title="基本資訊">
@@ -594,7 +604,7 @@ export function DraftEditor() {
                           onChange={(e) =>
                             updateSchedule(i, { time: e.target.value })
                           }
-                          placeholder="18:00"
+                          placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].time}
                           className={`${inputClass} w-28`}
                         />
                         <input
@@ -602,7 +612,7 @@ export function DraftEditor() {
                           onChange={(e) =>
                             updateSchedule(i, { event: e.target.value })
                           }
-                          placeholder="Dinner & Ceremony"
+                          placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].event}
                           className={`${inputClass} flex-1`}
                         />
                         <button

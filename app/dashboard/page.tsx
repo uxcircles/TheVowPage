@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createWedding } from "@/lib/actions/weddings";
+import { WeddingRowMenu } from "@/components/dashboard/WeddingRowMenu";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -34,11 +35,11 @@ export default async function DashboardPage() {
 
       <ul className="mt-8 flex flex-col gap-3">
         {weddings?.map((w) => (
-          <li key={w.id}>
-            <Link
-              href={`/dashboard/${w.id}/edit`}
-              className="flex items-center justify-between rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)]"
-            >
+          <li
+            key={w.id}
+            className="flex items-center gap-3 rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)]"
+          >
+            <Link href={`/dashboard/${w.id}/edit`} className="flex flex-1 items-center justify-between">
               <span>
                 <span className="font-medium">
                   {w.groom_name || "新郎"} ＆ {w.bride_name || "新娘"}
@@ -53,6 +54,7 @@ export default async function DashboardPage() {
                 {w.status === "published" ? "已發布" : "草稿"}
               </span>
             </Link>
+            {w.status !== "published" && <WeddingRowMenu weddingId={w.id} />}
           </li>
         ))}
       </ul>

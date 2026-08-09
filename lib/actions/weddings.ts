@@ -103,6 +103,7 @@ export async function updateWeddingContent(
       venue_lng: venueLng,
       schedule,
       theme: String(formData.get("theme") ?? "gold").trim(),
+      seal: String(formData.get("seal") ?? "calla").trim(),
       show_family: formData.get("showFamily") === "on",
       show_schedule: formData.get("showSchedule") === "on",
       show_rsvp: formData.get("showRsvp") === "on",

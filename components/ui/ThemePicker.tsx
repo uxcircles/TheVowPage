@@ -1,7 +1,6 @@
 "use client";
 
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
-import { InvitationCardVisual } from "@/components/marketing/InvitationPreviewCard";
 
 export function ThemePicker({
   value,
@@ -11,23 +10,23 @@ export function ThemePicker({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <div className="flex flex-wrap gap-3">
       {CLASSIC_THEMES.map((theme) => (
         <button
           key={theme.id}
           type="button"
           onClick={() => onChange(theme.id)}
-          className={`flex flex-col gap-2 rounded-lg p-2 text-left transition ${
+          className={`flex items-center gap-2.5 rounded-full border py-1.5 pl-1.5 pr-4 transition ${
             value === theme.id
-              ? "ring-2 ring-[var(--brand-gold)]"
-              : "ring-1 ring-transparent hover:ring-[var(--brand-line)]"
+              ? "border-[var(--brand-gold)] bg-[var(--brand-gold)]/10"
+              : "border-[var(--brand-line)] hover:border-[var(--brand-gold)]"
           }`}
         >
-          <InvitationCardVisual theme={theme} />
-          <div>
-            <p className="text-sm font-medium text-foreground">{theme.name}</p>
-            <p className="text-xs text-[var(--brand-ink-soft)]">{theme.tagline}</p>
-          </div>
+          <span
+            className="h-7 w-7 shrink-0 rounded-full border border-black/10"
+            style={{ backgroundColor: theme.gold }}
+          />
+          <span className="text-sm font-medium text-foreground">{theme.name}</span>
         </button>
       ))}
     </div>

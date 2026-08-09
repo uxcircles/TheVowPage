@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WeddingEditForm } from "@/components/dashboard/WeddingEditForm";
-import { PublishToggle } from "@/components/dashboard/PublishToggle";
 import { PhotoSlot } from "@/components/dashboard/PhotoSlot";
 import { MomentsGallery } from "@/components/dashboard/MomentsGallery";
 import { EditorCard } from "@/components/ui/EditorCard";
@@ -42,8 +41,6 @@ export default async function EditWeddingPage({
 
   return (
     <div className="flex flex-col gap-10">
-      <PublishToggle weddingId={weddingId} status={wedding.status} slug={wedding.slug} />
-
       <section>
         <h2 className="mb-4 text-lg font-medium">照片</h2>
         <div className="flex flex-col gap-6">
@@ -83,7 +80,14 @@ export default async function EditWeddingPage({
 
       <section>
         <h2 className="mb-4 text-lg font-medium">喜帖內容</h2>
-        <WeddingEditForm weddingId={weddingId} wedding={wedding} />
+        <WeddingEditForm
+          weddingId={weddingId}
+          wedding={wedding}
+          heroPhotoUrl={heroPhoto ? publicUrl(heroPhoto.storage_path) : null}
+          familyPhotoUrl={familyPhoto ? publicUrl(familyPhoto.storage_path) : null}
+          footerPhotoUrl={footerPhoto ? publicUrl(footerPhoto.storage_path) : null}
+          momentPhotoUrls={moments.map((p) => publicUrl(p.storage_path))}
+        />
       </section>
     </div>
   );

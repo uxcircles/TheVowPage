@@ -151,6 +151,7 @@ export type Database = {
           id: string
           owner_id: string
           schedule: Json
+          seal: string
           show_family: boolean
           show_rsvp: boolean
           show_schedule: boolean
@@ -177,6 +178,7 @@ export type Database = {
           id?: string
           owner_id: string
           schedule?: Json
+          seal?: string
           show_family?: boolean
           show_rsvp?: boolean
           show_schedule?: boolean
@@ -203,6 +205,7 @@ export type Database = {
           id?: string
           owner_id?: string
           schedule?: Json
+          seal?: string
           show_family?: boolean
           show_rsvp?: boolean
           show_schedule?: boolean

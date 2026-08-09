@@ -1,34 +1,53 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useCallback, useRef, useState } from "react";
 import { updateWeddingContent } from "@/lib/actions/weddings";
 import { fetchGeocode } from "@/lib/create-wedding-client";
-import { toDatetimeLocalValue } from "@/lib/timezone";
+import { toDatetimeLocalValue, wallTimeToUtcIso } from "@/lib/timezone";
 import { Toggle } from "@/components/ui/Toggle";
 import { ThemePicker } from "@/components/ui/ThemePicker";
+import { SealPicker } from "@/components/ui/SealPicker";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
+import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingChrome";
 import type { Tables } from "@/lib/supabase/database.types";
-import type { ScheduleItem } from "@/components/templates/classic/types";
+import {
+  SCHEDULE_PLACEHOLDERS,
+  emptySchedule,
+  type ClassicTemplateData,
+  type ScheduleItem,
+} from "@/components/templates/classic/types";
 
 const inputClass = "rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground";
 const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
+const FORM_ID = "wedding-edit-form";
 
 export function WeddingEditForm({
   weddingId,
   wedding,
+  heroPhotoUrl,
+  familyPhotoUrl,
+  footerPhotoUrl,
+  momentPhotoUrls,
 }: {
   weddingId: string;
   wedding: Tables<"weddings">;
+  heroPhotoUrl: string | null;
+  familyPhotoUrl: string | null;
+  footerPhotoUrl: string | null;
+  momentPhotoUrls: string[];
 }) {
   const action = updateWeddingContent.bind(null, weddingId);
   const [state, formAction, pending] = useActionState(action, undefined);
+  useEditSaveBar({ formId: FORM_ID, pending, error: state?.error, success: state?.success });
+  const formRef = useRef<HTMLFormElement>(null);
   const savedSchedule = wedding.schedule as ScheduleItem[] | null;
   const [schedule, setSchedule] = useState<ScheduleItem[]>(
-    savedSchedule && savedSchedule.length > 0 ? savedSchedule : [{ time: "", event: "" }]
+    savedSchedule && savedSchedule.length > 0 ? savedSchedule : emptySchedule()
   );
   const [manualCoords, setManualCoords] = useState(false);
   const [theme, setTheme] = useState(wedding.theme);
+  const [sealDesign, setSealDesign] = useState(wedding.seal);
   const [showFamily, setShowFamily] = useState(wedding.show_family);
   const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
   const [showRsvp, setShowRsvp] = useState(wedding.show_rsvp);
@@ -78,11 +97,67 @@ export function WeddingEditForm({
     }
   }
 
+  // Snapshots the form's *current* (possibly unsaved) values into
+  // ClassicTemplateData for the live preview. Most fields here are
+  // uncontrolled inputs (defaultValue only), so their live-typed values
+  // have to be read via FormData at snapshot time - React state alone
+  // (theme/schedule additions/toggles) doesn't capture them.
+  const getPreviewSnapshot = useCallback((): ClassicTemplateData => {
+    const fd = new FormData(formRef.current ?? undefined);
+    const timezone = previewTimezone ?? wedding.timezone;
+    const times = fd.getAll("scheduleTime") as string[];
+    const events = fd.getAll("scheduleEvent") as string[];
+    return {
+      weddingId: wedding.id,
+      theme,
+      sealDesign,
+      groomName: String(fd.get("groomName") ?? ""),
+      brideName: String(fd.get("brideName") ?? ""),
+      groomParents: String(fd.get("groomParents") ?? ""),
+      brideParents: String(fd.get("brideParents") ?? ""),
+      eventDate: wallTimeToUtcIso(String(fd.get("eventDate") ?? ""), timezone),
+      timezone,
+      venueName: String(fd.get("venueName") ?? ""),
+      venueHall: String(fd.get("venueHall") ?? ""),
+      venueAddress: String(fd.get("venueAddress") ?? ""),
+      venueLat: locationPreview?.lat ?? wedding.venue_lat,
+      venueLng: locationPreview?.lng ?? wedding.venue_lng,
+      schedule: times
+        .map((time, i) => ({ time, event: events[i] ?? "" }))
+        .filter((item) => item.time || item.event),
+      thanksMessage: String(fd.get("thanksMessage") ?? ""),
+      heroPhotoUrl,
+      familyPhotoUrl,
+      footerPhotoUrl,
+      momentPhotoUrls,
+      showFamily,
+      showSchedule,
+      showRsvp,
+    };
+  }, [
+    wedding,
+    theme,
+    sealDesign,
+    previewTimezone,
+    locationPreview,
+    heroPhotoUrl,
+    familyPhotoUrl,
+    footerPhotoUrl,
+    momentPhotoUrls,
+    showFamily,
+    showSchedule,
+    showRsvp,
+  ]);
+  useEditPreview(getPreviewSnapshot);
+
   return (
-    <form action={formAction} className="flex flex-col gap-6 pb-24">
+    <form ref={formRef} id={FORM_ID} action={formAction} className="flex flex-col gap-6">
       <EditorCard title="喜帖樣板">
         <input type="hidden" name="theme" value={theme} />
         <ThemePicker value={theme} onChange={setTheme} />
+        <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
+        <input type="hidden" name="seal" value={sealDesign} />
+        <SealPicker value={sealDesign} onChange={setSealDesign} />
       </EditorCard>
 
       <EditorCard title="基本資訊">
@@ -258,13 +333,13 @@ export function WeddingEditForm({
                 <input
                   name="scheduleTime"
                   defaultValue={item.time}
-                  placeholder="18:00"
+                  placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].time}
                   className={`${inputClass} w-28`}
                 />
                 <input
                   name="scheduleEvent"
                   defaultValue={item.event}
-                  placeholder="Dinner & Ceremony"
+                  placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].event}
                   className={`${inputClass} flex-1`}
                 />
                 <button
@@ -310,20 +385,6 @@ export function WeddingEditForm({
           className={`${inputClass} w-full`}
         />
       </EditorCard>
-
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl flex-col gap-1 px-6 py-3">
-          {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
-          {state?.success && <p className="text-sm text-green-700">已儲存</p>}
-          <button
-            type="submit"
-            disabled={pending}
-            className="self-start rounded bg-[var(--brand-gold)] px-6 py-2 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-          >
-            {pending ? "儲存中..." : "儲存"}
-          </button>
-        </div>
-      </div>
     </form>
   );
 }

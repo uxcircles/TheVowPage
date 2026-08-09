@@ -2,6 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 import { launchConfetti } from "./confetti";
+import type { ClassicTheme } from "./themes";
+
+// Lightens (positive percent) or darkens (negative percent) a hex color by
+// blending each channel toward white/black - used to build the scratch-foil
+// gradient and confetti palette from a single theme accent color instead of
+// a hardcoded gold gradient.
+function shadeHex(hex: string, percent: number): string {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const clamp = (v: number) => Math.max(0, Math.min(255, v));
+  const r = clamp((num >> 16) + amt);
+  const g = clamp(((num >> 8) & 0x00ff) + amt);
+  const b = clamp((num & 0x0000ff) + amt);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
 
 // Wedding date/time is always shown in the venue's local time (resolved
 // from the venue's location), not the visiting guest's browser timezone.
@@ -54,10 +69,12 @@ export function ScratchCard({
   eventDate,
   venueLabel,
   timeZone,
+  theme,
 }: {
   eventDate: Date | null;
   venueLabel: string;
   timeZone: string;
+  theme: ClassicTheme;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -91,11 +108,11 @@ export function ScratchCard({
       ctx.globalCompositeOperation = "source-over";
 
       const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, "#d4b483");
-      grad.addColorStop(0.22, "#b8935f");
-      grad.addColorStop(0.5, "#c9a877");
-      grad.addColorStop(0.78, "#a17f4f");
-      grad.addColorStop(1, "#8f6f47");
+      grad.addColorStop(0, shadeHex(theme.gold, 30));
+      grad.addColorStop(0.22, shadeHex(theme.gold, 10));
+      grad.addColorStop(0.5, shadeHex(theme.gold, 20));
+      grad.addColorStop(0.78, shadeHex(theme.gold, -6));
+      grad.addColorStop(1, shadeHex(theme.gold, -16));
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
 
@@ -157,7 +174,15 @@ export function ScratchCard({
     function reveal() {
       localRevealed = true;
       setRevealed(true);
-      if (confettiLayerRef.current) launchConfetti(confettiLayerRef.current);
+      if (confettiLayerRef.current) {
+        launchConfetti(confettiLayerRef.current, [
+          theme.gold,
+          shadeHex(theme.gold, 20),
+          theme.creamDeep,
+          theme.inkSoft,
+          theme.cream,
+        ]);
+      }
       startCountdown();
     }
 
@@ -231,7 +256,7 @@ export function ScratchCard({
       if (intervalId) clearInterval(intervalId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventDate]);
+  }, [eventDate, theme]);
 
   return (
     <section className="scratch-section">
