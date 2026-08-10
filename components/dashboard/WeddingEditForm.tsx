@@ -14,6 +14,7 @@ import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingCh
 import type { Tables } from "@/lib/supabase/database.types";
 import {
   SCHEDULE_PLACEHOLDERS,
+  SCHEDULE_PLACEHOLDER_FALLBACK,
   emptySchedule,
   type ClassicTemplateData,
   type ScheduleItem,
@@ -340,13 +341,13 @@ export function WeddingEditForm({
                 <input
                   name="scheduleTime"
                   defaultValue={item.time}
-                  placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].time}
+                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time}
                   className={`${inputClass} w-28`}
                 />
                 <input
                   name="scheduleEvent"
                   defaultValue={item.event}
-                  placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].event}
+                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event}
                   className={`${inputClass} flex-1`}
                 />
                 <button

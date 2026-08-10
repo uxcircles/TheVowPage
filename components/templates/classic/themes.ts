@@ -57,3 +57,23 @@ export const DEFAULT_CLASSIC_THEME_ID: ClassicThemeId = "gold";
 export function getClassicTheme(id: string | null | undefined): ClassicTheme {
   return CLASSIC_THEMES.find((t) => t.id === id) ?? CLASSIC_THEMES[0];
 }
+
+type EnvelopeImages = { bottom: string; flap: string };
+
+const DEFAULT_ENVELOPE_IMAGES: EnvelopeImages = {
+  bottom: "/templates/classic/envelope-bottom.webp",
+  flap: "/templates/classic/envelope-flap.webp",
+};
+
+// Only themes with dedicated pre-rendered envelope art appear here; every
+// other theme falls back to the default gold-toned envelope images.
+const ENVELOPE_IMAGES_BY_THEME: Partial<Record<ClassicThemeId, EnvelopeImages>> = {
+  rose: {
+    bottom: "/templates/classic/envelope-bottom-pink.webp",
+    flap: "/templates/classic/envelope-flap-pink.webp",
+  },
+};
+
+export function getEnvelopeImages(themeId: ClassicThemeId): EnvelopeImages {
+  return ENVELOPE_IMAGES_BY_THEME[themeId] ?? DEFAULT_ENVELOPE_IMAGES;
+}

@@ -3,16 +3,22 @@ export type ScheduleItem = {
   event: string;
 };
 
-// Placeholder hints shown per-row in the schedule editor - cycled by index so
-// a freshly-started schedule shows three distinct example rows instead of
-// the same "18:00 / Dinner & Ceremony" repeated three times.
+// Placeholder hints shown per-row in the schedule editor - indexed (not
+// cycled) so each of the default rows shows a distinct example instead of
+// an earlier one repeating verbatim.
 export const SCHEDULE_PLACEHOLDERS: ScheduleItem[] = [
   { time: "17:30", event: "賓客入席" },
   { time: "18:00", event: "證婚儀式" },
   { time: "18:30", event: "晚宴開始" },
+  { time: "19:30", event: "敬酒環節" },
+  { time: "20:30", event: "送客" },
 ];
 
-export function emptySchedule(rows = 3): ScheduleItem[] {
+// Shown once a row runs past the example hints above, so extra rows don't
+// start repeating an earlier example verbatim.
+export const SCHEDULE_PLACEHOLDER_FALLBACK: ScheduleItem = { time: "時間", event: "活動項目" };
+
+export function emptySchedule(rows = 5): ScheduleItem[] {
   return Array.from({ length: rows }, () => ({ time: "", event: "" }));
 }
 

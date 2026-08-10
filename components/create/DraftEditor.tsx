@@ -21,6 +21,7 @@ import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import {
   emptySchedule,
   SCHEDULE_PLACEHOLDERS,
+  SCHEDULE_PLACEHOLDER_FALLBACK,
   type ClassicTemplateData,
   type ScheduleItem,
 } from "@/components/templates/classic/types";
@@ -612,7 +613,7 @@ export function DraftEditor() {
                           onChange={(e) =>
                             updateSchedule(i, { time: e.target.value })
                           }
-                          placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].time}
+                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time}
                           className={`${inputClass} w-28`}
                         />
                         <input
@@ -620,7 +621,7 @@ export function DraftEditor() {
                           onChange={(e) =>
                             updateSchedule(i, { event: e.target.value })
                           }
-                          placeholder={SCHEDULE_PLACEHOLDERS[i % SCHEDULE_PLACEHOLDERS.length].event}
+                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event}
                           className={`${inputClass} flex-1`}
                         />
                         <button

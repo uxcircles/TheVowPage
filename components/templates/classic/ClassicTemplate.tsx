@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { EB_Garamond, Noto_Serif_TC } from "next/font/google";
 import "./classic.css";
 import type { ClassicTemplateData } from "./types";
-import { getClassicTheme } from "./themes";
+import { getClassicTheme, getEnvelopeImages } from "./themes";
 import { getSealDesign, getSealImage } from "./seals";
 import { getMomentsStyle } from "./momentsStyles";
 import { ScratchCard } from "./ScratchCard";
@@ -334,6 +334,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const venueLabel = [data.venueName, data.venueHall].filter(Boolean).join(" ・ ");
   const theme = getClassicTheme(data.theme);
   const seal = getSealDesign(data.sealDesign);
+  const envelopeImages = getEnvelopeImages(theme.id);
 
   return (
     <div
@@ -360,12 +361,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           <div className="envelope-bottom-stack">
             <img
               className={`envelope-bottom-frame is-base${envelopeState !== "locked" ? " is-fading-base" : ""}`}
-              src="/templates/classic/envelope-bottom3.png"
+              src={envelopeImages.bottom}
               alt=""
             />
           </div>
           <div className="envelope-top-group">
-            <img className="envelope-flap" src="/templates/classic/envelope-flap.png" alt="" />
+            <img className="envelope-flap" src={envelopeImages.flap} alt="" />
             <button type="button" className="wax-seal" aria-label="拆開信封" onClick={openEnvelope}>
               <img src={getSealImage(seal, theme.id)} alt="" />
             </button>
