@@ -10,7 +10,7 @@ export function MomentsStylePicker({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {MOMENTS_STYLES.map((style) => (
         <button
           key={style.id}

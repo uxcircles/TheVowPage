@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WeddingEditForm } from "@/components/dashboard/WeddingEditForm";
+import { WeddingStylePicker } from "@/components/dashboard/WeddingStylePicker";
+import { MomentsStyleField } from "@/components/dashboard/MomentsStyleField";
 import { PhotoSlot } from "@/components/dashboard/PhotoSlot";
 import { MomentsGallery } from "@/components/dashboard/MomentsGallery";
 import { EditorCard } from "@/components/ui/EditorCard";
@@ -42,6 +44,13 @@ export default async function EditWeddingPage({
   return (
     <div className="flex flex-col gap-10">
       <section>
+        <h2 className="mb-4 text-lg font-medium">喜帖樣板</h2>
+        <EditorCard>
+          <WeddingStylePicker defaultTheme={wedding.theme} defaultSeal={wedding.seal} />
+        </EditorCard>
+      </section>
+
+      <section>
         <h2 className="mb-4 text-lg font-medium">照片</h2>
         <div className="flex flex-col gap-6">
           <EditorCard title="主視覺 / 合影 / 頁尾照片">
@@ -74,6 +83,7 @@ export default async function EditWeddingPage({
               weddingId={weddingId}
               photos={moments.map((p) => ({ id: p.id, url: publicUrl(p.storage_path) }))}
             />
+            <MomentsStyleField defaultValue={wedding.moments_style} />
           </EditorCard>
         </div>
       </section>

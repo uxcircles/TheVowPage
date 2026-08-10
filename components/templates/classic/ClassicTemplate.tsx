@@ -348,6 +348,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           "--ink-soft": theme.inkSoft,
           "--gold": theme.gold,
           "--line": theme.line,
+          "--envelope-shadow-rgb": theme.envelopeShadowRgb,
         } as React.CSSProperties
       }
     >

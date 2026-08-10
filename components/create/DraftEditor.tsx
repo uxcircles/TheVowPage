@@ -340,6 +340,18 @@ export function DraftEditor() {
         </p>
 
         <section className="mt-8">
+          <h2 className="mb-4 text-lg font-medium">喜帖樣板</h2>
+          <EditorCard>
+            <ThemePicker value={draft.theme} onChange={(id) => update("theme", id)} />
+            <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
+            <SealPicker
+              value={draft.sealDesign}
+              onChange={(id) => update("sealDesign", id)}
+            />
+          </EditorCard>
+        </section>
+
+        <section className="mt-10">
           <h2 className="mb-4 text-lg font-medium">照片</h2>
           <div className="flex flex-col gap-6">
             <EditorCard title="主視覺 / 合影 / 頁尾照片">
@@ -395,6 +407,11 @@ export function DraftEditor() {
                   }}
                 />
               </label>
+              <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
+              <MomentsStylePicker
+                value={draft.momentsStyle}
+                onChange={(id) => update("momentsStyle", id)}
+              />
             </EditorCard>
           </div>
         </section>
@@ -402,20 +419,6 @@ export function DraftEditor() {
         <section className="mt-10">
           <h2 className="mb-4 text-lg font-medium">喜帖內容</h2>
           <div className="flex flex-col gap-6">
-            <EditorCard title="喜帖樣板">
-              <ThemePicker value={draft.theme} onChange={(id) => update("theme", id)} />
-              <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
-              <SealPicker
-                value={draft.sealDesign}
-                onChange={(id) => update("sealDesign", id)}
-              />
-              <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
-              <MomentsStylePicker
-                value={draft.momentsStyle}
-                onChange={(id) => update("momentsStyle", id)}
-              />
-            </EditorCard>
-
             <EditorCard title="基本資訊">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className={labelClass}>

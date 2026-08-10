@@ -5,9 +5,6 @@ import { updateWeddingContent } from "@/lib/actions/weddings";
 import { fetchGeocode } from "@/lib/create-wedding-client";
 import { toDatetimeLocalValue, wallTimeToUtcIso } from "@/lib/timezone";
 import { Toggle } from "@/components/ui/Toggle";
-import { ThemePicker } from "@/components/ui/ThemePicker";
-import { SealPicker } from "@/components/ui/SealPicker";
-import { MomentsStylePicker } from "@/components/ui/MomentsStylePicker";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingChrome";
@@ -22,7 +19,11 @@ import {
 
 const inputClass = "rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground";
 const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
-const FORM_ID = "wedding-edit-form";
+
+// Exported so fields that live outside this form in the DOM (the style/seal
+// picker and the Moments-style picker, both rendered in sibling EditorCards
+// on the edit page) can still submit into it via the HTML `form` attribute.
+export const FORM_ID = "wedding-edit-form";
 
 export function WeddingEditForm({
   weddingId,
@@ -48,9 +49,6 @@ export function WeddingEditForm({
     savedSchedule && savedSchedule.length > 0 ? savedSchedule : emptySchedule()
   );
   const [manualCoords, setManualCoords] = useState(false);
-  const [theme, setTheme] = useState(wedding.theme);
-  const [sealDesign, setSealDesign] = useState(wedding.seal);
-  const [momentsStyle, setMomentsStyle] = useState(wedding.moments_style);
   const [showFamily, setShowFamily] = useState(wedding.show_family);
   const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
   const [showRsvp, setShowRsvp] = useState(wedding.show_rsvp);
@@ -104,7 +102,9 @@ export function WeddingEditForm({
   // ClassicTemplateData for the live preview. Most fields here are
   // uncontrolled inputs (defaultValue only), so their live-typed values
   // have to be read via FormData at snapshot time - React state alone
-  // (theme/schedule additions/toggles) doesn't capture them.
+  // (schedule additions/toggles) doesn't capture them. theme/seal/
+  // momentsStyle are rendered by sibling components outside this <form>,
+  // wired in via the HTML `form` attribute, so FormData still picks them up.
   const getPreviewSnapshot = useCallback((): ClassicTemplateData => {
     const fd = new FormData(formRef.current ?? undefined);
     const timezone = previewTimezone ?? wedding.timezone;
@@ -112,9 +112,9 @@ export function WeddingEditForm({
     const events = fd.getAll("scheduleEvent") as string[];
     return {
       weddingId: wedding.id,
-      theme,
-      sealDesign,
-      momentsStyle,
+      theme: String(fd.get("theme") ?? wedding.theme),
+      sealDesign: String(fd.get("seal") ?? wedding.seal),
+      momentsStyle: String(fd.get("momentsStyle") ?? wedding.moments_style),
       groomName: String(fd.get("groomName") ?? ""),
       brideName: String(fd.get("brideName") ?? ""),
       groomParents: String(fd.get("groomParents") ?? ""),
@@ -140,9 +140,6 @@ export function WeddingEditForm({
     };
   }, [
     wedding,
-    theme,
-    sealDesign,
-    momentsStyle,
     previewTimezone,
     locationPreview,
     heroPhotoUrl,
@@ -157,16 +154,6 @@ export function WeddingEditForm({
 
   return (
     <form ref={formRef} id={FORM_ID} action={formAction} className="flex flex-col gap-6">
-      <EditorCard title="喜帖樣板">
-        <input type="hidden" name="theme" value={theme} />
-        <ThemePicker value={theme} onChange={setTheme} />
-        <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
-        <input type="hidden" name="seal" value={sealDesign} />
-        <SealPicker value={sealDesign} onChange={setSealDesign} />
-        <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
-        <input type="hidden" name="momentsStyle" value={momentsStyle} />
-        <MomentsStylePicker value={momentsStyle} onChange={setMomentsStyle} />
-      </EditorCard>
 
       <EditorCard title="基本資訊">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

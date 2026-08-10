@@ -10,6 +10,10 @@ export type ClassicTheme = {
   inkSoft: string;
   gold: string;
   line: string;
+  // Comma-separated "r, g, b" (no rgba() wrapper) so classic.css can plug it
+  // into rgba(var(--envelope-shadow-rgb), <alpha>) at different opacities
+  // for the envelope/wax-seal drop-shadows.
+  envelopeShadowRgb: string;
 };
 
 // These map directly onto the CSS custom properties defined at the .classic
@@ -27,6 +31,7 @@ export const CLASSIC_THEMES: ClassicTheme[] = [
     inkSoft: "#6b6156",
     gold: "#a3835a",
     line: "#ddd1ba",
+    envelopeShadowRgb: "107, 67, 33",
   },
   {
     id: "rose",
@@ -38,6 +43,7 @@ export const CLASSIC_THEMES: ClassicTheme[] = [
     inkSoft: "#8a6a63",
     gold: "#c07f77",
     line: "#e8cfc9",
+    envelopeShadowRgb: "138, 74, 74",
   },
   {
     id: "ink",
@@ -49,6 +55,7 @@ export const CLASSIC_THEMES: ClassicTheme[] = [
     inkSoft: "#5c5a53",
     gold: "#2f2e2b",
     line: "#d8d7d1",
+    envelopeShadowRgb: "45, 43, 38",
   },
 ];
 

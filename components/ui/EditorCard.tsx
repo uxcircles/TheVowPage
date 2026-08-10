@@ -11,16 +11,18 @@ export function EditorCard({
   action,
   children,
 }: {
-  title: string;
+  title?: string;
   action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <section className="rounded-lg border border-[var(--brand-line)] bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h3 className="text-sm font-medium text-foreground">{title}</h3>
-        {action}
-      </div>
+      {(title || action) && (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          {title && <h3 className="text-sm font-medium text-foreground">{title}</h3>}
+          {action}
+        </div>
+      )}
       {children}
     </section>
   );
