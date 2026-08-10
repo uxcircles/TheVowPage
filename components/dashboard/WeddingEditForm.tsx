@@ -329,18 +329,18 @@ export function WeddingEditForm({
                   name="scheduleTime"
                   defaultValue={item.time}
                   placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time}
-                  className={`${inputClass} w-28`}
+                  className={`${inputClass} w-20 shrink-0 sm:w-28`}
                 />
                 <input
                   name="scheduleEvent"
                   defaultValue={item.event}
                   placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event}
-                  className={`${inputClass} flex-1`}
+                  className={`${inputClass} min-w-0 flex-1`}
                 />
                 <button
                   type="button"
                   onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
-                  className="rounded border border-[var(--brand-line)] px-3 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                  className="shrink-0 rounded border border-[var(--brand-line)] px-2 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500 sm:px-3"
                 >
                   刪除
                 </button>

@@ -617,7 +617,7 @@ export function DraftEditor() {
                             updateSchedule(i, { time: e.target.value })
                           }
                           placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time}
-                          className={`${inputClass} w-28`}
+                          className={`${inputClass} w-20 shrink-0 sm:w-28`}
                         />
                         <input
                           value={item.event}
@@ -625,7 +625,7 @@ export function DraftEditor() {
                             updateSchedule(i, { event: e.target.value })
                           }
                           placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event}
-                          className={`${inputClass} flex-1`}
+                          className={`${inputClass} min-w-0 flex-1`}
                         />
                         <button
                           type="button"
@@ -637,7 +637,7 @@ export function DraftEditor() {
                               ),
                             }))
                           }
-                          className="rounded border border-[var(--brand-line)] px-3 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                          className="shrink-0 rounded border border-[var(--brand-line)] px-2 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500 sm:px-3"
                         >
                           刪除
                         </button>
