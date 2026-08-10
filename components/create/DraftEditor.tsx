@@ -16,6 +16,7 @@ import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { Toggle } from "@/components/ui/Toggle";
 import { ThemePicker } from "@/components/ui/ThemePicker";
 import { SealPicker } from "@/components/ui/SealPicker";
+import { MomentsStylePicker } from "@/components/ui/MomentsStylePicker";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import {
   emptySchedule,
@@ -31,6 +32,7 @@ const DEFAULT_TIMEZONE = "Asia/Taipei";
 const EMPTY_DRAFT: DraftContent = {
   theme: "gold",
   sealDesign: "calla",
+  momentsStyle: "stack",
   groomName: "",
   brideName: "",
   groomParents: "",
@@ -248,6 +250,7 @@ export function DraftEditor() {
       weddingId: "",
       theme: draft.theme,
       sealDesign: draft.sealDesign,
+      momentsStyle: draft.momentsStyle,
       groomName: draft.groomName,
       brideName: draft.brideName,
       groomParents: draft.groomParents,
@@ -404,6 +407,11 @@ export function DraftEditor() {
               <SealPicker
                 value={draft.sealDesign}
                 onChange={(id) => update("sealDesign", id)}
+              />
+              <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
+              <MomentsStylePicker
+                value={draft.momentsStyle}
+                onChange={(id) => update("momentsStyle", id)}
               />
             </EditorCard>
 

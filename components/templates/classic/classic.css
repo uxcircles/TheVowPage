@@ -577,6 +577,161 @@
   }
 }
 
+/* ---------- MOMENTS: photo-wall style (v1) ---------- */
+.classic .moments-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 24px 0;
+  column-count: 3;
+  column-gap: 14px;
+}
+.classic .moments-grid img {
+  width: 100%;
+  display: block;
+  margin-bottom: 14px;
+  break-inside: avoid;
+  box-shadow: 0 12px 30px -15px rgba(60, 53, 44, 0.35);
+  cursor: pointer;
+  transition: opacity 1s ease, transform 1s ease, box-shadow 0.25s ease;
+}
+.classic .moments-grid img:hover {
+  box-shadow: 0 16px 36px -14px rgba(60, 53, 44, 0.45);
+}
+@media (max-width: 720px) {
+  .classic .moments-grid {
+    column-count: 2;
+  }
+}
+
+.classic .lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 25, 20, 0.92);
+}
+.classic .lightbox-img {
+  max-width: min(90vw, 900px);
+  max-height: 86vh;
+  width: auto;
+  height: auto;
+  display: block;
+  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+.classic .lightbox-close,
+.classic .lightbox-nav {
+  position: absolute;
+  z-index: 2;
+  background: none;
+  border: none;
+  color: #f8f3e9;
+  cursor: pointer;
+  font-family: var(--classic-font-display), serif;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+  opacity: 0.75;
+}
+.classic .lightbox-close:hover,
+.classic .lightbox-nav:hover {
+  opacity: 1;
+}
+.classic .lightbox-close {
+  top: 22px;
+  right: 24px;
+  font-size: 34px;
+  padding: 6px;
+}
+.classic .lightbox-nav {
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 52px;
+  padding: 10px 16px;
+}
+.classic .lightbox-prev {
+  left: 8px;
+}
+.classic .lightbox-next {
+  right: 8px;
+}
+@media (max-width: 600px) {
+  .classic .lightbox-nav {
+    font-size: 38px;
+    padding: 8px 10px;
+  }
+  .classic .lightbox-close {
+    top: 14px;
+    right: 14px;
+    font-size: 30px;
+  }
+}
+
+/* ---------- MOMENTS: 3D carousel style ---------- */
+.classic .moments-carousel {
+  position: relative;
+  height: min(72vh, 640px);
+  overflow: hidden;
+  padding: 40px 0;
+}
+.classic .carousel-backdrop {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(50px) saturate(1.1);
+  transform: scale(1.2);
+  opacity: 0.85;
+}
+.classic .carousel-stage {
+  position: relative;
+  height: 100%;
+  perspective: 1400px;
+  touch-action: pan-y;
+}
+.classic .carousel-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(60vw, 360px);
+  aspect-ratio: 4 / 5;
+  background: #fff;
+  padding: 10px 10px 10px;
+  border: none;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 26px 55px -20px rgba(60, 53, 44, 0.45);
+  cursor: pointer;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+}
+.classic .carousel-card img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.classic .carousel-counter {
+  position: relative;
+  margin-top: 18px;
+  text-align: center;
+  font-family: var(--classic-font-display), serif;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+@media (max-width: 720px) {
+  .classic .carousel-card.is-far {
+    display: none;
+  }
+  .classic .carousel-card {
+    width: min(64vw, 300px);
+  }
+}
+
 /* ---------- VENUE ---------- */
 .classic section.venue {
   position: relative;

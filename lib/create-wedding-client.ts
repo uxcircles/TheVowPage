@@ -7,6 +7,7 @@ const DEFAULT_TIMEZONE = "Asia/Taipei";
 export type DraftContent = {
   theme: string;
   sealDesign: string;
+  momentsStyle: string;
   groomName: string;
   brideName: string;
   groomParents: string;
@@ -99,6 +100,7 @@ export async function saveDraftAsWedding(
       timezone,
       theme: draft.theme,
       seal: draft.sealDesign,
+      moments_style: draft.momentsStyle,
       venue_name: draft.venueName,
       venue_hall: draft.venueHall,
       venue_address: draft.venueAddress,

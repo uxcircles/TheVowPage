@@ -7,6 +7,7 @@ import { toDatetimeLocalValue, wallTimeToUtcIso } from "@/lib/timezone";
 import { Toggle } from "@/components/ui/Toggle";
 import { ThemePicker } from "@/components/ui/ThemePicker";
 import { SealPicker } from "@/components/ui/SealPicker";
+import { MomentsStylePicker } from "@/components/ui/MomentsStylePicker";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingChrome";
@@ -48,6 +49,7 @@ export function WeddingEditForm({
   const [manualCoords, setManualCoords] = useState(false);
   const [theme, setTheme] = useState(wedding.theme);
   const [sealDesign, setSealDesign] = useState(wedding.seal);
+  const [momentsStyle, setMomentsStyle] = useState(wedding.moments_style);
   const [showFamily, setShowFamily] = useState(wedding.show_family);
   const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
   const [showRsvp, setShowRsvp] = useState(wedding.show_rsvp);
@@ -111,6 +113,7 @@ export function WeddingEditForm({
       weddingId: wedding.id,
       theme,
       sealDesign,
+      momentsStyle,
       groomName: String(fd.get("groomName") ?? ""),
       brideName: String(fd.get("brideName") ?? ""),
       groomParents: String(fd.get("groomParents") ?? ""),
@@ -138,6 +141,7 @@ export function WeddingEditForm({
     wedding,
     theme,
     sealDesign,
+    momentsStyle,
     previewTimezone,
     locationPreview,
     heroPhotoUrl,
@@ -158,6 +162,9 @@ export function WeddingEditForm({
         <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
         <input type="hidden" name="seal" value={sealDesign} />
         <SealPicker value={sealDesign} onChange={setSealDesign} />
+        <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
+        <input type="hidden" name="momentsStyle" value={momentsStyle} />
+        <MomentsStylePicker value={momentsStyle} onChange={setMomentsStyle} />
       </EditorCard>
 
       <EditorCard title="基本資訊">

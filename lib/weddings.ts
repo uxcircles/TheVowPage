@@ -33,6 +33,7 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
     weddingId: wedding.id,
     theme: wedding.theme,
     sealDesign: wedding.seal,
+    momentsStyle: wedding.moments_style,
     groomName: wedding.groom_name,
     brideName: wedding.bride_name,
     groomParents: wedding.groom_parents,

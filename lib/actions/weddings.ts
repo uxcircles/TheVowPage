@@ -104,6 +104,7 @@ export async function updateWeddingContent(
       schedule,
       theme: String(formData.get("theme") ?? "gold").trim(),
       seal: String(formData.get("seal") ?? "calla").trim(),
+      moments_style: String(formData.get("momentsStyle") ?? "stack").trim(),
       show_family: formData.get("showFamily") === "on",
       show_schedule: formData.get("showSchedule") === "on",
       show_rsvp: formData.get("showRsvp") === "on",

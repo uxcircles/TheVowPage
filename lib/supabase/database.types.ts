@@ -149,6 +149,7 @@ export type Database = {
           groom_name: string
           groom_parents: string
           id: string
+          moments_style: string
           owner_id: string
           schedule: Json
           seal: string
@@ -176,6 +177,7 @@ export type Database = {
           groom_name?: string
           groom_parents?: string
           id?: string
+          moments_style?: string
           owner_id: string
           schedule?: Json
           seal?: string
@@ -203,6 +205,7 @@ export type Database = {
           groom_name?: string
           groom_parents?: string
           id?: string
+          moments_style?: string
           owner_id?: string
           schedule?: Json
           seal?: string

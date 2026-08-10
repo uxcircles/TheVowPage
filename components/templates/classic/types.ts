@@ -20,6 +20,7 @@ export type ClassicTemplateData = {
   weddingId: string;
   theme: string;
   sealDesign: string;
+  momentsStyle: string;
   groomName: string;
   brideName: string;
   groomParents: string;

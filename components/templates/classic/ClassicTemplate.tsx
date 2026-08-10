@@ -6,7 +6,10 @@ import "./classic.css";
 import type { ClassicTemplateData } from "./types";
 import { getClassicTheme } from "./themes";
 import { getSealDesign, getSealImage } from "./seals";
+import { getMomentsStyle } from "./momentsStyles";
 import { ScratchCard } from "./ScratchCard";
+import { MomentsGrid } from "./MomentsGrid";
+import { MomentsCarousel } from "./MomentsCarousel";
 import { VenueMap } from "./VenueMap";
 import { RsvpSection } from "./RsvpForm";
 import { useReveal } from "./useReveal";
@@ -57,6 +60,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
 
   const [envelopeState, setEnvelopeState] = useState<"locked" | "opening" | "hidden">("locked");
   const eventDate = data.eventDate ? new Date(data.eventDate) : null;
+  const momentsStyle = getMomentsStyle(data.momentsStyle);
 
   useReveal(rootRef);
 
@@ -95,8 +99,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
     }, 450);
   }
 
-  // Moments: scroll-scrubbed polaroid stack
+  // Moments: scroll-scrubbed polaroid stack (only when that style is
+  // selected - the grid style renders neither ref's DOM node, so this
+  // would no-op anyway via the null checks below, but skipping it outright
+  // avoids attaching scroll/resize listeners that will never do anything)
   useEffect(() => {
+    if (momentsStyle.id !== "stack") return;
     const section = momentsSectionRef.current;
     const viewport = stackViewportRef.current;
     if (!section || !viewport || data.momentPhotoUrls.length === 0) return;
@@ -193,7 +201,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", layout);
     };
-  }, [data.momentPhotoUrls.length]);
+  }, [data.momentPhotoUrls.length, momentsStyle.id]);
 
   // Schedule: flower draws in, then timeline + calendar + footer items
   // reveal. The flower/timeline (wrap/path) are optional - showSchedule can
@@ -420,15 +428,21 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
             <img src="/templates/classic/illus-heart-vine-divider.png" alt="" aria-hidden="true" />
           </div>
           <p className="eyebrow moments-label reveal">moments</p>
-          <section className="moments" ref={momentsSectionRef}>
-            <div className="stack-viewport" ref={stackViewportRef}>
-              {data.momentPhotoUrls.map((url, i) => (
-                <div className="polaroid" key={url + i}>
-                  <img src={url} alt="" />
-                </div>
-              ))}
-            </div>
-          </section>
+          {momentsStyle.id === "grid" ? (
+            <MomentsGrid photoUrls={data.momentPhotoUrls} />
+          ) : momentsStyle.id === "carousel" ? (
+            <MomentsCarousel photoUrls={data.momentPhotoUrls} />
+          ) : (
+            <section className="moments" ref={momentsSectionRef}>
+              <div className="stack-viewport" ref={stackViewportRef}>
+                {data.momentPhotoUrls.map((url, i) => (
+                  <div className="polaroid" key={url + i}>
+                    <img src={url} alt="" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </>
       )}
 
