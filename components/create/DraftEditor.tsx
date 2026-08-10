@@ -36,6 +36,8 @@ const EMPTY_DRAFT: DraftContent = {
   momentsStyle: "stack",
   groomName: "",
   brideName: "",
+  groomLabel: "新郎",
+  brideLabel: "新娘",
   groomParents: "",
   brideParents: "",
   eventDate: "",
@@ -46,9 +48,11 @@ const EMPTY_DRAFT: DraftContent = {
   venueLat: "",
   venueLng: "",
   schedule: emptySchedule(),
+  dressCode: "",
   thanksMessage: "",
   showFamily: true,
   showSchedule: true,
+  showDressCode: true,
   showRsvp: true,
 };
 
@@ -254,6 +258,8 @@ export function DraftEditor() {
       momentsStyle: draft.momentsStyle,
       groomName: draft.groomName,
       brideName: draft.brideName,
+      groomLabel: draft.groomLabel || "新郎",
+      brideLabel: draft.brideLabel || "新娘",
       groomParents: draft.groomParents,
       brideParents: draft.brideParents,
       eventDate: wallTimeToUtcIso(draft.eventDate, timezone),
@@ -268,6 +274,7 @@ export function DraftEditor() {
         locationPreview?.lng ??
         (draft.venueLng ? Number(draft.venueLng) : null),
       schedule: draft.schedule.filter((item) => item.time || item.event),
+      dressCode: draft.dressCode,
       thanksMessage: draft.thanksMessage,
       heroPhotoUrl,
       familyPhotoUrl,
@@ -275,6 +282,7 @@ export function DraftEditor() {
       momentPhotoUrls,
       showFamily: draft.showFamily,
       showSchedule: draft.showSchedule,
+      showDressCode: draft.showDressCode,
       showRsvp: draft.showRsvp,
     });
 
@@ -374,7 +382,12 @@ export function DraftEditor() {
               </div>
             </EditorCard>
             <EditorCard title="婚紗相簿（Moments）">
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <p className="mb-2 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
+              <MomentsStylePicker
+                value={draft.momentsStyle}
+                onChange={(id) => update("momentsStyle", id)}
+              />
+              <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {photos.moments.map((file, i) => (
                   <MomentThumb
                     key={i}
@@ -407,11 +420,6 @@ export function DraftEditor() {
                   }}
                 />
               </label>
-              <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
-              <MomentsStylePicker
-                value={draft.momentsStyle}
-                onChange={(id) => update("momentsStyle", id)}
-              />
             </EditorCard>
           </div>
         </section>
@@ -421,8 +429,28 @@ export function DraftEditor() {
           <div className="flex flex-col gap-6">
             <EditorCard title="基本資訊">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {/* Editable role labels (default 新郎/新娘) so the
+                    invitation can read correctly for same-sex couples too,
+                    e.g. "新人一/新人二" - they double as the field labels
+                    below via live state. */}
                 <label className={labelClass}>
-                  新郎姓名
+                  稱謂（例如：新郎、新人一）
+                  <input
+                    value={draft.groomLabel}
+                    onChange={(e) => update("groomLabel", e.target.value)}
+                    className={inputClass}
+                  />
+                </label>
+                <label className={labelClass}>
+                  稱謂（例如：新娘、新人二）
+                  <input
+                    value={draft.brideLabel}
+                    onChange={(e) => update("brideLabel", e.target.value)}
+                    className={inputClass}
+                  />
+                </label>
+                <label className={labelClass}>
+                  {draft.groomLabel || "新郎"}姓名
                   <input
                     value={draft.groomName}
                     onChange={(e) => update("groomName", e.target.value)}
@@ -430,7 +458,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  新娘姓名
+                  {draft.brideLabel || "新娘"}姓名
                   <input
                     value={draft.brideName}
                     onChange={(e) => update("brideName", e.target.value)}
@@ -453,20 +481,20 @@ export function DraftEditor() {
               {draft.showFamily ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className={labelClass}>
-                    新郎雙親
+                    {draft.groomLabel || "新郎"}雙親
                     <input
                       value={draft.groomParents}
                       onChange={(e) => update("groomParents", e.target.value)}
-                      placeholder="林建平・王淑芬　之子"
+                      placeholder="林建平・王淑芬"
                       className={inputClass}
                     />
                   </label>
                   <label className={labelClass}>
-                    新娘雙親
+                    {draft.brideLabel || "新娘"}雙親
                     <input
                       value={draft.brideParents}
                       onChange={(e) => update("brideParents", e.target.value)}
-                      placeholder="黃文昌・李美玲　之女"
+                      placeholder="黃文昌・李美玲"
                       className={inputClass}
                     />
                   </label>
@@ -657,6 +685,29 @@ export function DraftEditor() {
                     + 新增流程項目
                   </button>
                 </>
+              ) : (
+                <HiddenSectionHint />
+              )}
+            </EditorCard>
+
+            <EditorCard
+              title="Dress Code"
+              action={
+                <Toggle
+                  checked={draft.showDressCode}
+                  onChange={(v) => update("showDressCode", v)}
+                  label="顯示"
+                />
+              }
+            >
+              {draft.showDressCode ? (
+                <textarea
+                  value={draft.dressCode}
+                  onChange={(e) => update("dressCode", e.target.value)}
+                  placeholder="建議服裝：香檳金、酒紅色系，避免純白色系"
+                  rows={2}
+                  className={`${inputClass} w-full`}
+                />
               ) : (
                 <HiddenSectionHint />
               )}

@@ -83,6 +83,8 @@ export function WeddingChrome({
   weddingId,
   groomName,
   brideName,
+  groomLabel,
+  brideLabel,
   slug,
   status,
   tabs,
@@ -91,6 +93,8 @@ export function WeddingChrome({
   weddingId: string;
   groomName: string;
   brideName: string;
+  groomLabel: string;
+  brideLabel: string;
   slug: string;
   status: string;
   tabs: { href: string; label: string }[];
@@ -153,7 +157,7 @@ export function WeddingChrome({
           <div className="mx-auto max-w-4xl pt-5">
             <div className="flex items-start justify-between gap-4">
               <h1 className="text-2xl font-medium text-foreground">
-                {groomName || "新郎"} ＆ {brideName || "新娘"}
+                {groomName || groomLabel} ＆ {brideName || brideLabel}
               </h1>
               <button
                 type="button"

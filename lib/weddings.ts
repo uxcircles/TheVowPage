@@ -36,6 +36,8 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
     momentsStyle: wedding.moments_style,
     groomName: wedding.groom_name,
     brideName: wedding.bride_name,
+    groomLabel: wedding.groom_label,
+    brideLabel: wedding.bride_label,
     groomParents: wedding.groom_parents,
     brideParents: wedding.bride_parents,
     eventDate: wedding.event_date,
@@ -46,6 +48,7 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
     venueLat: wedding.venue_lat,
     venueLng: wedding.venue_lng,
     schedule: (wedding.schedule as ScheduleItem[] | null) ?? [],
+    dressCode: wedding.dress_code,
     thanksMessage: wedding.thanks_message,
     heroPhotoUrl: heroPhoto ? publicUrl(heroPhoto.storage_path) : null,
     familyPhotoUrl: familyPhoto ? publicUrl(familyPhoto.storage_path) : null,
@@ -53,6 +56,7 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
     momentPhotoUrls: moments.map((p) => publicUrl(p.storage_path)),
     showFamily: wedding.show_family,
     showSchedule: wedding.show_schedule,
+    showDressCode: wedding.show_dress_code,
     showRsvp: wedding.show_rsvp,
   };
 }

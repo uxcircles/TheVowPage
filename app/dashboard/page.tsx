@@ -11,7 +11,7 @@ export default async function DashboardPage() {
 
   const { data: weddings } = await supabase
     .from("weddings")
-    .select("id, slug, groom_name, bride_name, status, updated_at")
+    .select("id, slug, groom_name, bride_name, groom_label, bride_label, status, updated_at")
     .eq("owner_id", user!.id)
     .order("updated_at", { ascending: false });
 
@@ -42,7 +42,7 @@ export default async function DashboardPage() {
             <Link href={`/dashboard/${w.id}/edit`} className="flex flex-1 items-center justify-between">
               <span>
                 <span className="font-medium">
-                  {w.groom_name || "新郎"} ＆ {w.bride_name || "新娘"}
+                  {w.groom_name || w.groom_label} ＆ {w.bride_name || w.bride_label}
                 </span>
                 <span className="ml-3 text-sm text-[var(--brand-ink-soft)]">/w/{w.slug}</span>
               </span>

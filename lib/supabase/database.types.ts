@@ -142,10 +142,13 @@ export type Database = {
       }
       weddings: {
         Row: {
+          bride_label: string
           bride_name: string
           bride_parents: string
           created_at: string
+          dress_code: string
           event_date: string | null
+          groom_label: string
           groom_name: string
           groom_parents: string
           id: string
@@ -153,6 +156,7 @@ export type Database = {
           owner_id: string
           schedule: Json
           seal: string
+          show_dress_code: boolean
           show_family: boolean
           show_rsvp: boolean
           show_schedule: boolean
@@ -170,10 +174,13 @@ export type Database = {
           venue_name: string
         }
         Insert: {
+          bride_label?: string
           bride_name?: string
           bride_parents?: string
           created_at?: string
+          dress_code?: string
           event_date?: string | null
+          groom_label?: string
           groom_name?: string
           groom_parents?: string
           id?: string
@@ -181,6 +188,7 @@ export type Database = {
           owner_id: string
           schedule?: Json
           seal?: string
+          show_dress_code?: boolean
           show_family?: boolean
           show_rsvp?: boolean
           show_schedule?: boolean
@@ -198,10 +206,13 @@ export type Database = {
           venue_name?: string
         }
         Update: {
+          bride_label?: string
           bride_name?: string
           bride_parents?: string
           created_at?: string
+          dress_code?: string
           event_date?: string | null
+          groom_label?: string
           groom_name?: string
           groom_parents?: string
           id?: string
@@ -209,6 +220,7 @@ export type Database = {
           owner_id?: string
           schedule?: Json
           seal?: string
+          show_dress_code?: boolean
           show_family?: boolean
           show_rsvp?: boolean
           show_schedule?: boolean

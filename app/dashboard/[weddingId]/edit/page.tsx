@@ -79,11 +79,13 @@ export default async function EditWeddingPage({
             </div>
           </EditorCard>
           <EditorCard title="婚紗相簿（Moments）">
-            <MomentsGallery
-              weddingId={weddingId}
-              photos={moments.map((p) => ({ id: p.id, url: publicUrl(p.storage_path) }))}
-            />
             <MomentsStyleField defaultValue={wedding.moments_style} />
+            <div className="mt-6">
+              <MomentsGallery
+                weddingId={weddingId}
+                photos={moments.map((p) => ({ id: p.id, url: publicUrl(p.storage_path) }))}
+              />
+            </div>
           </EditorCard>
         </div>
       </section>

@@ -37,11 +37,6 @@ export function MomentsCarousel({ photoUrls }: { photoUrls: string[] }) {
   return (
     <div className="moments-carousel">
       <div
-        className="carousel-backdrop"
-        style={{ backgroundImage: `url(${photoUrls[centerIndex]})` }}
-        aria-hidden="true"
-      />
-      <div
         className="carousel-stage"
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}

@@ -11,7 +11,7 @@ export function MomentsStyleField({ defaultValue }: { defaultValue: string }) {
   const [momentsStyle, setMomentsStyle] = useState(defaultValue);
 
   return (
-    <div className="mt-6">
+    <div>
       <p className="mb-2 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
       <input type="hidden" name="momentsStyle" value={momentsStyle} form={FORM_ID} />
       <MomentsStylePicker value={momentsStyle} onChange={setMomentsStyle} />

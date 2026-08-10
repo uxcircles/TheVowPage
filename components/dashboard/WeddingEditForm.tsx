@@ -49,8 +49,11 @@ export function WeddingEditForm({
     savedSchedule && savedSchedule.length > 0 ? savedSchedule : emptySchedule()
   );
   const [manualCoords, setManualCoords] = useState(false);
+  const [groomLabel, setGroomLabel] = useState(wedding.groom_label);
+  const [brideLabel, setBrideLabel] = useState(wedding.bride_label);
   const [showFamily, setShowFamily] = useState(wedding.show_family);
   const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
+  const [showDressCode, setShowDressCode] = useState(wedding.show_dress_code);
   const [showRsvp, setShowRsvp] = useState(wedding.show_rsvp);
 
   const venueNameRef = useRef<HTMLInputElement>(null);
@@ -117,6 +120,8 @@ export function WeddingEditForm({
       momentsStyle: String(fd.get("momentsStyle") ?? wedding.moments_style),
       groomName: String(fd.get("groomName") ?? ""),
       brideName: String(fd.get("brideName") ?? ""),
+      groomLabel: groomLabel || "新郎",
+      brideLabel: brideLabel || "新娘",
       groomParents: String(fd.get("groomParents") ?? ""),
       brideParents: String(fd.get("brideParents") ?? ""),
       eventDate: wallTimeToUtcIso(String(fd.get("eventDate") ?? ""), timezone),
@@ -129,6 +134,7 @@ export function WeddingEditForm({
       schedule: times
         .map((time, i) => ({ time, event: events[i] ?? "" }))
         .filter((item) => item.time || item.event),
+      dressCode: String(fd.get("dressCode") ?? ""),
       thanksMessage: String(fd.get("thanksMessage") ?? ""),
       heroPhotoUrl,
       familyPhotoUrl,
@@ -136,6 +142,7 @@ export function WeddingEditForm({
       momentPhotoUrls,
       showFamily,
       showSchedule,
+      showDressCode,
       showRsvp,
     };
   }, [
@@ -146,8 +153,11 @@ export function WeddingEditForm({
     familyPhotoUrl,
     footerPhotoUrl,
     momentPhotoUrls,
+    groomLabel,
+    brideLabel,
     showFamily,
     showSchedule,
+    showDressCode,
     showRsvp,
   ]);
   useEditPreview(getPreviewSnapshot);
@@ -162,12 +172,33 @@ export function WeddingEditForm({
             <input name="slug" defaultValue={wedding.slug} required className={inputClass} />
           </label>
           <div />
+          {/* Editable role labels (default 新郎/新娘) so the invitation can
+              read correctly for same-sex couples too, e.g. "新人一/新人二" -
+              they double as the field labels below via live state. */}
           <label className={labelClass}>
-            新郎姓名
+            稱謂（例如：新郎、新人一）
+            <input
+              name="groomLabel"
+              value={groomLabel}
+              onChange={(e) => setGroomLabel(e.target.value)}
+              className={inputClass}
+            />
+          </label>
+          <label className={labelClass}>
+            稱謂（例如：新娘、新人二）
+            <input
+              name="brideLabel"
+              value={brideLabel}
+              onChange={(e) => setBrideLabel(e.target.value)}
+              className={inputClass}
+            />
+          </label>
+          <label className={labelClass}>
+            {groomLabel || "新郎"}姓名
             <input name="groomName" defaultValue={wedding.groom_name} className={inputClass} />
           </label>
           <label className={labelClass}>
-            新娘姓名
+            {brideLabel || "新娘"}姓名
             <input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />
           </label>
         </div>
@@ -183,20 +214,20 @@ export function WeddingEditForm({
             hidden form fields still submit their value normally. */}
         <div className={showFamily ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "hidden"}>
           <label className={labelClass}>
-            新郎雙親
+            {groomLabel || "新郎"}雙親
             <input
               name="groomParents"
               defaultValue={wedding.groom_parents}
-              placeholder="林建平・王淑芬　之子"
+              placeholder="林建平・王淑芬"
               className={inputClass}
             />
           </label>
           <label className={labelClass}>
-            新娘雙親
+            {brideLabel || "新娘"}雙親
             <input
               name="brideParents"
               defaultValue={wedding.bride_parents}
-              placeholder="黃文昌・李美玲　之女"
+              placeholder="黃文昌・李美玲"
               className={inputClass}
             />
           </label>
@@ -356,6 +387,23 @@ export function WeddingEditForm({
           </button>
         </div>
         {!showSchedule && <HiddenSectionHint />}
+      </EditorCard>
+
+      <EditorCard
+        title="Dress Code"
+        action={<Toggle checked={showDressCode} onChange={setShowDressCode} label="顯示" />}
+      >
+        <input type="hidden" name="showDressCode" value={showDressCode ? "on" : "off"} />
+        <div className={showDressCode ? "" : "hidden"}>
+          <textarea
+            name="dressCode"
+            defaultValue={wedding.dress_code}
+            placeholder="建議服裝：香檳金、酒紅色系，避免純白色系"
+            rows={2}
+            className={`${inputClass} w-full`}
+          />
+        </div>
+        {!showDressCode && <HiddenSectionHint />}
       </EditorCard>
 
       <EditorCard

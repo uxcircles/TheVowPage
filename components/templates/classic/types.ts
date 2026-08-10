@@ -29,6 +29,8 @@ export type ClassicTemplateData = {
   momentsStyle: string;
   groomName: string;
   brideName: string;
+  groomLabel: string;
+  brideLabel: string;
   groomParents: string;
   brideParents: string;
   eventDate: string | null; // ISO timestamp
@@ -39,6 +41,7 @@ export type ClassicTemplateData = {
   venueLat: number | null;
   venueLng: number | null;
   schedule: ScheduleItem[];
+  dressCode: string;
   thanksMessage: string;
   heroPhotoUrl: string | null;
   familyPhotoUrl: string | null;
@@ -46,5 +49,6 @@ export type ClassicTemplateData = {
   momentPhotoUrls: string[];
   showFamily: boolean;
   showSchedule: boolean;
+  showDressCode: boolean;
   showRsvp: boolean;
 };

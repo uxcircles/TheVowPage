@@ -10,6 +10,8 @@ export type DraftContent = {
   momentsStyle: string;
   groomName: string;
   brideName: string;
+  groomLabel: string;
+  brideLabel: string;
   groomParents: string;
   brideParents: string;
   eventDate: string; // datetime-local value, wall clock in the venue's timezone
@@ -20,9 +22,11 @@ export type DraftContent = {
   venueLat: string;
   venueLng: string;
   schedule: ScheduleItem[];
+  dressCode: string;
   thanksMessage: string;
   showFamily: boolean;
   showSchedule: boolean;
+  showDressCode: boolean;
   showRsvp: boolean;
 };
 
@@ -94,6 +98,8 @@ export async function saveDraftAsWedding(
       slug: `wedding-${randomSlugSuffix()}`,
       groom_name: draft.groomName,
       bride_name: draft.brideName,
+      groom_label: draft.groomLabel.trim() || "新郎",
+      bride_label: draft.brideLabel.trim() || "新娘",
       groom_parents: draft.groomParents,
       bride_parents: draft.brideParents,
       event_date: wallTimeToUtcIso(draft.eventDate, timezone),
@@ -107,9 +113,11 @@ export async function saveDraftAsWedding(
       venue_lat: venueLat,
       venue_lng: venueLng,
       schedule: draft.schedule.filter((item) => item.time || item.event),
+      dress_code: draft.dressCode,
       thanks_message: draft.thanksMessage,
       show_family: draft.showFamily,
       show_schedule: draft.showSchedule,
+      show_dress_code: draft.showDressCode,
       show_rsvp: draft.showRsvp,
     })
     .select("id")

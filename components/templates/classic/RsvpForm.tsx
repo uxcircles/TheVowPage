@@ -126,7 +126,7 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
             </div>
           )}
           <label>
-            給新郎新娘的話
+            給新人的話
             <textarea name="message" rows={4} placeholder="想對他們說的話" />
           </label>
           <button type="submit" className="rsvp-submit" disabled={submitting}>

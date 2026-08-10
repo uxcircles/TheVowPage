@@ -17,7 +17,7 @@ export default async function WeddingLayout({
 
   const { data: wedding } = await supabase
     .from("weddings")
-    .select("id, groom_name, bride_name, status, slug")
+    .select("id, groom_name, bride_name, groom_label, bride_label, status, slug")
     .eq("id", weddingId)
     .eq("owner_id", user?.id ?? "")
     .maybeSingle();
@@ -35,6 +35,8 @@ export default async function WeddingLayout({
       weddingId={weddingId}
       groomName={wedding.groom_name}
       brideName={wedding.bride_name}
+      groomLabel={wedding.groom_label}
+      brideLabel={wedding.bride_label}
       slug={wedding.slug}
       status={wedding.status}
       tabs={tabs}

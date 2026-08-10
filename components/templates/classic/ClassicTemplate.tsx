@@ -393,7 +393,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         </div>
         <p className="eyebrow reveal">wedding invitation</p>
         <p className="name-logo reveal">
-          {data.groomName || "新郎"} ＆ {data.brideName || "新娘"}
+          {data.groomName || data.groomLabel} ＆ {data.brideName || data.brideLabel}
         </p>
       </section>
 
@@ -404,14 +404,14 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           <p className="eyebrow reveal">our families</p>
           <div className="family-grid">
             <div className="side reveal">
-              <p className="role">新郎</p>
-              <p className="name">{data.groomName || "新郎"}</p>
+              <p className="role">{data.groomLabel}</p>
+              <p className="name">{data.groomName || data.groomLabel}</p>
               <p className="parents">{data.groomParents}</p>
             </div>
             <div className="amp reveal">&amp;</div>
             <div className="side reveal">
-              <p className="role">新娘</p>
-              <p className="name">{data.brideName || "新娘"}</p>
+              <p className="role">{data.brideLabel}</p>
+              <p className="name">{data.brideName || data.brideLabel}</p>
               <p className="parents">{data.brideParents}</p>
             </div>
           </div>
@@ -521,6 +521,13 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           aria-hidden="true"
         />
       </section>
+
+      {data.showDressCode && data.dressCode && (
+        <section className="dress-code">
+          <p className="eyebrow reveal">dress code</p>
+          <p className="dress-code-text reveal">{data.dressCode}</p>
+        </section>
+      )}
 
       {data.showRsvp && <RsvpSection weddingId={data.weddingId} />}
 

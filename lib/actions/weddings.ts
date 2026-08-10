@@ -89,6 +89,8 @@ export async function updateWeddingContent(
       slug,
       groom_name: String(formData.get("groomName") ?? "").trim(),
       bride_name: String(formData.get("brideName") ?? "").trim(),
+      groom_label: String(formData.get("groomLabel") ?? "").trim() || "新郎",
+      bride_label: String(formData.get("brideLabel") ?? "").trim() || "新娘",
       groom_parents: String(formData.get("groomParents") ?? "").trim(),
       bride_parents: String(formData.get("brideParents") ?? "").trim(),
       // The datetime-local input has no timezone of its own; treat it as
@@ -107,6 +109,8 @@ export async function updateWeddingContent(
       moments_style: String(formData.get("momentsStyle") ?? "stack").trim(),
       show_family: formData.get("showFamily") === "on",
       show_schedule: formData.get("showSchedule") === "on",
+      dress_code: String(formData.get("dressCode") ?? "").trim(),
+      show_dress_code: formData.get("showDressCode") === "on",
       show_rsvp: formData.get("showRsvp") === "on",
       thanks_message: String(formData.get("thanksMessage") ?? "").trim(),
     })
