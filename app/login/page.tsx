@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { signIn } from "@/lib/actions/auth";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(signIn, undefined);
@@ -10,10 +11,19 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm">
-        <h1 className="text-center text-2xl font-medium text-[var(--brand-gold)]">The Vow Page 諾頁</h1>
+        <h1 className="text-center text-2xl font-medium text-[var(--brand-gold)]">The Vow Page 摯頁</h1>
         <p className="mt-2 text-center text-sm text-[var(--brand-ink-soft)]">登入你的帳號</p>
 
-        <form action={formAction} className="mt-8 flex flex-col gap-4">
+        <div className="mt-8">
+          <GoogleAuthButton label="使用 Google 登入" />
+        </div>
+        <div className="my-6 flex items-center gap-3 text-xs text-[var(--brand-ink-soft)]">
+          <span className="h-px flex-1 bg-[var(--brand-line)]" />
+          或
+          <span className="h-px flex-1 bg-[var(--brand-line)]" />
+        </div>
+
+        <form action={formAction} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]">
             Email
             <input

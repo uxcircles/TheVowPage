@@ -332,7 +332,7 @@ export function DraftEditor() {
     <>
       <header className="flex items-center justify-between px-6 py-5">
         <Link href="/" className="text-lg font-medium text-[var(--brand-gold)]">
-          The Vow Page 諾頁
+          The Vow Page 摯頁
         </Link>
         <Link
           href="/login"
@@ -382,12 +382,7 @@ export function DraftEditor() {
               </div>
             </EditorCard>
             <EditorCard title="婚紗相簿（Moments）">
-              <p className="mb-2 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
-              <MomentsStylePicker
-                value={draft.momentsStyle}
-                onChange={(id) => update("momentsStyle", id)}
-              />
-              <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {photos.moments.map((file, i) => (
                   <MomentThumb
                     key={i}
@@ -401,7 +396,11 @@ export function DraftEditor() {
                   />
                 ))}
               </div>
-              <label className="mt-4 inline-block cursor-pointer rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
+              <label
+                className={`inline-block cursor-pointer rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] ${
+                  photos.moments.length > 0 ? "mt-4" : ""
+                }`}
+              >
                 + 新增照片（可多選）
                 <input
                   ref={momentsInputRef}
@@ -420,6 +419,11 @@ export function DraftEditor() {
                   }}
                 />
               </label>
+              <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
+              <MomentsStylePicker
+                value={draft.momentsStyle}
+                onChange={(id) => update("momentsStyle", id)}
+              />
             </EditorCard>
           </div>
         </section>
@@ -691,7 +695,7 @@ export function DraftEditor() {
             </EditorCard>
 
             <EditorCard
-              title="Dress Code"
+              title="服裝建議"
               action={
                 <Toggle
                   checked={draft.showDressCode}
@@ -758,7 +762,14 @@ export function DraftEditor() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowPreview(true)}
+                onClick={() => {
+                  setShowPreview(true);
+                  // The preview swaps in fresh content under the same
+                  // window scroll position, so without this it can open
+                  // wherever the editor form happened to be scrolled to
+                  // instead of the envelope at the top.
+                  window.scrollTo({ top: 0, behavior: "instant" });
+                }}
                 className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90"
               >
                 預覽喜帖

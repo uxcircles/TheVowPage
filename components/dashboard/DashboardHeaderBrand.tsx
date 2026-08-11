@@ -21,7 +21,7 @@ export function DashboardHeaderBrand() {
 
   return (
     <Link href="/dashboard" className="text-lg font-medium text-[var(--brand-gold)]">
-      The Vow Page 諾頁
+      The Vow Page 摯頁
     </Link>
   );
 }

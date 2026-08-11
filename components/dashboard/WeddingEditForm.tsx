@@ -390,7 +390,7 @@ export function WeddingEditForm({
       </EditorCard>
 
       <EditorCard
-        title="Dress Code"
+        title="服裝建議"
         action={<Toggle checked={showDressCode} onChange={setShowDressCode} label="顯示" />}
       >
         <input type="hidden" name="showDressCode" value={showDressCode ? "on" : "off"} />

@@ -9,7 +9,7 @@ const notoSansTC = Noto_Sans_TC({
 });
 
 export const metadata: Metadata = {
-  title: "The Vow Page 諾頁｜線上電子喜帖平台",
+  title: "The Vow Page 摯頁｜線上電子喜帖平台",
   description: "為新人打造的電子喜帖平台：挑選模板、編輯內容、管理賓客與 RSVP、分享婚紗相簿。",
 };
 

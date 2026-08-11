@@ -154,6 +154,8 @@ export type Database = {
           id: string
           moments_style: string
           owner_id: string
+          paid_at: string | null
+          plan: string
           schedule: Json
           seal: string
           show_dress_code: boolean
@@ -162,6 +164,7 @@ export type Database = {
           show_schedule: boolean
           slug: string
           status: string
+          stripe_checkout_session_id: string | null
           template_id: string
           thanks_message: string
           theme: string
@@ -186,6 +189,8 @@ export type Database = {
           id?: string
           moments_style?: string
           owner_id: string
+          paid_at?: string | null
+          plan?: string
           schedule?: Json
           seal?: string
           show_dress_code?: boolean
@@ -194,6 +199,7 @@ export type Database = {
           show_schedule?: boolean
           slug: string
           status?: string
+          stripe_checkout_session_id?: string | null
           template_id?: string
           thanks_message?: string
           theme?: string
@@ -218,6 +224,8 @@ export type Database = {
           id?: string
           moments_style?: string
           owner_id?: string
+          paid_at?: string | null
+          plan?: string
           schedule?: Json
           seal?: string
           show_dress_code?: boolean
@@ -226,6 +234,7 @@ export type Database = {
           show_schedule?: boolean
           slug?: string
           status?: string
+          stripe_checkout_session_id?: string | null
           template_id?: string
           thanks_message?: string
           theme?: string

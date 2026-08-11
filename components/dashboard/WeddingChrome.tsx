@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { setWeddingStatus } from "@/lib/actions/weddings";
+import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import type { ClassicTemplateData } from "@/components/templates/classic/types";
 
@@ -87,6 +88,7 @@ export function WeddingChrome({
   brideLabel,
   slug,
   status,
+  plan,
   tabs,
   children,
 }: {
@@ -97,6 +99,7 @@ export function WeddingChrome({
   brideLabel: string;
   slug: string;
   status: string;
+  plan: string;
   tabs: { href: string; label: string }[];
   children: React.ReactNode;
 }) {
@@ -113,9 +116,27 @@ export function WeddingChrome({
   );
   const [isPublished, setIsPublished] = useState(status === "published");
   const [publishPending, startPublishTransition] = useTransition();
+  const [checkoutError, setCheckoutError] = useState("");
   const publicPath = `/w/${slug}`;
+  const isPaid = plan !== "draft";
 
   function togglePublish() {
+    // Turning it on for the first time on a still-draft (unpaid) plan sends
+    // the couple to Stripe Checkout instead of publishing directly; the
+    // webhook flips `plan` once payment succeeds, and this button becomes a
+    // normal publish toggle from then on.
+    if (!isPublished && !isPaid) {
+      setCheckoutError("");
+      startPublishTransition(async () => {
+        const result = await createCheckoutSession(weddingId);
+        if ("error" in result) {
+          setCheckoutError(result.error);
+        } else {
+          window.location.href = result.url;
+        }
+      });
+      return;
+    }
     const next = isPublished ? "draft" : "published";
     startPublishTransition(async () => {
       await setWeddingStatus(weddingId, next);
@@ -126,6 +147,10 @@ export function WeddingChrome({
   function handlePreviewClick() {
     if (previewSnapshot) {
       setPreviewData(previewSnapshot());
+      // The preview reuses the real window scroll (not a new scroll
+      // container), so without this it opens wherever the editor form
+      // happened to be scrolled to instead of the envelope at the top.
+      window.scrollTo({ top: 0, behavior: "instant" });
     } else {
       window.open(publicPath, "_blank", "noopener");
     }
@@ -165,9 +190,16 @@ export function WeddingChrome({
                 onClick={togglePublish}
                 className="shrink-0 rounded bg-[var(--brand-gold)] px-5 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-60"
               >
-                {publishPending ? "處理中..." : isPublished ? "取消發布" : "發布喜帖"}
+                {publishPending
+                  ? "處理中..."
+                  : isPublished
+                    ? "取消發布"
+                    : isPaid
+                      ? "發布喜帖"
+                      : "付費解鎖發布"}
               </button>
             </div>
+            {checkoutError && <p className="mt-2 text-sm text-red-600">{checkoutError}</p>}
             <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
               <span className="flex items-center gap-1.5">
                 <span

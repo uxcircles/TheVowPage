@@ -545,7 +545,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           {data.groomName}　＆　{data.brideName}
         </p>
         <p className="credit" ref={footerCreditRef}>
-          Made with The Vow Page 諾頁
+          Made with The Vow Page 摯頁
         </p>
       </footer>
     </div>

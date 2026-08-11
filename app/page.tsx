@@ -37,7 +37,7 @@ export default function Home() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="flex items-center justify-between border-b border-[var(--brand-line)]/60 px-6 py-5 sm:px-10">
-        <span className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>The Vow Page 諾頁</span>
+        <span className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>The Vow Page 摯頁</span>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/login" className="text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]">
             登入
@@ -154,7 +154,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-[var(--brand-line)]/60 px-6 py-8 text-center text-xs text-[var(--brand-ink-soft)]">
-        © {new Date().getFullYear()} The Vow Page 諾頁
+        © {new Date().getFullYear()} The Vow Page 摯頁
       </footer>
     </div>
   );

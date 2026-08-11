@@ -16,26 +16,38 @@ export const SEAL_DESIGNS: SealDesign[] = [
   {
     id: "calla",
     name: "海芋",
-    image: "/templates/classic/wax-seal.png",
-    imageByTheme: { rose: "/templates/classic/wax-seal-calla-pink.png" },
+    image: "/templates/classic/wax-seal.webp",
+    imageByTheme: {
+      rose: "/templates/classic/wax-seal-calla-pink.webp",
+      blue: "/templates/classic/wax-seal-calla-blue.webp",
+    },
   },
   {
     id: "rose",
     name: "玫瑰",
-    image: "/templates/classic/wax-seal-rose.png",
-    imageByTheme: { rose: "/templates/classic/wax-seal-rose-pink.png" },
+    image: "/templates/classic/wax-seal-rose.webp",
+    imageByTheme: {
+      rose: "/templates/classic/wax-seal-rose-pink.webp",
+      blue: "/templates/classic/wax-seal-rose-blue.webp",
+    },
   },
   {
     id: "forget-me-not",
     name: "勿忘我",
-    image: "/templates/classic/wax-seal-forget-me-not.png",
-    imageByTheme: { rose: "/templates/classic/wax-seal-forget-me-not-pink.png" },
+    image: "/templates/classic/wax-seal-forget-me-not.webp",
+    imageByTheme: {
+      rose: "/templates/classic/wax-seal-forget-me-not-pink.webp",
+      blue: "/templates/classic/wax-seal-forget-me-not-blue.webp",
+    },
   },
   {
     id: "hydrangea",
     name: "繡球花",
-    image: "/templates/classic/wax-seal-hydrangea.png",
-    imageByTheme: { rose: "/templates/classic/wax-seal-hydrangea-pink.png" },
+    image: "/templates/classic/wax-seal-hydrangea.webp",
+    imageByTheme: {
+      rose: "/templates/classic/wax-seal-hydrangea-pink.webp",
+      blue: "/templates/classic/wax-seal-hydrangea-blue.webp",
+    },
   },
 ];
 

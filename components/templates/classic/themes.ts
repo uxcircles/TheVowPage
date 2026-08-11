@@ -1,4 +1,4 @@
-export type ClassicThemeId = "gold" | "rose" | "ink";
+export type ClassicThemeId = "gold" | "rose" | "blue";
 
 export type ClassicTheme = {
   id: ClassicThemeId;
@@ -46,16 +46,16 @@ export const CLASSIC_THEMES: ClassicTheme[] = [
     envelopeShadowRgb: "138, 74, 74",
   },
   {
-    id: "ink",
-    name: "墨韻極簡",
-    tagline: "深墨留白，低調高雅",
-    cream: "#f4f4f2",
-    creamDeep: "#e2e1dc",
-    ink: "#25241f",
-    inkSoft: "#5c5a53",
-    gold: "#2f2e2b",
-    line: "#d8d7d1",
-    envelopeShadowRgb: "45, 43, 38",
+    id: "blue",
+    name: "晨霧灰藍",
+    tagline: "灰藍靜謐，優雅清新",
+    cream: "#eef3f4",
+    creamDeep: "#dbe7ea",
+    ink: "#2d3f45",
+    inkSoft: "#62787d",
+    gold: "#6f97a3",
+    line: "#c3d8dc",
+    envelopeShadowRgb: "61, 83, 90",
   },
 ];
 
@@ -78,6 +78,10 @@ const ENVELOPE_IMAGES_BY_THEME: Partial<Record<ClassicThemeId, EnvelopeImages>> 
   rose: {
     bottom: "/templates/classic/envelope-bottom-pink.webp",
     flap: "/templates/classic/envelope-flap-pink.webp",
+  },
+  blue: {
+    bottom: "/templates/classic/envelope-bottom-blue.webp",
+    flap: "/templates/classic/envelope-flap-blue.webp",
   },
 };
 

@@ -63,7 +63,11 @@ export function MomentsGallery({
           </div>
         ))}
       </div>
-      <label className="mt-4 inline-block cursor-pointer rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
+      <label
+        className={`inline-block cursor-pointer rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] ${
+          photos.length > 0 ? "mt-4" : ""
+        }`}
+      >
         {pending ? "上傳中..." : "+ 新增照片（可多選）"}
         <input
           ref={inputRef}
