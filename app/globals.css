@@ -20,4 +20,10 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  /* Safety net for decorative elements that intentionally bleed past their
+     section (e.g. the moments carousel's side cards) - without this,
+     removing overflow:hidden from those closer ancestors (needed so it
+     stops clipping the cards' own box-shadow) could open up page-level
+     horizontal scroll on narrow viewports. */
+  overflow-x: hidden;
 }

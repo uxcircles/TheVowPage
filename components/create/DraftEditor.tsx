@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthModal } from "./AuthModal";
+import { createClient } from "@/lib/supabase/client";
 import {
   saveDraftAsWedding,
   fetchGeocode,
@@ -147,6 +148,7 @@ export function DraftEditor() {
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [resumeUser, setResumeUser] = useState<User | null>(null);
   const momentsInputRef = useRef<HTMLInputElement>(null);
 
   const [locating, setLocating] = useState(false);
@@ -159,6 +161,8 @@ export function DraftEditor() {
   // it - but only while it still matches what we set (i.e. the user hasn't
   // typed their own address over it since).
   const lastAutoFilledAddressRef = useRef<string | null>(null);
+
+  const [draftHydrated, setDraftHydrated] = useState(false);
 
   useEffect(() => {
     // Hydrating from sessionStorage (browser-only, absent during SSR) has to
@@ -174,11 +178,45 @@ export function DraftEditor() {
         // ignore malformed saved draft
       }
     }
+    setDraftHydrated(true);
   }, []);
 
+  // Google sign-in from the AuthModal is a full-page redirect (unlike the
+  // email/password form in that same modal, which authenticates in place
+  // and calls onAuthenticated() directly) - it lands back here via
+  // /auth/callback?next=/create?resume=1. Detect that signal, confirm a
+  // session actually exists, then finish the save the same way the
+  // in-modal form does. Gated on draftHydrated (rather than also using an
+  // empty-deps effect) so this can't call getUser() - and from there
+  // finalizeSave() - before the sessionStorage draft above has actually
+  // made it into `draft`; that race did happen and silently saved an
+  // empty draft.
   useEffect(() => {
+    if (!draftHydrated) return;
+    if (new URLSearchParams(window.location.search).get("resume") !== "1") return;
+    window.history.replaceState(null, "", "/create");
+    createClient()
+      .auth.getUser()
+      .then(({ data }) => {
+        if (data.user) setResumeUser(data.user);
+      });
+  }, [draftHydrated]);
+
+  useEffect(() => {
+    if (resumeUser) finalizeSave(resumeUser);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumeUser]);
+
+  useEffect(() => {
+    // Guard on draftHydrated: without it, this fires with the initial
+    // EMPTY_DRAFT before the hydration effect's read has been applied to
+    // state, and (under React Strict Mode's double-invoke in dev, which
+    // interleaves both effects twice within the same mount) can overwrite
+    // - and the hydration effect can then re-read - a real saved draft
+    // with that empty one before either settles.
+    if (!draftHydrated) return;
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-  }, [draft]);
+  }, [draft, draftHydrated]);
 
   function update<K extends keyof DraftContent>(
     key: K,

@@ -672,7 +672,11 @@
 .classic .moments-carousel {
   position: relative;
   height: min(72vh, 640px);
-  overflow: hidden;
+  /* visible, not hidden - clipping here cut off the side cards' own
+     box-shadow before it could fade out naturally near the edges. Page-level
+     horizontal overflow from the far cards' bleed is guarded on body
+     instead (see globals.css). */
+  overflow: visible;
   padding: 40px 0;
 }
 .classic .carousel-stage {

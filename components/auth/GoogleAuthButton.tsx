@@ -3,15 +3,24 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function GoogleAuthButton({ label }: { label: string }) {
+export function GoogleAuthButton({
+  label,
+  next = "/dashboard",
+}: {
+  label: string;
+  /** Same-site path to land on after the OAuth round trip completes. */
+  next?: string;
+}) {
   const [pending, setPending] = useState(false);
 
   async function handleClick() {
     setPending(true);
     const supabase = createClient();
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    callbackUrl.searchParams.set("next", next);
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: callbackUrl.toString() },
     });
     // On success the browser navigates away to Google; pending only matters
     // for the (rare) case the call itself fails before that redirect fires.
@@ -22,7 +31,7 @@ export function GoogleAuthButton({ label }: { label: string }) {
       type="button"
       onClick={handleClick}
       disabled={pending}
-      className="flex items-center justify-center gap-2 rounded border border-[var(--brand-line)] bg-white px-4 py-2 text-sm text-foreground transition-colors hover:border-[var(--brand-gold)] disabled:opacity-60"
+      className="flex w-full items-center justify-center gap-2 rounded border border-[var(--brand-line)] bg-white px-4 py-2 text-sm text-foreground transition-colors hover:border-[var(--brand-gold)] disabled:opacity-60"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
         <path

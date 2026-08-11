@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import type { User } from "@supabase/supabase-js";
 
 export function AuthModal({
@@ -67,6 +68,18 @@ export function AuthModal({
         <p className="mb-4 text-sm text-[var(--brand-ink-soft)]">
           你剛剛編輯的內容會在{mode === "signup" ? "建立帳號" : "登入"}後自動儲存，不會遺失。
         </p>
+
+        {/* Google is a full-page redirect (Google -> /auth/callback ->
+            back here), unlike the form below which authenticates in place
+            and calls onAuthenticated() directly - so it can't share that
+            callback. DraftEditor instead detects the `resume=1` it's
+            redirected back with and finishes the save itself. */}
+        <GoogleAuthButton label="使用 Google 繼續" next="/create?resume=1" />
+        <div className="my-4 flex items-center gap-3 text-xs text-[var(--brand-ink-soft)]">
+          <span className="h-px flex-1 bg-[var(--brand-line)]" />
+          或
+          <span className="h-px flex-1 bg-[var(--brand-line)]" />
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {mode === "signup" && (

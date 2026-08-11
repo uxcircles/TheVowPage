@@ -264,10 +264,16 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
 
       const itemsStart = section!.offsetTop - getStableVH() * 0.7;
       const itemsProgress = scrollBandProgress(itemsStart);
-      const starts = [0, 0.09, 0.18, 0.27, 0.36, 0.4, 0.52, 0.64, 0.72, 0.81];
+      // Each item's own reveal (fade + slide) takes this fraction of the
+      // scroll band. Start positions are spread evenly across the
+      // remaining [0, 1 - duration] range so the count of items - which
+      // varies with the couple's schedule length - can't push any item's
+      // start past the point where it'd never reach full opacity.
+      const revealDuration = 0.19;
       items.forEach((li, i) => {
-        const start = starts[i] !== undefined ? starts[i] : i * 0.09;
-        const p = clamp((itemsProgress - start) / 0.19, 0, 1);
+        const start =
+          items.length > 1 ? (i / (items.length - 1)) * (1 - revealDuration) : 0;
+        const p = clamp((itemsProgress - start) / revealDuration, 0, 1);
         li.style.opacity = String(p);
         li.style.transform = `translateY(${lerp(16, 0, p)}px)`;
       });
