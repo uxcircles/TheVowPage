@@ -11,6 +11,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { setWeddingStatus } from "@/lib/actions/weddings";
@@ -58,8 +59,9 @@ export function useEditSaveBar(
  * (possibly unsaved) field values into ClassicTemplateData, so "預覽喜帖"
  * can show a live draft preview - matching /create's behavior - instead of
  * only ever showing the last-saved public page. Only registered while the
- * 內容編輯 tab is mounted; other tabs fall back to opening the real public
- * page, since there's nothing being edited there to preview live. */
+ * 內容編輯 tab is mounted; other tabs have nothing to preview, so the
+ * button (and the whole bottom bar, once that's all it held) just doesn't
+ * render there. */
 export function useEditPreview(getSnapshot: () => ClassicTemplateData) {
   const setPreviewSnapshot = useContext(EditChromeContext)?.setPreviewSnapshot;
   // Registration only needs to happen once (see useEditSaveBar above for why
@@ -119,6 +121,10 @@ export function WeddingChrome({
   const [checkoutError, setCheckoutError] = useState("");
   const publicPath = `/w/${slug}`;
   const isPaid = plan !== "draft";
+  // Guests and RSVP tabs register neither, so there's nothing for this bar
+  // to show - both hooks below register their state as null on unmount,
+  // so switching tabs clears these correctly.
+  const showBottomBar = Boolean(saveBar || previewSnapshot);
 
   function togglePublish() {
     // Turning it on for the first time on a still-draft (unpaid) plan sends
@@ -144,32 +150,42 @@ export function WeddingChrome({
     });
   }
 
+  // Only ever called from the preview button below, which is itself only
+  // rendered when previewSnapshot is registered (the 內容編輯 tab) - guests
+  // and RSVP tabs have nothing to preview, so the button (and once that's
+  // the only thing left, the whole bottom bar) just doesn't render there.
   function handlePreviewClick() {
-    if (previewSnapshot) {
-      setPreviewData(previewSnapshot());
-      // The preview reuses the real window scroll (not a new scroll
-      // container), so without this it opens wherever the editor form
-      // happened to be scrolled to instead of the envelope at the top.
-      window.scrollTo({ top: 0, behavior: "instant" });
-    } else {
-      window.open(publicPath, "_blank", "noopener");
-    }
+    if (!previewSnapshot) return;
+    setPreviewData(previewSnapshot());
+    // The preview reuses the real window scroll (not a new scroll
+    // container), so without this it opens wherever the editor form
+    // happened to be scrolled to instead of the envelope at the top.
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   return (
     <EditChromeContext.Provider value={contextValue}>
-      {previewData && (
-        <>
-          <button
-            type="button"
-            onClick={() => setPreviewData(null)}
-            className="fixed right-4 top-4 z-[1001] rounded-full bg-white px-4 py-2 text-sm shadow-lg hover:opacity-90"
-          >
-            ✕ 返回編輯
-          </button>
-          <ClassicTemplate data={previewData} />
-        </>
-      )}
+      {previewData &&
+        createPortal(
+          // Portaled straight to <body>, escaping the dashboard layout's own
+          // <header> and its max-w-4xl <main> - without this the preview
+          // rendered nested inside them, so the outer "← 返回" header stayed
+          // visible above it and the theme background was capped at that
+          // narrow content width instead of the full page. Positioned
+          // (not fixed) so it still scrolls with the real window, which
+          // ClassicTemplate's scroll-driven reveals depend on.
+          <div className="absolute left-0 top-0 z-[1000] w-screen">
+            <button
+              type="button"
+              onClick={() => setPreviewData(null)}
+              className="fixed right-4 top-4 z-[1001] rounded-full bg-white px-4 py-2 text-sm shadow-lg hover:opacity-90"
+            >
+              ✕ 返回編輯
+            </button>
+            <ClassicTemplate data={previewData} />
+          </div>,
+          document.body,
+        )}
       {/* The editor stays mounted (just hidden) during preview, rather than
           being unmounted/swapped like /create's preview - most fields here
           are uncontrolled inputs holding their live-typed value only in the
@@ -180,7 +196,13 @@ export function WeddingChrome({
       <div className={previewData ? "hidden" : ""}>
         <div className="sticky top-0 z-30 -mx-6 border-b border-[var(--brand-line)] bg-[var(--background)]/95 px-6 backdrop-blur">
           <div className="mx-auto max-w-4xl pt-5">
-            <div className="flex items-start justify-between gap-4">
+            <Link
+              href="/dashboard"
+              className="text-sm text-[var(--brand-gold)] hover:underline"
+            >
+              ← 返回
+            </Link>
+            <div className="mt-2 flex items-start justify-between gap-4">
               <h1 className="text-2xl font-medium text-foreground">
                 {groomName || groomLabel} ＆ {brideName || brideLabel}
               </h1>
@@ -246,37 +268,43 @@ export function WeddingChrome({
           </div>
         </div>
 
-        <div className="mx-auto max-w-4xl pb-28 pt-8">{children}</div>
+        <div className={`mx-auto max-w-4xl pt-8 ${showBottomBar ? "pb-28" : "pb-8"}`}>
+          {children}
+        </div>
 
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
-          <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
-            {saveBar?.error && (
-              <p className="text-sm text-red-600">{saveBar.error}</p>
-            )}
-            {saveBar?.success && (
-              <p className="text-sm text-green-700">已儲存</p>
-            )}
-            <div className="flex justify-end gap-3">
-              {saveBar && (
-                <button
-                  type="submit"
-                  form={saveBar.formId}
-                  disabled={saveBar.pending}
-                  className="rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
-                >
-                  {saveBar.pending ? "儲存中..." : "儲存"}
-                </button>
+        {showBottomBar && (
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
+            <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
+              {saveBar?.error && (
+                <p className="text-sm text-red-600">{saveBar.error}</p>
               )}
-              <button
-                type="button"
-                onClick={handlePreviewClick}
-                className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90"
-              >
-                預覽喜帖
-              </button>
+              {saveBar?.success && (
+                <p className="text-sm text-green-700">已儲存</p>
+              )}
+              <div className="flex justify-end gap-3">
+                {saveBar && (
+                  <button
+                    type="submit"
+                    form={saveBar.formId}
+                    disabled={saveBar.pending}
+                    className="rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
+                  >
+                    {saveBar.pending ? "儲存中..." : "儲存"}
+                  </button>
+                )}
+                {previewSnapshot && (
+                  <button
+                    type="button"
+                    onClick={handlePreviewClick}
+                    className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90"
+                  >
+                    預覽喜帖
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </EditChromeContext.Provider>
   );

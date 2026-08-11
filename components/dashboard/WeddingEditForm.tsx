@@ -20,6 +20,14 @@ import {
 const inputClass = "rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground";
 const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
 
+// Smart default for the "關係稱謂" field, applied once when the field is
+// first rendered (not kept in sync with later 稱謂 edits): only fills in
+// "之子"/"之女" when the couple is still using the standard 新郎/新娘
+// labels, since a custom label (e.g. "新人一") has no obvious relation word.
+function defaultParentsRelation(label: string, standardLabel: string, relationWord: string) {
+  return label === standardLabel ? relationWord : "";
+}
+
 // Exported so fields that live outside this form in the DOM (the style/seal
 // picker and the Moments-style picker, both rendered in sibling EditorCards
 // on the edit page) can still submit into it via the HTML `form` attribute.
@@ -51,6 +59,10 @@ export function WeddingEditForm({
   const [manualCoords, setManualCoords] = useState(false);
   const [groomLabel, setGroomLabel] = useState(wedding.groom_label);
   const [brideLabel, setBrideLabel] = useState(wedding.bride_label);
+  const groomParentsRelationDefault =
+    wedding.groom_parents_relation || defaultParentsRelation(wedding.groom_label, "新郎", "之子");
+  const brideParentsRelationDefault =
+    wedding.bride_parents_relation || defaultParentsRelation(wedding.bride_label, "新娘", "之女");
   const [showFamily, setShowFamily] = useState(wedding.show_family);
   const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
   const [showDressCode, setShowDressCode] = useState(wedding.show_dress_code);
@@ -123,7 +135,9 @@ export function WeddingEditForm({
       groomLabel: groomLabel || "新郎",
       brideLabel: brideLabel || "新娘",
       groomParents: String(fd.get("groomParents") ?? ""),
+      groomParentsRelation: String(fd.get("groomParentsRelation") ?? ""),
       brideParents: String(fd.get("brideParents") ?? ""),
+      brideParentsRelation: String(fd.get("brideParentsRelation") ?? ""),
       eventDate: wallTimeToUtcIso(String(fd.get("eventDate") ?? ""), timezone),
       timezone,
       venueName: String(fd.get("venueName") ?? ""),
@@ -215,21 +229,39 @@ export function WeddingEditForm({
         <div className={showFamily ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "hidden"}>
           <label className={labelClass}>
             {groomLabel || "新郎"}雙親
-            <input
-              name="groomParents"
-              defaultValue={wedding.groom_parents}
-              placeholder="林建平・王淑芬"
-              className={inputClass}
-            />
+            <div className="flex gap-2">
+              <input
+                name="groomParents"
+                defaultValue={wedding.groom_parents}
+                placeholder="林建平・王淑芬"
+                className={`${inputClass} min-w-0 flex-1`}
+              />
+              <input
+                name="groomParentsRelation"
+                defaultValue={groomParentsRelationDefault}
+                placeholder="之子"
+                aria-label={`${groomLabel || "新郎"}與雙親的關係稱謂`}
+                className={`${inputClass} w-20 shrink-0`}
+              />
+            </div>
           </label>
           <label className={labelClass}>
             {brideLabel || "新娘"}雙親
-            <input
-              name="brideParents"
-              defaultValue={wedding.bride_parents}
-              placeholder="黃文昌・李美玲"
-              className={inputClass}
-            />
+            <div className="flex gap-2">
+              <input
+                name="brideParents"
+                defaultValue={wedding.bride_parents}
+                placeholder="黃文昌・李美玲"
+                className={`${inputClass} min-w-0 flex-1`}
+              />
+              <input
+                name="brideParentsRelation"
+                defaultValue={brideParentsRelationDefault}
+                placeholder="之女"
+                aria-label={`${brideLabel || "新娘"}與雙親的關係稱謂`}
+                className={`${inputClass} w-20 shrink-0`}
+              />
+            </div>
           </label>
         </div>
         {!showFamily && <HiddenSectionHint />}

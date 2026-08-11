@@ -412,13 +412,17 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
             <div className="side reveal">
               <p className="role">{data.groomLabel}</p>
               <p className="name">{data.groomName || data.groomLabel}</p>
-              <p className="parents">{data.groomParents}</p>
+              <p className="parents">
+                {[data.groomParents, data.groomParentsRelation].filter(Boolean).join("　")}
+              </p>
             </div>
             <div className="amp reveal">&amp;</div>
             <div className="side reveal">
               <p className="role">{data.brideLabel}</p>
               <p className="name">{data.brideName || data.brideLabel}</p>
-              <p className="parents">{data.brideParents}</p>
+              <p className="parents">
+                {[data.brideParents, data.brideParentsRelation].filter(Boolean).join("　")}
+              </p>
             </div>
           </div>
           {data.familyPhotoUrl && (

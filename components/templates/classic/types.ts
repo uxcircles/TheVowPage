@@ -32,7 +32,9 @@ export type ClassicTemplateData = {
   groomLabel: string;
   brideLabel: string;
   groomParents: string;
+  groomParentsRelation: string;
   brideParents: string;
+  brideParentsRelation: string;
   eventDate: string | null; // ISO timestamp
   timezone: string; // IANA zone the eventDate should be displayed in
   venueName: string;

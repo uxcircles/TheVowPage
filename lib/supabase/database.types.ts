@@ -145,12 +145,14 @@ export type Database = {
           bride_label: string
           bride_name: string
           bride_parents: string
+          bride_parents_relation: string
           created_at: string
           dress_code: string
           event_date: string | null
           groom_label: string
           groom_name: string
           groom_parents: string
+          groom_parents_relation: string
           id: string
           moments_style: string
           owner_id: string
@@ -180,12 +182,14 @@ export type Database = {
           bride_label?: string
           bride_name?: string
           bride_parents?: string
+          bride_parents_relation?: string
           created_at?: string
           dress_code?: string
           event_date?: string | null
           groom_label?: string
           groom_name?: string
           groom_parents?: string
+          groom_parents_relation?: string
           id?: string
           moments_style?: string
           owner_id: string
@@ -215,12 +219,14 @@ export type Database = {
           bride_label?: string
           bride_name?: string
           bride_parents?: string
+          bride_parents_relation?: string
           created_at?: string
           dress_code?: string
           event_date?: string | null
           groom_label?: string
           groom_name?: string
           groom_parents?: string
+          groom_parents_relation?: string
           id?: string
           moments_style?: string
           owner_id?: string

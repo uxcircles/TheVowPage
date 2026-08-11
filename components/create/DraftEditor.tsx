@@ -40,7 +40,9 @@ const EMPTY_DRAFT: DraftContent = {
   groomLabel: "新郎",
   brideLabel: "新娘",
   groomParents: "",
+  groomParentsRelation: "之子",
   brideParents: "",
+  brideParentsRelation: "之女",
   eventDate: "",
   venueName: "",
   venueHall: "",
@@ -299,7 +301,9 @@ export function DraftEditor() {
       groomLabel: draft.groomLabel || "新郎",
       brideLabel: draft.brideLabel || "新娘",
       groomParents: draft.groomParents,
+      groomParentsRelation: draft.groomParentsRelation,
       brideParents: draft.brideParents,
+      brideParentsRelation: draft.brideParentsRelation,
       eventDate: wallTimeToUtcIso(draft.eventDate, timezone),
       timezone,
       venueName: draft.venueName,
@@ -524,21 +528,39 @@ export function DraftEditor() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className={labelClass}>
                     {draft.groomLabel || "新郎"}雙親
-                    <input
-                      value={draft.groomParents}
-                      onChange={(e) => update("groomParents", e.target.value)}
-                      placeholder="林建平・王淑芬"
-                      className={inputClass}
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        value={draft.groomParents}
+                        onChange={(e) => update("groomParents", e.target.value)}
+                        placeholder="林建平・王淑芬"
+                        className={`${inputClass} min-w-0 flex-1`}
+                      />
+                      <input
+                        value={draft.groomParentsRelation}
+                        onChange={(e) => update("groomParentsRelation", e.target.value)}
+                        placeholder="之子"
+                        aria-label={`${draft.groomLabel || "新郎"}與雙親的關係稱謂`}
+                        className={`${inputClass} w-20 shrink-0`}
+                      />
+                    </div>
                   </label>
                   <label className={labelClass}>
                     {draft.brideLabel || "新娘"}雙親
-                    <input
-                      value={draft.brideParents}
-                      onChange={(e) => update("brideParents", e.target.value)}
-                      placeholder="黃文昌・李美玲"
-                      className={inputClass}
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        value={draft.brideParents}
+                        onChange={(e) => update("brideParents", e.target.value)}
+                        placeholder="黃文昌・李美玲"
+                        className={`${inputClass} min-w-0 flex-1`}
+                      />
+                      <input
+                        value={draft.brideParentsRelation}
+                        onChange={(e) => update("brideParentsRelation", e.target.value)}
+                        placeholder="之女"
+                        aria-label={`${draft.brideLabel || "新娘"}與雙親的關係稱謂`}
+                        className={`${inputClass} w-20 shrink-0`}
+                      />
+                    </div>
                   </label>
                 </div>
               ) : (

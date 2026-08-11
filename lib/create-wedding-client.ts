@@ -13,7 +13,9 @@ export type DraftContent = {
   groomLabel: string;
   brideLabel: string;
   groomParents: string;
+  groomParentsRelation: string;
   brideParents: string;
+  brideParentsRelation: string;
   eventDate: string; // datetime-local value, wall clock in the venue's timezone
   venueName: string;
   venueHall: string;
@@ -101,7 +103,9 @@ export async function saveDraftAsWedding(
       groom_label: draft.groomLabel.trim() || "新郎",
       bride_label: draft.brideLabel.trim() || "新娘",
       groom_parents: draft.groomParents,
+      groom_parents_relation: draft.groomParentsRelation,
       bride_parents: draft.brideParents,
+      bride_parents_relation: draft.brideParentsRelation,
       event_date: wallTimeToUtcIso(draft.eventDate, timezone),
       timezone,
       theme: draft.theme,

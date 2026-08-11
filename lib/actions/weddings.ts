@@ -92,7 +92,9 @@ export async function updateWeddingContent(
       groom_label: String(formData.get("groomLabel") ?? "").trim() || "新郎",
       bride_label: String(formData.get("brideLabel") ?? "").trim() || "新娘",
       groom_parents: String(formData.get("groomParents") ?? "").trim(),
+      groom_parents_relation: String(formData.get("groomParentsRelation") ?? "").trim(),
       bride_parents: String(formData.get("brideParents") ?? "").trim(),
+      bride_parents_relation: String(formData.get("brideParentsRelation") ?? "").trim(),
       // The datetime-local input has no timezone of its own; treat it as
       // wall-clock time in the venue's own (geocoded) timezone, not the
       // server process's timezone.
