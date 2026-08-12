@@ -2,6 +2,7 @@
 
 import { useRef, useTransition } from "react";
 import { uploadWeddingPhoto, deleteWeddingPhoto } from "@/lib/actions/weddings";
+import { TrashIcon } from "@/components/ui/TrashIcon";
 
 export function PhotoSlot({
   weddingId,
@@ -46,9 +47,10 @@ export function PhotoSlot({
             type="button"
             disabled={pending}
             onClick={() => startTransition(() => deleteWeddingPhoto(weddingId, photoId))}
-            className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+            aria-label="移除"
+            className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
           >
-            移除
+            <TrashIcon className="h-4 w-4" />
           </button>
         )}
       </div>

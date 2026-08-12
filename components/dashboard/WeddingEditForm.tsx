@@ -405,7 +405,7 @@ export function WeddingEditForm({
                   type="button"
                   onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
                   aria-label="刪除"
-                  className="flex shrink-0 items-center justify-center rounded border border-[var(--brand-line)] px-2 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
                 >
                   <TrashIcon className="h-4 w-4" />
                 </button>
