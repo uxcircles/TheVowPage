@@ -21,10 +21,12 @@ import { MomentsStylePicker } from "@/components/ui/MomentsStylePicker";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import {
   emptySchedule,
   SCHEDULE_PLACEHOLDERS,
   SCHEDULE_PLACEHOLDER_FALLBACK,
+  THANKS_MESSAGE_FALLBACK,
   type ClassicTemplateData,
   type ScheduleItem,
 } from "@/components/templates/classic/types";
@@ -712,11 +714,15 @@ export function DraftEditor() {
                   className={inputClass}
                 />
               </label>
-              <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
-                系統會依場地位置自動判斷時區，目前設定：
-                <span className="font-medium text-foreground">{timezone}</span>
-                {timezone === DEFAULT_TIMEZONE &&
-                  "（尚未確認地點前，先以台灣時間計算）"}
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-[var(--brand-ink-soft)]">
+                時區：<span className="font-medium text-foreground">{timezone}</span>
+                <InfoTooltip
+                  text={
+                    timezone === DEFAULT_TIMEZONE
+                      ? "系統會依場地位置自動判斷時區，尚未確認地點前先以台灣時間計算。"
+                      : "系統會依場地位置自動判斷時區，確認地點後會依當地時區重新計算。"
+                  }
+                />
               </p>
             </EditorCard>
 
@@ -834,6 +840,7 @@ export function DraftEditor() {
               <textarea
                 value={draft.thanksMessage}
                 onChange={(e) => update("thanksMessage", e.target.value)}
+                placeholder={THANKS_MESSAGE_FALLBACK}
                 rows={3}
                 className={`${inputClass} w-full`}
               />

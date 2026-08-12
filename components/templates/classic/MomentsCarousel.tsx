@@ -35,7 +35,7 @@ export function MomentsCarousel({ photoUrls }: { photoUrls: string[] }) {
     .filter((c) => c.i >= 0 && c.i < photoUrls.length);
 
   return (
-    <div className="moments-carousel">
+    <div className="moments-carousel reveal">
       <div
         className="carousel-stage"
         onPointerDown={handlePointerDown}

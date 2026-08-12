@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getOwnedWedding } from "@/lib/weddings";
-import { WeddingEditForm } from "@/components/dashboard/WeddingEditForm";
+import { WeddingEditForm, FORM_ID } from "@/components/dashboard/WeddingEditForm";
 import { WeddingStylePicker } from "@/components/dashboard/WeddingStylePicker";
 import { MomentsStyleField } from "@/components/dashboard/MomentsStyleField";
 import { PhotoSlot } from "@/components/dashboard/PhotoSlot";
@@ -34,6 +34,26 @@ export default async function EditWeddingPage({
 
   return (
     <div className="flex flex-col gap-10">
+      <section>
+        <h2 className="mb-4 text-lg font-medium">網址代稱</h2>
+        {/* Rendered outside <WeddingEditForm>'s own <form> so it can sit in
+            its own card at the top of the page (separate from the rest of
+            the content fields further down) while still submitting through
+            the same 儲存 action via the form attribute. */}
+        <EditorCard>
+          <label className="flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]">
+            這決定喜帖的公開網址（thevowpage.com/w/...）
+            <input
+              name="slug"
+              defaultValue={wedding.slug}
+              required
+              form={FORM_ID}
+              className="rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground"
+            />
+          </label>
+        </EditorCard>
+      </section>
+
       <section>
         <h2 className="mb-4 text-lg font-medium">喜帖樣板</h2>
         <EditorCard>

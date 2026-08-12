@@ -22,6 +22,11 @@ export function emptySchedule(rows = 5): ScheduleItem[] {
   return Array.from({ length: rows }, () => ({ time: "", event: "" }));
 }
 
+// Shown on the public page when thanksMessage is empty, and used as the
+// editors' placeholder text so what a couple sees while editing matches
+// what actually renders if they leave the field blank.
+export const THANKS_MESSAGE_FALLBACK = "感謝您撥冗參與，見證我們人生中最重要的時刻";
+
 export type ClassicTemplateData = {
   weddingId: string;
   theme: string;

@@ -309,6 +309,11 @@
   font-size: clamp(30px, 8vw, 48px);
   color: var(--ink);
   letter-spacing: 0.04em;
+  /* CJK text can otherwise break between any two Han characters, splitting
+     a name mid-way if it doesn't fit on one line - keep-all restricts
+     wrapping to the spaces around "＆" instead, so long names wrap between
+     names (never inside one) while short names still sit on a single line. */
+  word-break: keep-all;
 }
 
 /* ---------- SCRATCH CARD + COUNTDOWN ---------- */

@@ -7,12 +7,14 @@ import { toDatetimeLocalValue, wallTimeToUtcIso } from "@/lib/timezone";
 import { Toggle } from "@/components/ui/Toggle";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingChrome";
 import type { Tables } from "@/lib/supabase/database.types";
 import {
   SCHEDULE_PLACEHOLDERS,
   SCHEDULE_PLACEHOLDER_FALLBACK,
+  THANKS_MESSAGE_FALLBACK,
   emptySchedule,
   type ClassicTemplateData,
   type ScheduleItem,
@@ -182,11 +184,6 @@ export function WeddingEditForm({
 
       <EditorCard title="基本資訊">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className={labelClass}>
-            網址代稱（slug）
-            <input name="slug" defaultValue={wedding.slug} required className={inputClass} />
-          </label>
-          <div />
           {/* Editable role labels (default 新郎/新娘) so the invitation can
               read correctly for same-sex couples too, e.g. "新人一/新人二" -
               they double as the field labels below via live state. */}
@@ -371,9 +368,9 @@ export function WeddingEditForm({
             className={inputClass}
           />
         </label>
-        <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
-          系統會依場地位置自動判斷時區，目前設定：<span className="font-medium text-foreground">{wedding.timezone}</span>
-          （儲存後會依最新的場地位置重新確認）
+        <p className="mt-2 flex items-center gap-1.5 text-sm text-[var(--brand-ink-soft)]">
+          時區：<span className="font-medium text-foreground">{wedding.timezone}</span>
+          <InfoTooltip text="系統會依場地位置自動判斷時區，儲存後會依最新的場地位置重新確認。" />
         </p>
       </EditorCard>
 
@@ -458,6 +455,7 @@ export function WeddingEditForm({
         <textarea
           name="thanksMessage"
           defaultValue={wedding.thanks_message}
+          placeholder={THANKS_MESSAGE_FALLBACK}
           rows={3}
           className={`${inputClass} w-full`}
         />

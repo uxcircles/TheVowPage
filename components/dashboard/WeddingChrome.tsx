@@ -223,26 +223,9 @@ export function WeddingChrome({
             >
               ← 返回
             </Link>
-            <div className="mt-1.5 flex items-start justify-between gap-4">
-              <h1 className="text-2xl font-medium text-foreground">
-                {groomName || groomLabel} ＆ {brideName || brideLabel}
-              </h1>
-              <button
-                type="button"
-                disabled={publishPending}
-                onClick={togglePublish}
-                className="shrink-0 rounded bg-[var(--brand-gold)] px-5 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-              >
-                {publishPending
-                  ? "處理中..."
-                  : isPublished
-                    ? "取消發布"
-                    : isPaid
-                      ? "發布喜帖"
-                      : "付費解鎖發布"}
-              </button>
-            </div>
-            {publishError && <p className="mt-1.5 text-sm text-red-600">{publishError}</p>}
+            <h1 className="mt-1.5 text-2xl font-medium text-foreground">
+              {groomName || groomLabel} ＆ {brideName || brideLabel}
+            </h1>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
               <span className="flex items-center gap-1.5">
                 <span
@@ -299,6 +282,7 @@ export function WeddingChrome({
               {saveBar?.error && (
                 <p className="text-sm text-red-600">{saveBar.error}</p>
               )}
+              {publishError && <p className="text-sm text-red-600">{publishError}</p>}
               <div className="flex items-center justify-end gap-3">
                 {showSavedNotice && (
                   <p className="text-sm text-[var(--brand-ink-soft)]">已儲存</p>
@@ -317,11 +301,25 @@ export function WeddingChrome({
                   <button
                     type="button"
                     onClick={handlePreviewClick}
-                    className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90"
+                    className="rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)]"
                   >
                     預覽喜帖
                   </button>
                 )}
+                <button
+                  type="button"
+                  disabled={publishPending}
+                  onClick={togglePublish}
+                  className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                >
+                  {publishPending
+                    ? "處理中..."
+                    : isPublished
+                      ? "取消發布"
+                      : isPaid
+                        ? "發布喜帖"
+                        : "付費解鎖發布"}
+                </button>
               </div>
             </div>
           </div>

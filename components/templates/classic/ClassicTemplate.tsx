@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EB_Garamond, Noto_Serif_TC } from "next/font/google";
 import "./classic.css";
-import type { ClassicTemplateData } from "./types";
+import { THANKS_MESSAGE_FALLBACK, type ClassicTemplateData } from "./types";
 import { getClassicTheme, getEnvelopeImages } from "./themes";
 import { getSealDesign, getSealImage } from "./seals";
 import { getMomentsStyle } from "./momentsStyles";
@@ -549,7 +549,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         )}
         <img className="bg-illus footer-rings-accent" src="/templates/classic/illus-rings.png" alt="" aria-hidden="true" />
         <p className="thanks" ref={footerThanksRef}>
-          {data.thanksMessage || "感謝您撥冗參與，見證我們人生中最重要的時刻"}
+          {data.thanksMessage || THANKS_MESSAGE_FALLBACK}
         </p>
         <p className="names" ref={footerNamesRef}>
           {data.groomName}　＆　{data.brideName}
