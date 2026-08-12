@@ -58,7 +58,11 @@ export type DraftPhotos = {
   hero: File | null;
   family: File | null;
   footer: File | null;
-  moments: File[];
+  // Each moment needs a stable id (independent of array position) so the
+  // reorderable grid can track items across drag/move/remove - a plain
+  // File[] has nothing to key on besides array index, which breaks once
+  // items get reordered or removed out of sequence.
+  moments: { id: string; file: File }[];
 };
 
 function randomSlugSuffix() {
@@ -128,7 +132,7 @@ export async function saveDraftAsWedding(
     .single();
 
   if (insertError || !wedding) {
-    throw new Error(insertError?.message ?? "建立喜帖失敗");
+    throw new Error("建立喜帖失敗，請稍後再試。");
   }
 
   const weddingId = wedding.id as string;
@@ -139,18 +143,18 @@ export async function saveDraftAsWedding(
     const { error: uploadError } = await supabase.storage
       .from("wedding-photos")
       .upload(path, file, { contentType: file.type });
-    if (uploadError) throw new Error(uploadError.message);
+    if (uploadError) throw new Error("照片上傳失敗，請稍後再試。");
     const { error: rowError } = await supabase
       .from("wedding_photos")
       .insert({ wedding_id: weddingId, kind, storage_path: path, sort_order: sortOrder });
-    if (rowError) throw new Error(rowError.message);
+    if (rowError) throw new Error("照片上傳失敗，請稍後再試。");
   }
 
   if (photos.hero) await uploadOne("hero", photos.hero, 0);
   if (photos.family) await uploadOne("family", photos.family, 0);
   if (photos.footer) await uploadOne("footer", photos.footer, 0);
   for (let i = 0; i < photos.moments.length; i++) {
-    await uploadOne("moment", photos.moments[i], i);
+    await uploadOne("moment", photos.moments[i].file, i);
   }
 
   return weddingId;

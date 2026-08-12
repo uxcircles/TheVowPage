@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { addGuest, deleteGuest } from "@/lib/actions/guests";
+import { TrashIcon } from "@/components/ui/TrashIcon";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export function GuestList({
@@ -12,12 +13,29 @@ export function GuestList({
   guests: Tables<"guests">[];
 }) {
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleAdd(formData: FormData) {
+    setError("");
     startTransition(async () => {
-      await addGuest(weddingId, formData);
-      formRef.current?.reset();
+      try {
+        await addGuest(weddingId, formData);
+        formRef.current?.reset();
+      } catch {
+        setError("新增賓客失敗，請稍後再試。");
+      }
+    });
+  }
+
+  function handleDelete(guestId: string) {
+    setError("");
+    startTransition(async () => {
+      try {
+        await deleteGuest(weddingId, guestId);
+      } catch {
+        setError("刪除賓客失敗，請稍後再試。");
+      }
     });
   }
 
@@ -44,6 +62,8 @@ export function GuestList({
         </button>
       </form>
 
+      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+
       {guests.length === 0 ? (
         <p className="text-sm text-[var(--brand-ink-soft)]">還沒有賓客，新增第一位吧。</p>
       ) : (
@@ -60,10 +80,11 @@ export function GuestList({
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => startTransition(() => deleteGuest(weddingId, guest.id))}
-                className="text-sm text-[var(--brand-ink-soft)] hover:text-red-500"
+                onClick={() => handleDelete(guest.id)}
+                aria-label="刪除"
+                className="text-[var(--brand-ink-soft)] hover:text-red-500"
               >
-                刪除
+                <TrashIcon className="h-4 w-4" />
               </button>
             </li>
           ))}

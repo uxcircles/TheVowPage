@@ -119,7 +119,9 @@ export async function updateWeddingContent(
     .eq("id", weddingId);
 
   if (error) {
-    return { error: error.message.includes("duplicate") ? "這個網址代稱已經被使用了" : error.message };
+    return {
+      error: error.message.includes("duplicate") ? "這個網址代稱已經被使用了" : "儲存失敗，請稍後再試。",
+    };
   }
 
   revalidatePath(`/dashboard/${weddingId}/edit`);
@@ -228,5 +230,22 @@ export async function moveMomentPhoto(weddingId: string, photoId: string, direct
   await supabase.from("wedding_photos").update({ sort_order: b.sort_order }).eq("id", a.id);
   await supabase.from("wedding_photos").update({ sort_order: a.sort_order }).eq("id", b.id);
 
+  revalidatePath(`/dashboard/${weddingId}/edit`);
+}
+
+// Used by desktop drag-and-drop, which can drop a photo anywhere in the
+// grid in one gesture (not just swap with a neighbour like moveMomentPhoto
+// above) - orderedPhotoIds is the full Moments list in its new order.
+export async function reorderMomentPhotos(weddingId: string, orderedPhotoIds: string[]) {
+  const { supabase } = await requireUser();
+  await Promise.all(
+    orderedPhotoIds.map((id, index) =>
+      supabase
+        .from("wedding_photos")
+        .update({ sort_order: index })
+        .eq("id", id)
+        .eq("wedding_id", weddingId)
+    )
+  );
   revalidatePath(`/dashboard/${weddingId}/edit`);
 }

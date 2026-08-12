@@ -1,10 +1,33 @@
-import { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import type { ClassicTemplateData, ScheduleItem } from "@/components/templates/classic/types";
+import type { Tables } from "@/lib/supabase/database.types";
 
-// Not filtering on status here is intentional: RLS already scopes rows to
-// "published" for anon visitors, or the owner's own row regardless of
-// status - so the wedding's owner can preview a draft at /w/[slug] before
-// publishing, while everyone else only ever sees published weddings.
+// The [weddingId] layout and each of its edit/guests/rsvps pages all
+// independently re-fetched this same row just to re-verify ownership -
+// cache() collapses those into one query per request. Callers that only
+// need the ownership check (guests/rsvps pages) get the full row for free
+// instead of running their own narrower select.
+export const getOwnedWedding = cache(async (weddingId: string): Promise<Tables<"weddings"> | null> => {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const supabase = await createClient();
+  const { data: wedding } = await supabase
+    .from("weddings")
+    .select("*")
+    .eq("id", weddingId)
+    .eq("owner_id", user.id)
+    .maybeSingle();
+  return wedding;
+});
+
+// RLS lets the owner select their own row here regardless of status (so
+// dashboard code elsewhere can look up a draft by id), but this function is
+// specifically the *public* page's data source - explicitly requiring
+// status === "published" (rather than relying on RLS alone) means an
+// unpublished wedding's /w/[slug] link 404s for everyone, including the
+// owner viewing their own draft. Owners preview drafts via the dashboard's
+// own "預覽喜帖" button instead, which shows live unsaved edits too.
 export async function getPublicWeddingData(slug: string): Promise<ClassicTemplateData | null> {
   const supabase = await createClient();
   const { data: wedding, error } = await supabase
@@ -13,7 +36,7 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
     .eq("slug", slug)
     .maybeSingle();
 
-  if (error || !wedding) return null;
+  if (error || !wedding || wedding.status !== "published") return null;
 
   const { data: photos } = await supabase
     .from("wedding_photos")

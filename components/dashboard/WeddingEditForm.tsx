@@ -6,6 +6,7 @@ import { fetchGeocode } from "@/lib/create-wedding-client";
 import { toDatetimeLocalValue, wallTimeToUtcIso } from "@/lib/timezone";
 import { Toggle } from "@/components/ui/Toggle";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
+import { TrashIcon } from "@/components/ui/TrashIcon";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingChrome";
 import type { Tables } from "@/lib/supabase/database.types";
@@ -403,9 +404,10 @@ export function WeddingEditForm({
                 <button
                   type="button"
                   onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
-                  className="shrink-0 rounded border border-[var(--brand-line)] px-2 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500 sm:px-3"
+                  aria-label="刪除"
+                  className="flex shrink-0 items-center justify-center rounded border border-[var(--brand-line)] px-2 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
                 >
-                  刪除
+                  <TrashIcon className="h-4 w-4" />
                 </button>
               </div>
             ))}

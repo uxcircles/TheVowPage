@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { createWedding } from "@/lib/actions/weddings";
 import { WeddingRowMenu } from "@/components/dashboard/WeddingRowMenu";
 
 export default async function DashboardPage() {
+  const user = await getCurrentUser();
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const { data: weddings } = await supabase
     .from("weddings")
@@ -16,7 +14,7 @@ export default async function DashboardPage() {
     .order("updated_at", { ascending: false });
 
   return (
-    <div>
+    <div className="py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-medium">我的喜帖</h1>
         <form action={createWedding}>

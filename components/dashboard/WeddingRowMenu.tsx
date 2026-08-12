@@ -4,9 +4,24 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { deleteWedding } from "@/lib/actions/weddings";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
+// deleteWedding() redirects to /dashboard on success, which Next.js
+// implements by throwing a special error carrying this digest - our own
+// catch below must let that one through instead of treating it as a
+// genuine failure (see next/dist/client/components/redirect-error.js).
+function isRedirectError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof (error as { digest?: unknown }).digest === "string" &&
+    (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+  );
+}
+
 export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +37,15 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
 
   function handleConfirmDelete() {
     setConfirming(false);
-    startTransition(() => deleteWedding(weddingId));
+    setError("");
+    startTransition(async () => {
+      try {
+        await deleteWedding(weddingId);
+      } catch (err) {
+        if (isRedirectError(err)) throw err;
+        setError("刪除失敗，請稍後再試。");
+      }
+    });
   }
 
   return (
@@ -71,6 +94,9 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
           onConfirm={handleConfirmDelete}
           onCancel={() => setConfirming(false)}
         />
+      )}
+      {error && (
+        <p className="absolute right-0 top-full z-10 mt-1 w-40 text-right text-xs text-red-600">{error}</p>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getOwnedWedding } from "@/lib/weddings";
 import { WeddingEditForm } from "@/components/dashboard/WeddingEditForm";
 import { WeddingStylePicker } from "@/components/dashboard/WeddingStylePicker";
 import { MomentsStyleField } from "@/components/dashboard/MomentsStyleField";
@@ -13,20 +14,10 @@ export default async function EditWeddingPage({
   params: Promise<{ weddingId: string }>;
 }) {
   const { weddingId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: wedding } = await supabase
-    .from("weddings")
-    .select("*")
-    .eq("id", weddingId)
-    .eq("owner_id", user?.id ?? "")
-    .maybeSingle();
-
+  const wedding = await getOwnedWedding(weddingId);
   if (!wedding) notFound();
 
+  const supabase = await createClient();
   const { data: photos } = await supabase
     .from("wedding_photos")
     .select("*")

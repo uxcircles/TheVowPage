@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthModal } from "./AuthModal";
@@ -19,6 +19,8 @@ import { ThemePicker } from "@/components/ui/ThemePicker";
 import { SealPicker } from "@/components/ui/SealPicker";
 import { MomentsStylePicker } from "@/components/ui/MomentsStylePicker";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
+import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
+import { TrashIcon } from "@/components/ui/TrashIcon";
 import {
   emptySchedule,
   SCHEDULE_PLACEHOLDERS,
@@ -104,36 +106,46 @@ function PhotoPicker({
           <img src={url} alt={label} className="h-full w-full object-cover" />
         )}
       </div>
-      <label className="cursor-pointer rounded border border-[var(--brand-line)] px-3 py-1.5 text-center text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
-        {file ? "更換" : "選擇照片"}
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => onChange(e.target.files?.[0] ?? null)}
-        />
-      </label>
+      <div className="flex gap-2">
+        <label className="flex-1 cursor-pointer rounded border border-[var(--brand-line)] px-3 py-1.5 text-center text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
+          {file ? "更換" : "上傳"}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+          />
+        </label>
+        {file && (
+          <button
+            type="button"
+            onClick={() => onChange(null)}
+            className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+          >
+            移除
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
-function MomentThumb({ file, onRemove }: { file: File; onRemove: () => void }) {
-  const url = useObjectUrl(file);
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="aspect-[4/5] overflow-hidden rounded border border-[var(--brand-line)]">
-        {url && <img src={url} alt="" className="h-full w-full object-cover" />}
-      </div>
-      <button
-        type="button"
-        onClick={onRemove}
-        className="rounded border border-[var(--brand-line)] px-1.5 py-0.5 text-xs text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
-      >
-        移除
-      </button>
-    </div>
-  );
+/** Same create-and-revoke-in-one-effect reasoning as useObjectUrl above,
+ * just for the whole Moments array at once instead of one file at a time -
+ * MomentsPhotoGrid needs every item's url resolved upfront rather than
+ * having each grid cell call its own hook (the list's length changes as
+ * photos are added/removed, which useObjectUrl-per-item can't do safely). */
+function useObjectUrls(files: File[]): string[] {
+  const [urls, setUrls] = useState<string[]>([]);
+  useEffect(() => {
+    const created = files.map((f) => URL.createObjectURL(f));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUrls(created);
+    return () => {
+      created.forEach((u) => URL.revokeObjectURL(u));
+    };
+  }, [files]);
+  return urls;
 }
 
 export function DraftEditor() {
@@ -152,6 +164,9 @@ export function DraftEditor() {
   const [saveError, setSaveError] = useState("");
   const [resumeUser, setResumeUser] = useState<User | null>(null);
   const momentsInputRef = useRef<HTMLInputElement>(null);
+  const momentFiles = useMemo(() => photos.moments.map((m) => m.file), [photos.moments]);
+  const momentUrls = useObjectUrls(momentFiles);
+  const momentItems = photos.moments.map((m, i) => ({ id: m.id, url: momentUrls[i] ?? "" }));
 
   const [locating, setLocating] = useState(false);
   const [locationPreview, setLocationPreview] = useState<{
@@ -289,7 +304,7 @@ export function DraftEditor() {
     const footerPhotoUrl = photos.footer
       ? URL.createObjectURL(photos.footer)
       : null;
-    const momentPhotoUrls = photos.moments.map((f) => URL.createObjectURL(f));
+    const momentPhotoUrls = photos.moments.map((m) => URL.createObjectURL(m.file));
 
     setPreviewData({
       weddingId: "",
@@ -424,20 +439,33 @@ export function DraftEditor() {
               </div>
             </EditorCard>
             <EditorCard title="婚紗相簿（Moments）">
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                {photos.moments.map((file, i) => (
-                  <MomentThumb
-                    key={i}
-                    file={file}
-                    onRemove={() =>
-                      setPhotos((p) => ({
-                        ...p,
-                        moments: p.moments.filter((_, idx) => idx !== i),
-                      }))
-                    }
-                  />
-                ))}
-              </div>
+              <MomentsPhotoGrid
+                items={momentItems}
+                onReorder={(orderedIds) =>
+                  setPhotos((p) => ({
+                    ...p,
+                    moments: orderedIds.map(
+                      (id) => p.moments.find((m) => m.id === id)!,
+                    ),
+                  }))
+                }
+                onMove={(id, direction) =>
+                  setPhotos((p) => {
+                    const index = p.moments.findIndex((m) => m.id === id);
+                    const swapIndex = direction === "up" ? index - 1 : index + 1;
+                    if (index < 0 || swapIndex < 0 || swapIndex >= p.moments.length) return p;
+                    const moments = [...p.moments];
+                    [moments[index], moments[swapIndex]] = [moments[swapIndex], moments[index]];
+                    return { ...p, moments };
+                  })
+                }
+                onRemove={(id) =>
+                  setPhotos((p) => ({
+                    ...p,
+                    moments: p.moments.filter((m) => m.id !== id),
+                  }))
+                }
+              />
               <label
                 className={`inline-block cursor-pointer rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] ${
                   photos.moments.length > 0 ? "mt-4" : ""
@@ -454,7 +482,10 @@ export function DraftEditor() {
                     const files = Array.from(e.target.files ?? []);
                     setPhotos((p) => ({
                       ...p,
-                      moments: [...p.moments, ...files],
+                      moments: [
+                        ...p.moments,
+                        ...files.map((file) => ({ id: crypto.randomUUID(), file })),
+                      ],
                     }));
                     if (momentsInputRef.current)
                       momentsInputRef.current.value = "";
@@ -729,9 +760,10 @@ export function DraftEditor() {
                               ),
                             }))
                           }
-                          className="shrink-0 rounded border border-[var(--brand-line)] px-2 text-sm text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500 sm:px-3"
+                          aria-label="刪除"
+                          className="flex shrink-0 items-center justify-center rounded border border-[var(--brand-line)] px-2 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
                         >
-                          刪除
+                          <TrashIcon className="h-4 w-4" />
                         </button>
                       </div>
                     ))}

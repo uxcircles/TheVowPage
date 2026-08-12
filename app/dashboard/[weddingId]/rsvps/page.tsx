@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getOwnedWedding } from "@/lib/weddings";
 import { RsvpTable } from "@/components/dashboard/RsvpTable";
 
 export default async function RsvpsPage({
@@ -8,20 +9,10 @@ export default async function RsvpsPage({
   params: Promise<{ weddingId: string }>;
 }) {
   const { weddingId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: wedding } = await supabase
-    .from("weddings")
-    .select("id")
-    .eq("id", weddingId)
-    .eq("owner_id", user?.id ?? "")
-    .maybeSingle();
-
+  const wedding = await getOwnedWedding(weddingId);
   if (!wedding) notFound();
 
+  const supabase = await createClient();
   const { data: rsvps } = await supabase
     .from("rsvps")
     .select("*")

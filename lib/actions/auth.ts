@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { translateAuthError } from "@/lib/authErrors";
 
 export type AuthActionState = { error?: string } | undefined;
 
@@ -18,7 +19,7 @@ export async function signUp(_prevState: AuthActionState, formData: FormData): P
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: translateAuthError(error.message) };
   }
 
   redirect("/dashboard");
@@ -32,7 +33,7 @@ export async function signIn(_prevState: AuthActionState, formData: FormData): P
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: error.message };
+    return { error: translateAuthError(error.message) };
   }
 
   redirect("/dashboard");

@@ -118,7 +118,7 @@ export function WeddingChrome({
   );
   const [isPublished, setIsPublished] = useState(status === "published");
   const [publishPending, startPublishTransition] = useTransition();
-  const [checkoutError, setCheckoutError] = useState("");
+  const [publishError, setPublishError] = useState("");
   const publicPath = `/w/${slug}`;
   const isPaid = plan !== "draft";
   // Guests and RSVP tabs register neither, so there's nothing for this bar
@@ -126,17 +126,33 @@ export function WeddingChrome({
   // so switching tabs clears these correctly.
   const showBottomBar = Boolean(saveBar || previewSnapshot);
 
+  // "已儲存" only flashes briefly after a save completes, rather than
+  // sitting there indefinitely (saveBar.success stays true until the next
+  // submit). Detected as a pending->not-pending edge instead of just
+  // watching `success`, so it re-fires on every save, not just the first.
+  const [showSavedNotice, setShowSavedNotice] = useState(false);
+  const wasPendingRef = useRef(false);
+  useEffect(() => {
+    const isPending = Boolean(saveBar?.pending);
+    const justFinished = wasPendingRef.current && !isPending;
+    wasPendingRef.current = isPending;
+    if (!justFinished || !saveBar?.success) return;
+    setShowSavedNotice(true);
+    const timeout = setTimeout(() => setShowSavedNotice(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [saveBar?.pending, saveBar?.success]);
+
   function togglePublish() {
     // Turning it on for the first time on a still-draft (unpaid) plan sends
     // the couple to Stripe Checkout instead of publishing directly; the
     // webhook flips `plan` once payment succeeds, and this button becomes a
     // normal publish toggle from then on.
     if (!isPublished && !isPaid) {
-      setCheckoutError("");
+      setPublishError("");
       startPublishTransition(async () => {
         const result = await createCheckoutSession(weddingId);
         if ("error" in result) {
-          setCheckoutError(result.error);
+          setPublishError(result.error);
         } else {
           window.location.href = result.url;
         }
@@ -144,9 +160,14 @@ export function WeddingChrome({
       return;
     }
     const next = isPublished ? "draft" : "published";
+    setPublishError("");
     startPublishTransition(async () => {
-      await setWeddingStatus(weddingId, next);
-      setIsPublished(next === "published");
+      try {
+        await setWeddingStatus(weddingId, next);
+        setIsPublished(next === "published");
+      } catch {
+        setPublishError("操作失敗，請稍後再試。");
+      }
     });
   }
 
@@ -195,14 +216,14 @@ export function WeddingChrome({
           ClassicTemplate's scroll-driven animations. */}
       <div className={previewData ? "hidden" : ""}>
         <div className="sticky top-0 z-30 -mx-6 border-b border-[var(--brand-line)] bg-[var(--background)]/95 px-6 backdrop-blur">
-          <div className="mx-auto max-w-4xl pt-5">
+          <div className="mx-auto max-w-4xl pt-3">
             <Link
               href="/dashboard"
               className="text-sm text-[var(--brand-gold)] hover:underline"
             >
               ← 返回
             </Link>
-            <div className="mt-2 flex items-start justify-between gap-4">
+            <div className="mt-1.5 flex items-start justify-between gap-4">
               <h1 className="text-2xl font-medium text-foreground">
                 {groomName || groomLabel} ＆ {brideName || brideLabel}
               </h1>
@@ -221,8 +242,8 @@ export function WeddingChrome({
                       : "付費解鎖發布"}
               </button>
             </div>
-            {checkoutError && <p className="mt-2 text-sm text-red-600">{checkoutError}</p>}
-            <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
+            {publishError && <p className="mt-1.5 text-sm text-red-600">{publishError}</p>}
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
               <span className="flex items-center gap-1.5">
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
@@ -254,7 +275,7 @@ export function WeddingChrome({
                   <Link
                     key={tab.href}
                     href={tab.href}
-                    className={`border-b-2 pb-3 text-sm transition-colors ${
+                    className={`border-b-2 pb-2 text-sm transition-colors ${
                       active
                         ? "border-[var(--brand-gold)] font-medium text-foreground"
                         : "border-transparent text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
@@ -278,10 +299,10 @@ export function WeddingChrome({
               {saveBar?.error && (
                 <p className="text-sm text-red-600">{saveBar.error}</p>
               )}
-              {saveBar?.success && (
-                <p className="text-sm text-green-700">已儲存</p>
-              )}
-              <div className="flex justify-end gap-3">
+              <div className="flex items-center justify-end gap-3">
+                {showSavedNotice && (
+                  <p className="text-sm text-[var(--brand-ink-soft)]">已儲存</p>
+                )}
                 {saveBar && (
                   <button
                     type="submit"

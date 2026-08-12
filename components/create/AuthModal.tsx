@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { translateAuthError } from "@/lib/authErrors";
 import type { User } from "@supabase/supabase-js";
 
 export function AuthModal({
@@ -32,7 +33,7 @@ export function AuthModal({
         options: { data: { display_name: displayName } },
       });
       if (error) {
-        setError(error.message);
+        setError(translateAuthError(error.message));
         setPending(false);
         return;
       }
@@ -45,7 +46,7 @@ export function AuthModal({
     } else {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        setError(error.message);
+        setError(translateAuthError(error.message));
         setPending(false);
         return;
       }

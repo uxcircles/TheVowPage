@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getOwnedWedding } from "@/lib/weddings";
 import { WeddingChrome } from "@/components/dashboard/WeddingChrome";
 
 export default async function WeddingLayout({
@@ -10,17 +10,7 @@ export default async function WeddingLayout({
   params: Promise<{ weddingId: string }>;
 }) {
   const { weddingId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: wedding } = await supabase
-    .from("weddings")
-    .select("id, groom_name, bride_name, groom_label, bride_label, status, slug, plan")
-    .eq("id", weddingId)
-    .eq("owner_id", user?.id ?? "")
-    .maybeSingle();
+  const wedding = await getOwnedWedding(weddingId);
 
   if (!wedding) notFound();
 

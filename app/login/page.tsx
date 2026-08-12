@@ -1,9 +1,19 @@
 "use client";
 
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "@/lib/actions/auth";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+
+// Reads the `?error=oauth` param /auth/callback redirects here with on
+// failure. Isolated in its own component so useSearchParams's Suspense
+// requirement doesn't force the whole page out of static rendering.
+function OAuthErrorNotice() {
+  const searchParams = useSearchParams();
+  if (searchParams.get("error") !== "oauth") return null;
+  return <p className="mt-4 text-center text-sm text-red-600">Google 登入失敗，請再試一次。</p>;
+}
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(signIn, undefined);
@@ -13,6 +23,9 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <h1 className="text-center text-2xl font-medium text-[var(--brand-gold)]">The Vow Page 摯頁</h1>
         <p className="mt-2 text-center text-sm text-[var(--brand-ink-soft)]">登入你的帳號</p>
+        <Suspense fallback={null}>
+          <OAuthErrorNotice />
+        </Suspense>
 
         <div className="mt-8">
           <GoogleAuthButton label="使用 Google 登入" />
