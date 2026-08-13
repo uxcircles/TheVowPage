@@ -282,7 +282,11 @@ export function WeddingChrome({
                     type="submit"
                     form={saveBar.formId}
                     disabled={saveBar.pending}
-                    className="rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
+                    className={
+                      isPublished
+                        ? "rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                        : "rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
+                    }
                   >
                     {saveBar.pending ? "儲存中..." : "儲存"}
                   </button>
@@ -293,14 +297,18 @@ export function WeddingChrome({
                     onClick={handlePreviewClick}
                     className="rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)]"
                   >
-                    預覽喜帖
+                    預覽
                   </button>
                 )}
                 <button
                   type="button"
                   disabled={publishPending}
                   onClick={togglePublish}
-                  className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  className={
+                    isPublished
+                      ? "rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
+                      : "rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  }
                 >
                   {publishPending
                     ? "處理中..."

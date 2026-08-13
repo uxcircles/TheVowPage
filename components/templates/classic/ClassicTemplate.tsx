@@ -80,14 +80,16 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   }, [envelopeState]);
 
   useEffect(() => {
-    // Applied to <body> (not the .classic wrapper) so it doesn't create a
-    // nested scroll container - that would break position:sticky in the
-    // moments stack below.
+    // Horizontal bleed protection lives in app/globals.css (overflow-x: clip
+    // on html/body) - setting overflowX here too would apply as an inline
+    // style, which wins over that class rule and reintroduces the exact bug
+    // clip was chosen to avoid (see the comment there): "hidden" forces the
+    // other axis to compute as a scroll container, breaking the moments
+    // stack's position:sticky and letting mobile Safari still touch-scroll
+    // the hidden axis.
     document.documentElement.style.scrollBehavior = "smooth";
-    document.body.style.overflowX = "hidden";
     return () => {
       document.documentElement.style.scrollBehavior = "";
-      document.body.style.overflowX = "";
     };
   }, []);
 
