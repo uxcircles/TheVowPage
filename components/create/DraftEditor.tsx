@@ -22,6 +22,7 @@ import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
+import { useToast } from "@/components/ui/Toast";
 import {
   emptySchedule,
   SCHEDULE_PLACEHOLDERS,
@@ -153,6 +154,7 @@ function useObjectUrls(files: File[]): string[] {
 
 export function DraftEditor() {
   const router = useRouter();
+  const showToast = useToast();
   const [draft, setDraft] = useState<DraftContent>(EMPTY_DRAFT);
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
   const [photos, setPhotos] = useState<DraftPhotos>({
@@ -164,7 +166,6 @@ export function DraftEditor() {
   const [showAuth, setShowAuth] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState("");
   const [resumeUser, setResumeUser] = useState<User | null>(null);
   const momentsInputRef = useRef<HTMLInputElement>(null);
   const momentFiles = useMemo(() => photos.moments.map((m) => m.file), [photos.moments]);
@@ -176,7 +177,6 @@ export function DraftEditor() {
     lat: number;
     lng: number;
   } | null>(null);
-  const [locationError, setLocationError] = useState("");
   // Tracks the address we last auto-filled, so a re-search can still refresh
   // it - but only while it still matches what we set (i.e. the user hasn't
   // typed their own address over it since).
@@ -256,7 +256,6 @@ export function DraftEditor() {
 
   async function locateVenue() {
     setLocating(true);
-    setLocationError("");
     const result = draft.manualCoords
       ? await fetchGeocode({
           lat: Number(draft.venueLat),
@@ -269,9 +268,7 @@ export function DraftEditor() {
     setLocating(false);
     if (!result) {
       setLocationPreview(null);
-      setLocationError(
-        "找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。",
-      );
+      showToast("找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。", "error");
       return;
     }
     setLocationPreview({ lat: result.lat, lng: result.lng });
@@ -377,13 +374,12 @@ export function DraftEditor() {
 
   async function finalizeSave(user: User) {
     setSaving(true);
-    setSaveError("");
     try {
       const weddingId = await saveDraftAsWedding(draft, photos, user.id);
       sessionStorage.removeItem(STORAGE_KEY);
       router.push(`/dashboard/${weddingId}/edit`);
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : "儲存失敗，請稍後再試");
+      showToast(err instanceof Error ? err.message : "儲存失敗，請稍後再試", "error");
       setSaving(false);
     }
   }
@@ -680,9 +676,6 @@ export function DraftEditor() {
                   >
                     {locating ? "定位中..." : "📍 確認地圖位置"}
                   </button>
-                  {locationError && (
-                    <p className="mt-2 text-sm text-red-600">{locationError}</p>
-                  )}
                   {locationPreview && (
                     <div className="mt-3 flex flex-col gap-2">
                       <p className="text-sm text-[var(--brand-ink-soft)]">
@@ -850,7 +843,6 @@ export function DraftEditor() {
 
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
           <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
-            {saveError && <p className="text-sm text-red-600">{saveError}</p>}
             <div className="flex justify-end gap-3">
               <button
                 type="button"

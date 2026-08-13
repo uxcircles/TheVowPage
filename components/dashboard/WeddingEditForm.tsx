@@ -8,6 +8,7 @@ import { Toggle } from "@/components/ui/Toggle";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
+import { useToast } from "@/components/ui/Toast";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingChrome";
 import type { Tables } from "@/lib/supabase/database.types";
@@ -51,6 +52,7 @@ export function WeddingEditForm({
   footerPhotoUrl: string | null;
   momentPhotoUrls: string[];
 }) {
+  const showToast = useToast();
   const action = updateWeddingContent.bind(null, weddingId);
   const [state, formAction, pending] = useActionState(action, undefined);
   useEditSaveBar({ formId: FORM_ID, pending, error: state?.error, success: state?.success });
@@ -78,7 +80,6 @@ export function WeddingEditForm({
   const [locating, setLocating] = useState(false);
   const [locationPreview, setLocationPreview] = useState<{ lat: number; lng: number } | null>(null);
   const [previewTimezone, setPreviewTimezone] = useState<string | null>(null);
-  const [locationError, setLocationError] = useState("");
   // Tracks the address we last auto-filled, so a re-search can still refresh
   // it - but only while it still matches what we set (i.e. the user hasn't
   // typed their own address over it since).
@@ -86,7 +87,6 @@ export function WeddingEditForm({
 
   async function locateVenue() {
     setLocating(true);
-    setLocationError("");
     const result = manualCoords
       ? await fetchGeocode({
           lat: Number(venueLatRef.current?.value ?? ""),
@@ -99,7 +99,7 @@ export function WeddingEditForm({
     setLocating(false);
     if (!result) {
       setLocationPreview(null);
-      setLocationError("找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。");
+      showToast("找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。", "error");
       return;
     }
     setLocationPreview({ lat: result.lat, lng: result.lng });
@@ -339,7 +339,6 @@ export function WeddingEditForm({
             >
               {locating ? "定位中..." : "📍 確認地圖位置"}
             </button>
-            {locationError && <p className="mt-2 text-sm text-red-600">{locationError}</p>}
             {locationPreview && (
               <div className="mt-3 flex flex-col gap-2">
                 <p className="text-sm text-[var(--brand-ink-soft)]">

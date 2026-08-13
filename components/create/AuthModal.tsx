@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { translateAuthError } from "@/lib/authErrors";
+import { useToast } from "@/components/ui/Toast";
 import type { User } from "@supabase/supabase-js";
 
 export function AuthModal({
@@ -13,17 +14,16 @@ export function AuthModal({
   onClose: () => void;
   onAuthenticated: (user: User) => void;
 }) {
+  const showToast = useToast();
   const [mode, setMode] = useState<"signup" | "login">("signup");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
-    setError("");
     const supabase = createClient();
 
     if (mode === "signup") {
@@ -33,12 +33,12 @@ export function AuthModal({
         options: { data: { display_name: displayName } },
       });
       if (error) {
-        setError(translateAuthError(error.message));
+        showToast(translateAuthError(error.message), "error");
         setPending(false);
         return;
       }
       if (!data.session) {
-        setError("請先到信箱完成驗證信確認，再回來登入一次即可繼續。");
+        showToast("請先到信箱完成驗證信確認，再回來登入一次即可繼續。", "error");
         setPending(false);
         return;
       }
@@ -46,7 +46,7 @@ export function AuthModal({
     } else {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        setError(translateAuthError(error.message));
+        showToast(translateAuthError(error.message), "error");
         setPending(false);
         return;
       }
@@ -116,8 +116,6 @@ export function AuthModal({
               className="rounded border border-[var(--brand-line)] px-3 py-2 text-foreground"
             />
           </label>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"

@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useRef, useTransition } from "react";
 import { addGuest, deleteGuest } from "@/lib/actions/guests";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { useToast } from "@/components/ui/Toast";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export function GuestList({
@@ -12,29 +13,27 @@ export function GuestList({
   weddingId: string;
   guests: Tables<"guests">[];
 }) {
+  const showToast = useToast();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleAdd(formData: FormData) {
-    setError("");
     startTransition(async () => {
       try {
         await addGuest(weddingId, formData);
         formRef.current?.reset();
       } catch {
-        setError("新增賓客失敗，請稍後再試。");
+        showToast("新增賓客失敗，請稍後再試。", "error");
       }
     });
   }
 
   function handleDelete(guestId: string) {
-    setError("");
     startTransition(async () => {
       try {
         await deleteGuest(weddingId, guestId);
       } catch {
-        setError("刪除賓客失敗，請稍後再試。");
+        showToast("刪除賓客失敗，請稍後再試。", "error");
       }
     });
   }
@@ -61,8 +60,6 @@ export function GuestList({
           新增
         </button>
       </form>
-
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       {guests.length === 0 ? (
         <p className="text-sm text-[var(--brand-ink-soft)]">還沒有賓客，新增第一位吧。</p>

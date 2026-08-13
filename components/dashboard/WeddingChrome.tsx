@@ -18,6 +18,7 @@ import { setWeddingStatus } from "@/lib/actions/weddings";
 import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import type { ClassicTemplateData } from "@/components/templates/classic/types";
+import { useToast } from "@/components/ui/Toast";
 
 type SaveBarState = {
   formId: string;
@@ -106,6 +107,7 @@ export function WeddingChrome({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const showToast = useToast();
   const [saveBar, setSaveBar] = useState<SaveBarState>(null);
   const [previewSnapshot, setPreviewSnapshot] =
     useState<PreviewSnapshotFn>(null);
@@ -118,7 +120,6 @@ export function WeddingChrome({
   );
   const [isPublished, setIsPublished] = useState(status === "published");
   const [publishPending, startPublishTransition] = useTransition();
-  const [publishError, setPublishError] = useState("");
   const publicPath = `/w/${slug}`;
   const isPaid = plan !== "draft";
   // Guests and RSVP tabs register neither, so there's nothing for this bar
@@ -126,21 +127,19 @@ export function WeddingChrome({
   // so switching tabs clears these correctly.
   const showBottomBar = Boolean(saveBar || previewSnapshot);
 
-  // "已儲存" only flashes briefly after a save completes, rather than
-  // sitting there indefinitely (saveBar.success stays true until the next
-  // submit). Detected as a pending->not-pending edge instead of just
-  // watching `success`, so it re-fires on every save, not just the first.
-  const [showSavedNotice, setShowSavedNotice] = useState(false);
+  // Fires a toast on the pending->not-pending edge (not just whenever
+  // success/error is truthy) since saveBar.success/error stays set until
+  // the next submit - without edge detection this would show every time
+  // any part of the chrome re-renders, not just right after a save.
   const wasPendingRef = useRef(false);
   useEffect(() => {
     const isPending = Boolean(saveBar?.pending);
     const justFinished = wasPendingRef.current && !isPending;
     wasPendingRef.current = isPending;
-    if (!justFinished || !saveBar?.success) return;
-    setShowSavedNotice(true);
-    const timeout = setTimeout(() => setShowSavedNotice(false), 2000);
-    return () => clearTimeout(timeout);
-  }, [saveBar?.pending, saveBar?.success]);
+    if (!justFinished) return;
+    if (saveBar?.success) showToast("已儲存", "success");
+    else if (saveBar?.error) showToast(saveBar.error, "error");
+  }, [saveBar?.pending, saveBar?.success, saveBar?.error, showToast]);
 
   function togglePublish() {
     // Turning it on for the first time on a still-draft (unpaid) plan sends
@@ -148,11 +147,10 @@ export function WeddingChrome({
     // webhook flips `plan` once payment succeeds, and this button becomes a
     // normal publish toggle from then on.
     if (!isPublished && !isPaid) {
-      setPublishError("");
       startPublishTransition(async () => {
         const result = await createCheckoutSession(weddingId);
         if ("error" in result) {
-          setPublishError(result.error);
+          showToast(result.error, "error");
         } else {
           window.location.href = result.url;
         }
@@ -160,13 +158,12 @@ export function WeddingChrome({
       return;
     }
     const next = isPublished ? "draft" : "published";
-    setPublishError("");
     startPublishTransition(async () => {
       try {
         await setWeddingStatus(weddingId, next);
         setIsPublished(next === "published");
       } catch {
-        setPublishError("操作失敗，請稍後再試。");
+        showToast("操作失敗，請稍後再試。", "error");
       }
     });
   }
@@ -279,14 +276,7 @@ export function WeddingChrome({
         {showBottomBar && (
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
             <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
-              {saveBar?.error && (
-                <p className="text-sm text-red-600">{saveBar.error}</p>
-              )}
-              {publishError && <p className="text-sm text-red-600">{publishError}</p>}
               <div className="flex items-center justify-end gap-3">
-                {showSavedNotice && (
-                  <p className="text-sm text-[var(--brand-ink-soft)]">已儲存</p>
-                )}
                 {saveBar && (
                   <button
                     type="submit"

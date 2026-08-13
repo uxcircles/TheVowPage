@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
+import { SignOutButton } from "@/components/dashboard/SignOutButton";
 
 /** Only shown on the top-level wedding list. One level deep into a specific
  * wedding's own pages, WeddingChrome renders its own compact header (with
@@ -18,9 +19,7 @@ export function DashboardHeader() {
         The Vow Page 摯頁
       </Link>
       <form action={signOut}>
-        <button type="submit" className="text-sm text-[var(--brand-ink-soft)] underline">
-          登出
-        </button>
+        <SignOutButton />
       </form>
     </header>
   );

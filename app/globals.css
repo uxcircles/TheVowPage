@@ -6,6 +6,14 @@
   --brand-gold: #a3835a;
   --brand-ink-soft: #6b6156;
   --brand-line: #ddd1ba;
+  /* Warm, muted tones for toast feedback - a saturated Tailwind red/green
+     reads as jarring against this palette's soft cream/gold. Error is a
+     dusty terracotta (still unmistakably "red"); success reuses the same
+     green already used for the "已發布" status dot elsewhere, rather than
+     the brand gold, which is already the primary-button color and would
+     blend in instead of reading as a distinct confirmation. */
+  --brand-error: #b5533f;
+  --brand-success: #4d8a5f;
 }
 
 @theme inline {
@@ -14,6 +22,8 @@
   --color-brand-gold: var(--brand-gold);
   --color-brand-ink-soft: var(--brand-ink-soft);
   --color-brand-line: var(--brand-line);
+  --color-brand-error: var(--brand-error);
+  --color-brand-success: var(--brand-success);
   --font-sans: var(--font-noto-sans-tc);
 }
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { deleteWedding } from "@/lib/actions/weddings";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
 
 // deleteWedding() redirects to /dashboard on success, which Next.js
 // implements by throwing a special error carrying this digest - our own
@@ -19,9 +20,9 @@ function isRedirectError(error: unknown): boolean {
 }
 
 export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
+  const showToast = useToast();
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
-  const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -37,13 +38,12 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
 
   function handleConfirmDelete() {
     setConfirming(false);
-    setError("");
     startTransition(async () => {
       try {
         await deleteWedding(weddingId);
       } catch (err) {
         if (isRedirectError(err)) throw err;
-        setError("刪除失敗，請稍後再試。");
+        showToast("刪除失敗，請稍後再試。", "error");
       }
     });
   }
@@ -94,9 +94,6 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
           onConfirm={handleConfirmDelete}
           onCancel={() => setConfirming(false)}
         />
-      )}
-      {error && (
-        <p className="absolute right-0 top-full z-10 mt-1 w-40 text-right text-xs text-red-600">{error}</p>
       )}
     </div>
   );

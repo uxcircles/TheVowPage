@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { createWedding } from "@/lib/actions/weddings";
 import { WeddingRowMenu } from "@/components/dashboard/WeddingRowMenu";
+import { CreateWeddingButton } from "@/components/dashboard/CreateWeddingButton";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -18,12 +19,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-medium">我的喜帖</h1>
         <form action={createWedding}>
-          <button
-            type="submit"
-            className="rounded bg-[var(--brand-gold)] px-4 py-2 text-sm text-white transition-opacity hover:opacity-90"
-          >
-            + 建立新喜帖
-          </button>
+          <CreateWeddingButton />
         </form>
       </div>
 

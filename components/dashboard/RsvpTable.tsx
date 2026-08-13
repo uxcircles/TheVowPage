@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { deleteRsvp } from "@/lib/actions/rsvps";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { useToast } from "@/components/ui/Toast";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export function RsvpTable({
@@ -12,16 +13,15 @@ export function RsvpTable({
   weddingId: string;
   rsvps: Tables<"rsvps">[];
 }) {
+  const showToast = useToast();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState("");
 
   function handleDelete(rsvpId: string) {
-    setError("");
     startTransition(async () => {
       try {
         await deleteRsvp(weddingId, rsvpId);
       } catch {
-        setError("刪除失敗，請稍後再試。");
+        showToast("刪除失敗，請稍後再試。", "error");
       }
     });
   }
@@ -32,7 +32,6 @@ export function RsvpTable({
 
   return (
     <div>
-      {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
       <div className="overflow-x-auto rounded border border-[var(--brand-line)] bg-white">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead>

@@ -4,9 +4,11 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { signUp } from "@/lib/actions/auth";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { useActionErrorToast } from "@/components/ui/Toast";
 
 export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signUp, undefined);
+  useActionErrorToast(pending, state?.error);
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-16">
@@ -15,7 +17,7 @@ export default function SignupPage() {
         <p className="mt-2 text-center text-sm text-[var(--brand-ink-soft)]">建立你的帳號，開始製作喜帖</p>
 
         <div className="mt-8">
-          <GoogleAuthButton label="使用 Google 註冊" />
+          <GoogleAuthButton label="使用 Google 繼續" />
         </div>
         <div className="my-6 flex items-center gap-3 text-xs text-[var(--brand-ink-soft)]">
           <span className="h-px flex-1 bg-[var(--brand-line)]" />
@@ -52,8 +54,6 @@ export default function SignupPage() {
               className="rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground"
             />
           </label>
-
-          {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
 
           <button
             type="submit"
