@@ -50,3 +50,20 @@ body {
   color: var(--foreground);
   overflow-x: clip;
 }
+
+/* Skeleton loading bars - Tailwind's default animate-pulse (1 <-> 0.5
+   opacity over 2s) read as barely-moving against these already-light
+   fill colors. Wider swing + faster cycle so it visibly reads as
+   "loading" rather than a static block. */
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.skeleton-pulse {
+  animation: skeleton-pulse 1.3s ease-in-out infinite;
+}

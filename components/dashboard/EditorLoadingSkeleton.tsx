@@ -5,10 +5,10 @@
 // the tab click looking like it did nothing.
 export function EditorLoadingSkeleton() {
   return (
-    <div className="flex animate-pulse flex-col gap-6" aria-label="載入中">
-      <div className="h-24 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-line)]/30" />
-      <div className="h-40 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-line)]/30" />
-      <div className="h-32 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-line)]/30" />
+    <div className="flex flex-col gap-6" aria-label="載入中">
+      <div className="skeleton-pulse h-24 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-line)]/45" />
+      <div className="skeleton-pulse h-40 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-line)]/45" />
+      <div className="skeleton-pulse h-32 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-line)]/45" />
     </div>
   );
 }

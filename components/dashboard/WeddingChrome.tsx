@@ -92,6 +92,7 @@ export function WeddingChrome({
   slug,
   status,
   plan,
+  expiresAt,
   tabs,
   children,
 }: {
@@ -103,6 +104,7 @@ export function WeddingChrome({
   slug: string;
   status: string;
   plan: string;
+  expiresAt: string | null;
   tabs: { href: string; label: string }[];
   children: React.ReactNode;
 }) {
@@ -122,6 +124,13 @@ export function WeddingChrome({
   const [publishPending, startPublishTransition] = useTransition();
   const publicPath = `/w/${slug}`;
   const isPaid = plan !== "draft";
+  const expiryDate = expiresAt ? new Date(expiresAt) : null;
+  const isExpired = Boolean(expiryDate && expiryDate < new Date());
+  const expiryLabel = expiryDate
+    ? `${expiryDate.getFullYear()}/${String(expiryDate.getMonth() + 1).padStart(2, "0")}/${String(
+        expiryDate.getDate()
+      ).padStart(2, "0")}`
+    : null;
   // Guests and RSVP tabs register neither, so there's nothing for this bar
   // to show - both hooks below register their state as null on unmount,
   // so switching tabs clears these correctly.
@@ -245,6 +254,14 @@ export function WeddingChrome({
                   >
                     {publicPath}
                   </a>
+                </>
+              )}
+              {expiryLabel && (
+                <>
+                  <span className="text-[var(--brand-line)]">·</span>
+                  <span className={isExpired ? "text-[var(--brand-error)]" : "text-[var(--brand-ink-soft)]"}>
+                    {isExpired ? "已到期" : `有效期限至 ${expiryLabel}`}
+                  </span>
                 </>
               )}
             </div>

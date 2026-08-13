@@ -149,6 +149,7 @@ export type Database = {
           created_at: string
           dress_code: string
           event_date: string | null
+          expires_at: string | null
           groom_label: string
           groom_name: string
           groom_parents: string
@@ -186,6 +187,7 @@ export type Database = {
           created_at?: string
           dress_code?: string
           event_date?: string | null
+          expires_at?: string | null
           groom_label?: string
           groom_name?: string
           groom_parents?: string
@@ -223,6 +225,7 @@ export type Database = {
           created_at?: string
           dress_code?: string
           event_date?: string | null
+          expires_at?: string | null
           groom_label?: string
           groom_name?: string
           groom_parents?: string

@@ -21,6 +21,11 @@ export const getOwnedWedding = cache(async (weddingId: string): Promise<Tables<"
   return wedding;
 });
 
+export type PublicWeddingResult =
+  | { status: "ok"; data: ClassicTemplateData }
+  | { status: "not_found" }
+  | { status: "expired" };
+
 // RLS lets the owner select their own row here regardless of status (so
 // dashboard code elsewhere can look up a draft by id), but this function is
 // specifically the *public* page's data source - explicitly requiring
@@ -28,7 +33,7 @@ export const getOwnedWedding = cache(async (weddingId: string): Promise<Tables<"
 // unpublished wedding's /w/[slug] link 404s for everyone, including the
 // owner viewing their own draft. Owners preview drafts via the dashboard's
 // own "預覽喜帖" button instead, which shows live unsaved edits too.
-export async function getPublicWeddingData(slug: string): Promise<ClassicTemplateData | null> {
+export async function getPublicWeddingData(slug: string): Promise<PublicWeddingResult> {
   const supabase = await createClient();
   const { data: wedding, error } = await supabase
     .from("weddings")
@@ -36,7 +41,8 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
     .eq("slug", slug)
     .maybeSingle();
 
-  if (error || !wedding || wedding.status !== "published") return null;
+  if (error || !wedding || wedding.status !== "published") return { status: "not_found" };
+  if (wedding.expires_at && new Date(wedding.expires_at) < new Date()) return { status: "expired" };
 
   const { data: photos } = await supabase
     .from("wedding_photos")
@@ -52,7 +58,7 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
   const footerPhoto = photos?.find((p) => p.kind === "footer");
   const moments = (photos ?? []).filter((p) => p.kind === "moment");
 
-  return {
+  const data: ClassicTemplateData = {
     weddingId: wedding.id,
     theme: wedding.theme,
     sealDesign: wedding.seal,
@@ -84,4 +90,5 @@ export async function getPublicWeddingData(slug: string): Promise<ClassicTemplat
     showDressCode: wedding.show_dress_code,
     showRsvp: wedding.show_rsvp,
   };
+  return { status: "ok", data };
 }

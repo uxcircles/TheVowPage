@@ -42,7 +42,7 @@ export default async function EditWeddingPage({
             the same 儲存 action via the form attribute. */}
         <EditorCard>
           <label className="flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]">
-            這決定喜帖的公開網址（thevowpage.com/w/...）
+            喜帖的公開網址（thevowpage.com/w/...）
             <input
               name="slug"
               defaultValue={wedding.slug}

@@ -139,58 +139,10 @@ export async function deleteWedding(weddingId: string) {
   const { supabase } = await requireUser();
   const { error } = await supabase.from("weddings").delete().eq("id", weddingId);
   if (error) throw new Error(error.message);
-  redirect("/dashboard");
-}
-
-const SINGLE_PHOTO_KINDS = new Set(["hero", "family", "footer"]);
-
-export async function uploadWeddingPhoto(weddingId: string, kind: string, formData: FormData) {
-  const { supabase } = await requireUser();
-  const file = formData.get("file") as File | null;
-  if (!file || file.size === 0) return;
-
-  if (SINGLE_PHOTO_KINDS.has(kind)) {
-    const { data: existing } = await supabase
-      .from("wedding_photos")
-      .select("id, storage_path")
-      .eq("wedding_id", weddingId)
-      .eq("kind", kind);
-    for (const photo of existing ?? []) {
-      await supabase.storage.from("wedding-photos").remove([photo.storage_path]);
-      await supabase.from("wedding_photos").delete().eq("id", photo.id);
-    }
-  }
-
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = `${weddingId}/${kind}-${Date.now()}.${ext}`;
-
-  const { error: uploadError } = await supabase.storage.from("wedding-photos").upload(path, file, {
-    contentType: file.type,
-  });
-  if (uploadError) throw new Error(uploadError.message);
-
-  let sortOrder = 0;
-  if (!SINGLE_PHOTO_KINDS.has(kind)) {
-    const { data: maxRow } = await supabase
-      .from("wedding_photos")
-      .select("sort_order")
-      .eq("wedding_id", weddingId)
-      .eq("kind", kind)
-      .order("sort_order", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    sortOrder = (maxRow?.sort_order ?? -1) + 1;
-  }
-
-  const { error: insertError } = await supabase.from("wedding_photos").insert({
-    wedding_id: weddingId,
-    kind,
-    storage_path: path,
-    sort_order: sortOrder,
-  });
-  if (insertError) throw new Error(insertError.message);
-
-  revalidatePath(`/dashboard/${weddingId}/edit`);
+  // ?deleted=1 lets the dashboard list show a toast after the redirect -
+  // the client never sees a normal resolved promise here (redirect() works
+  // by throwing), so there's no other point to fire one from.
+  redirect("/dashboard?deleted=1");
 }
 
 export async function deleteWeddingPhoto(weddingId: string, photoId: string) {

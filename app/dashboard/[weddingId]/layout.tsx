@@ -30,6 +30,7 @@ export default async function WeddingLayout({
       slug={wedding.slug}
       status={wedding.status}
       plan={wedding.plan}
+      expiresAt={wedding.expires_at}
       tabs={tabs}
     >
       {children}

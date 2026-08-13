@@ -6,13 +6,13 @@ export default function Loading() {
     <div className="py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-medium">我的喜帖</h1>
-        <div className="h-9 w-28 animate-pulse rounded bg-[var(--brand-line)]/30" />
+        <div className="skeleton-pulse h-9 w-28 rounded bg-[var(--brand-line)]/45" />
       </div>
       <div className="mt-8 flex flex-col gap-3">
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="h-[72px] animate-pulse rounded border border-[var(--brand-line)] bg-[var(--brand-line)]/20"
+            className="skeleton-pulse h-[72px] rounded border border-[var(--brand-line)] bg-[var(--brand-line)]/35"
           />
         ))}
       </div>

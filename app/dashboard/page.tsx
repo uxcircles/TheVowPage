@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { createWedding } from "@/lib/actions/weddings";
 import { WeddingRowMenu } from "@/components/dashboard/WeddingRowMenu";
 import { CreateWeddingButton } from "@/components/dashboard/CreateWeddingButton";
+import { DeletedNotice } from "@/components/dashboard/DeletedNotice";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -16,6 +18,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="py-10">
+      <Suspense fallback={null}>
+        <DeletedNotice />
+      </Suspense>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-medium">我的喜帖</h1>
         <form action={createWedding}>

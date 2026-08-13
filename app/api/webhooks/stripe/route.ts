@@ -25,11 +25,28 @@ export async function POST(request: Request) {
 
     if (weddingId) {
       const admin = createAdminClient();
+
+      // Extends from the current expires_at when there's time left on it
+      // (a future renewal paying again before expiry), rather than always
+      // resetting to exactly one year from now - that would forfeit
+      // whatever time remained.
+      const { data: existing } = await admin
+        .from("weddings")
+        .select("expires_at")
+        .eq("id", weddingId)
+        .maybeSingle();
+      const now = new Date();
+      const currentExpiry = existing?.expires_at ? new Date(existing.expires_at) : null;
+      const base = currentExpiry && currentExpiry > now ? currentExpiry : now;
+      const expiresAt = new Date(base);
+      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+
       const { error } = await admin
         .from("weddings")
         .update({
           plan: "standard",
-          paid_at: new Date().toISOString(),
+          paid_at: now.toISOString(),
+          expires_at: expiresAt.toISOString(),
           stripe_checkout_session_id: session.id,
         })
         .eq("id", weddingId);
