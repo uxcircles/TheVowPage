@@ -35,17 +35,20 @@ export default async function DashboardPage() {
         {weddings?.map((w) => (
           <li
             key={w.id}
-            className="flex items-center gap-3 rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)]"
+            className="flex items-start gap-3 rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)] sm:items-center"
           >
-            <Link href={`/dashboard/${w.id}/edit`} className="flex flex-1 items-center justify-between">
-              <span>
+            <Link
+              href={`/dashboard/${w.id}/edit`}
+              className="flex flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+            >
+              <span className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
                 <span className="font-medium">
                   {w.groom_name || w.groom_label} ＆ {w.bride_name || w.bride_label}
                 </span>
-                <span className="ml-3 text-sm text-[var(--brand-ink-soft)]">/w/{w.slug}</span>
+                <span className="break-all text-sm text-[var(--brand-ink-soft)]">/w/{w.slug}</span>
               </span>
               <span
-                className={`rounded px-2 py-1 text-xs ${
+                className={`self-start rounded px-2 py-1 text-xs sm:self-auto ${
                   w.status === "published" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
                 }`}
               >

@@ -23,13 +23,20 @@
    stops clipping the cards' own box-shadow) could open up page-level
    horizontal scroll on narrow viewports. Set on both html and body: body
    alone still let touch-drag rubber-band the viewport sideways on mobile
-   when a descendant's content overflowed it. */
+   when a descendant's content overflowed it.
+   Uses `clip`, not `hidden`: setting overflow-x alone forces the *other*
+   axis's computed value from "visible" to "auto" too (a CSS quirk) unless
+   the value is "visible" or "clip" - with `hidden` this silently turned
+   overflow-y into a scroll container on html/body, which broke the moments
+   stack's position:sticky pinning (sticky is computed against the nearest
+   ancestor scroll container, and this one wasn't it). `clip` is exempt
+   from that forcing rule, so overflow-y stays "visible" as intended. */
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
