@@ -167,7 +167,7 @@ const FAQS = [
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between border-b border-[var(--brand-line)]/60 px-6 py-5 sm:px-10">
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-[var(--brand-line)]/60 bg-[var(--background)]/90 px-6 py-5 backdrop-blur sm:px-10">
         <span className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>The Vow Page 摯頁</span>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/login" className="text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]">
@@ -175,7 +175,7 @@ export default function Home() {
           </Link>
           <Link
             href="/create"
-            className="rounded bg-[var(--brand-gold)] px-4 py-2 text-white transition-opacity hover:opacity-90"
+            className="rounded bg-[var(--brand-gold-dark)] px-4 py-2 text-white transition-opacity hover:opacity-90"
           >
             免費試做喜帖
           </Link>
@@ -190,18 +190,17 @@ export default function Home() {
             <h1
               className={`${headingFont.className} mt-4 text-4xl font-semibold leading-tight text-foreground sm:text-5xl`}
             >
-              為新人打造的
+              5 分鐘打造
               <br />
-              電子喜帖平台
+              質感電子喜帖
             </h1>
             <p className="mt-6 max-w-md text-[var(--brand-ink-soft)]">
-              挑選模板、放上照片、填好資訊，幾分鐘內完成一份能收 RSVP
-              的專屬喜帖網站——不用懂設計，也不用寫程式。
+              輕鬆收集 RSVP、傳遞你的專屬浪漫——不用懂設計，也不用寫程式，挑模板、放照片、填資訊就完成。
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/create"
-                className="rounded bg-[var(--brand-gold)] px-8 py-3 text-white transition-opacity hover:opacity-90"
+                className="rounded bg-[var(--brand-gold-dark)] px-8 py-3 text-white transition-opacity hover:opacity-90"
               >
                 開始建立你的喜帖
               </Link>
