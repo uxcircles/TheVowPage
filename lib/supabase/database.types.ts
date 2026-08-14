@@ -70,6 +70,8 @@ export type Database = {
           attending: boolean
           children: number
           created_at: string
+          diet: string
+          diet_note: string
           id: string
           message: string
           name: string
@@ -80,6 +82,8 @@ export type Database = {
           attending: boolean
           children?: number
           created_at?: string
+          diet?: string
+          diet_note?: string
           id?: string
           message?: string
           name: string
@@ -90,6 +94,8 @@ export type Database = {
           attending?: boolean
           children?: number
           created_at?: string
+          diet?: string
+          diet_note?: string
           id?: string
           message?: string
           name?: string

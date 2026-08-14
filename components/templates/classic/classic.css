@@ -1055,8 +1055,65 @@
   padding: 10px 12px;
   width: 100%;
 }
+.classic .rsvp-diet {
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.classic .rsvp-diet legend {
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  padding: 0;
+  margin-bottom: 6px;
+  width: 100%;
+}
+.classic .rsvp-diet label {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--ink);
+}
+.classic .rsvp-diet input[type="checkbox"] {
+  accent-color: var(--gold);
+}
+.classic .rsvp-diet label:has(input:disabled) {
+  color: var(--ink-soft);
+  opacity: 0.5;
+}
+.classic .rsvp-diet label.rsvp-diet-note {
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  font-size: 13px;
+}
+.classic .rsvp-diet-note input[type="text"] {
+  font-family: var(--classic-font-body), serif;
+  font-size: 15px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 10px 12px;
+}
+.classic .rsvp-diet-note input[type="text"]:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.classic .rsvp-submit-bar {
+  position: sticky;
+  bottom: 0;
+  background: var(--cream);
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+}
 .classic .rsvp-submit {
-  margin-top: 8px;
+  width: 100%;
   font-family: var(--classic-font-display), serif;
   font-style: italic;
   font-size: 16px;

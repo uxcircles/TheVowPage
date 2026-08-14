@@ -40,6 +40,7 @@ export function RsvpTable({
               <th className="px-4 py-3 font-medium">出席</th>
               <th className="px-4 py-3 font-medium">大人</th>
               <th className="px-4 py-3 font-medium">小孩</th>
+              <th className="px-4 py-3 font-medium">飲食需求</th>
               <th className="px-4 py-3 font-medium">留言</th>
               <th className="px-4 py-3 font-medium">時間</th>
               <th className="px-4 py-3" />
@@ -52,6 +53,15 @@ export function RsvpTable({
                 <td className="px-4 py-3">{r.attending ? "出席" : "不出席"}</td>
                 <td className="px-4 py-3">{r.attending ? r.adults : "-"}</td>
                 <td className="px-4 py-3">{r.attending ? r.children : "-"}</td>
+                <td className="px-4 py-3 max-w-[200px]">
+                  {r.attending && (r.diet || r.diet_note) ? (
+                    <span className="block truncate" title={[r.diet, r.diet_note].filter(Boolean).join(" - ")}>
+                      {[r.diet, r.diet_note].filter(Boolean).join(" - ")}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
                 <td className="px-4 py-3 max-w-[240px] truncate">{r.message}</td>
                 <td className="px-4 py-3 text-[var(--brand-ink-soft)]">
                   {new Date(r.created_at).toLocaleString("zh-TW")}
