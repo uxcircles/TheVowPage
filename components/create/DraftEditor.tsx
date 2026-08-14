@@ -435,6 +435,7 @@ export function DraftEditor() {
         <section className="mt-8">
           <h2 className="mb-4 text-lg font-medium">喜帖樣板</h2>
           <EditorCard>
+            <p className="mb-2 text-sm font-medium text-foreground">顏色</p>
             <ThemePicker value={draft.theme} onChange={(id) => update("theme", id)} />
             <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
             <SealPicker

@@ -22,9 +22,9 @@ export function SealPicker({
               : "border-[var(--brand-line)] hover:border-[var(--brand-gold)]"
           }`}
         >
-          <span className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-black/10 bg-[var(--brand-line)]">
+          <span className="h-7 w-7 shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={seal.image} alt="" className="h-full w-full object-cover" />
+            <img src={seal.image} alt="" className="h-full w-full object-contain" />
           </span>
           <span className="text-sm font-medium text-foreground">{seal.name}</span>
         </button>

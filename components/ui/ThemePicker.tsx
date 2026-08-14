@@ -22,10 +22,14 @@ export function ThemePicker({
               : "border-[var(--brand-line)] hover:border-[var(--brand-gold)]"
           }`}
         >
-          <span
-            className="h-7 w-7 shrink-0 rounded-full border border-black/10"
-            style={{ backgroundColor: theme.gold }}
-          />
+          <span className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-black/10">
+            <span
+              className="block h-full w-full"
+              style={{
+                background: `linear-gradient(45deg, ${theme.gold} 50%, ${theme.line} 50%)`,
+              }}
+            />
+          </span>
           <span className="text-sm font-medium text-foreground">{theme.name}</span>
         </button>
       ))}
