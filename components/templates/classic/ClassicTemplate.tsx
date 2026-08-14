@@ -523,7 +523,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
             <p className="eyebrow" ref={scheduleEyebrowRef}>
               schedule
             </p>
-            {data.schedule.length > 0 && (
+            {data.schedule.length > 0 ? (
               <ul className="timeline">
                 {data.schedule.map((item, i) => (
                   <li
@@ -540,6 +540,8 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
                   </li>
                 ))}
               </ul>
+            ) : (
+              <p className="schedule-empty">流程籌備中</p>
             )}
           </>
         )}

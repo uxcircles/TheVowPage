@@ -853,6 +853,13 @@
   display: inline-block;
   text-align: left;
 }
+.classic .schedule-empty {
+  margin-top: 48px;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
 .classic .timeline li {
   display: flex;
   align-items: baseline;
