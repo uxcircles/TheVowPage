@@ -44,7 +44,11 @@ export function MomentsLightbox({
       body.style.position = prev.position;
       body.style.top = prev.top;
       body.style.width = prev.width;
-      window.scrollTo(0, scrollY);
+      // `behavior: "instant"` overrides the template's global
+      // `scrollBehavior: smooth` (set for the calendar/anchor links) - without
+      // it, restoring scroll here visibly animates from the top back down to
+      // where the user was, instead of landing there instantly.
+      window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
     };
   }, []);
 
