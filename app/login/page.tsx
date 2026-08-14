@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signIn } from "@/lib/actions/auth";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { useToast, useActionErrorToast } from "@/components/ui/Toast";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { headingFont } from "@/lib/fonts";
 
 // Reads the `?error=oauth` param /auth/callback redirects here with on
@@ -57,13 +58,7 @@ export default function LoginPage() {
           </label>
           <label className="flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]">
             密碼
-            <input
-              type="password"
-              name="password"
-              required
-              minLength={6}
-              className="rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground"
-            />
+            <PasswordInput name="password" required minLength={6} />
           </label>
 
           <button

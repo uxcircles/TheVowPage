@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { translateAuthError } from "@/lib/authErrors";
 import { useToast } from "@/components/ui/Toast";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import type { User } from "@supabase/supabase-js";
 
 export function AuthModal({
@@ -67,7 +68,7 @@ export function AuthModal({
           </button>
         </div>
         <p className="mb-4 text-sm text-[var(--brand-ink-soft)]">
-          你剛剛編輯的內容會在{mode === "signup" ? "建立帳號" : "登入"}後自動儲存，不會遺失。
+          編輯的內容會在{mode === "signup" ? "建立帳號" : "登入"}後自動儲存，不會遺失。
         </p>
 
         {/* Google is a full-page redirect (Google -> /auth/callback ->
@@ -107,14 +108,7 @@ export function AuthModal({
           </label>
           <label className="flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]">
             密碼
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded border border-[var(--brand-line)] px-3 py-2 text-foreground"
-            />
+            <PasswordInput required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
           </label>
 
           <button
