@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { EB_Garamond } from "next/font/google";
 import { InvitationCardVisual, InvitationPreviewCard } from "@/components/marketing/InvitationPreviewCard";
+import { Reveal } from "@/components/marketing/Reveal";
+import { ShowcaseCarousel } from "@/components/marketing/ShowcaseCarousel";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
 import { headingFont } from "@/lib/fonts";
 
@@ -8,8 +10,8 @@ const displayFont = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"] });
 
 function IconWrap({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-gold)]/10 text-[var(--brand-gold)]">
-      {children}
+    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-gold)]/10 text-[var(--brand-gold)]">
+      <span className="[&>svg]:h-6 [&>svg]:w-6">{children}</span>
     </div>
   );
 }
@@ -71,6 +73,26 @@ function PhoneIcon() {
   );
 }
 
+function PaletteIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2a2 2 0 0 1 2-2h1a3 3 0 0 0 3-3c0-6-3.6-11-8-11Z" />
+      <circle cx="7.5" cy="11" r="1" fill="currentColor" stroke="none" />
+      <circle cx="10" cy="7.5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="7.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15V4M12 4l-4 4M12 4l4 4" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </svg>
+  );
+}
+
 function ChevronIcon() {
   return (
     <svg
@@ -90,47 +112,50 @@ const BENEFITS = [
   {
     icon: ShareIcon,
     title: "免印刷、免寄送",
-    description: "一個連結分享給所有賓客，立刻看到喜帖，省下印製與郵寄的時間與費用。",
+    description: "一個連結分享給所有賓客，省下印製與郵寄的時間與費用。",
   },
   {
     icon: LeafIcon,
     title: "環保無紙化",
-    description: "不製造紙本浪費，符合現代新人重視永續、簡約的價值觀。",
+    description: "不製造紙本浪費，符合現代新人重視的永續價值觀。",
   },
   {
     icon: ClipboardCheckIcon,
-    title: "RSVP 即時回覆與統計",
-    description: "賓客直接在頁面上回覆出席與否，人數自動彙整，不用再一一電話確認。",
+    title: "RSVP 即時統計",
+    description: "賓客直接線上回覆，出席人數自動彙整，不用再逐一電話確認。",
   },
   {
     icon: MapPinIcon,
-    title: "地址自動定位、時區自動換算",
-    description: "只要打場地名稱，系統自動標出地圖位置並換算正確時區，海外賓客也不會搞錯時間。",
+    title: "地圖與時區自動換算",
+    description: "打上場地名稱，自動標出位置並換算時區，海外賓客也不會搞錯時間。",
   },
   {
     icon: EditIcon,
     title: "隨時修改內容",
-    description: "婚期異動、場地變更，直接在後台更新，不用重新印製或補寄。",
+    description: "婚期異動、場地變更，後台直接更新，不用重新印製或補寄。",
   },
   {
     icon: PhoneIcon,
     title: "手機也完美呈現",
-    description: "拆信封、刮刮卡等精緻互動效果，在手機上一樣流暢動人。",
+    description: "拆信封、刮刮卡等互動效果，在手機上一樣流暢動人。",
   },
 ];
 
 const STEPS = [
   {
+    icon: PaletteIcon,
     number: "01",
     title: "挑選模板與配色",
     description: "選擇喜歡的樣式與色調，一鍵套用到你的喜帖。",
   },
   {
+    icon: UploadIcon,
     number: "02",
     title: "填寫資訊、上傳照片",
     description: "新人資訊、婚期地點、婚紗照，幾分鐘內就能完成。",
   },
   {
+    icon: ShareIcon,
     number: "03",
     title: "分享連結、收 RSVP",
     description: "傳給賓客，即時收到出席回覆與人數統計。",
@@ -185,8 +210,11 @@ export default function Home() {
       <main className="flex flex-1 flex-col">
         {/* Hero */}
         <section className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 px-6 py-16 sm:px-10 sm:py-24 lg:grid-cols-2">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">wedding invitation</p>
+          <Reveal>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--brand-gold)]/10 px-3 py-1 text-xs font-medium text-[var(--brand-gold-dark)]">
+              🎉 前 20 組新人限定優惠
+            </span>
+            <p className="mt-4 text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">wedding invitation</p>
             <h1
               className={`${headingFont.className} mt-4 text-4xl font-semibold leading-tight text-foreground sm:text-5xl`}
             >
@@ -211,37 +239,39 @@ export default function Home() {
                 先看看作品範例
               </a>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="relative mx-auto w-full max-w-sm">
+          <Reveal delay={150} className="relative mx-auto w-full max-w-sm">
             <div className="absolute -right-4 -top-4 w-full rotate-3 opacity-60">
               <InvitationCardVisual theme={CLASSIC_THEMES[1]} />
             </div>
             <div className="relative -rotate-2">
               <InvitationPreviewCard theme={CLASSIC_THEMES[0]} />
             </div>
-          </div>
+          </Reveal>
         </section>
 
         {/* Benefits */}
         <section className="bg-white/50 px-6 py-20 sm:px-10">
           <div className="mx-auto max-w-5xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">why digital</p>
-            <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>
-              為什麼新人都選擇電子喜帖
-            </h2>
-            <p className="mt-3 max-w-lg text-[var(--brand-ink-soft)]">
-              紙本喜帖印刷、寄送耗時耗力，場地或時間異動時還常常來不及通知——這些麻煩，電子喜帖都幫你省下來。
-            </p>
+            <Reveal>
+              <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">why digital</p>
+              <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>
+                為什麼新人都選擇電子喜帖
+              </h2>
+              <p className="mt-3 max-w-lg text-[var(--brand-ink-soft)]">
+                紙本喜帖印刷、寄送耗時耗力，場地或時間異動時還常常來不及通知——這些麻煩，電子喜帖都幫你省下來。
+              </p>
+            </Reveal>
             <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-              {BENEFITS.map((b) => (
-                <div key={b.title}>
+              {BENEFITS.map((b, i) => (
+                <Reveal key={b.title} delay={(i % 3) * 100}>
                   <IconWrap>
                     <b.icon />
                   </IconWrap>
-                  <h3 className="mt-4 font-medium text-foreground">{b.title}</h3>
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">{b.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[var(--brand-ink-soft)]">{b.description}</p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -250,18 +280,22 @@ export default function Home() {
         {/* How it works */}
         <section className="px-6 py-20 sm:px-10">
           <div className="mx-auto max-w-5xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">how it works</p>
-            <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>三步驟完成喜帖</h2>
+            <Reveal>
+              <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">how it works</p>
+              <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>三步驟完成喜帖</h2>
+            </Reveal>
             <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
               {STEPS.map((step, i) => (
-                <div key={step.title} className="relative">
-                  <p className={`${headingFont.className} text-4xl text-[var(--brand-gold)]/40`}>{step.number}</p>
-                  <h3 className="mt-3 font-medium text-foreground">{step.title}</h3>
+                <Reveal key={step.title} delay={i * 120}>
+                  <div className="flex items-center gap-3">
+                    <IconWrap>
+                      <step.icon />
+                    </IconWrap>
+                    <p className={`${headingFont.className} text-4xl text-[var(--brand-gold)]/40`}>{step.number}</p>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[var(--brand-ink-soft)]">{step.description}</p>
-                  {i < STEPS.length - 1 && (
-                    <div className="mt-6 hidden h-px w-full bg-[var(--brand-line)] sm:block" aria-hidden="true" />
-                  )}
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -270,41 +304,70 @@ export default function Home() {
         {/* Template showcase */}
         <section id="showcase" className="bg-white/50 px-6 py-20 sm:px-10">
           <div className="mx-auto max-w-5xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">showcase</p>
-            <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>作品範例</h2>
-            <p className="mt-3 max-w-lg text-[var(--brand-ink-soft)]">
-              目前提供「經典」模板，可自由選擇配色氛圍；更多版面模板陸續推出中。
-            </p>
+            <Reveal>
+              <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">showcase</p>
+              <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>作品範例</h2>
+              <p className="mt-3 max-w-lg text-[var(--brand-ink-soft)]">
+                目前提供「經典」模板，可自由選擇配色氛圍；更多版面模板陸續推出中。
+              </p>
+            </Reveal>
             <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {CLASSIC_THEMES.map((theme) => (
-                <InvitationPreviewCard key={theme.name} theme={theme} />
-              ))}
-              <div className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--brand-line)] text-center">
-                <p className={`${displayFont.className} text-lg text-[var(--brand-ink-soft)]`}>
-                  Coming Soon
-                </p>
-                <p className="text-sm text-[var(--brand-ink-soft)]">更多模板敬請期待</p>
-              </div>
+              <ShowcaseCarousel themes={CLASSIC_THEMES} />
+              <Reveal delay={(CLASSIC_THEMES.length % 4) * 100}>
+                <div className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--brand-line)] text-center">
+                  <p className={`${displayFont.className} text-lg text-[var(--brand-ink-soft)]`}>
+                    Coming Soon
+                  </p>
+                  <p className="text-sm text-[var(--brand-ink-soft)]">更多模板敬請期待</p>
+                </div>
+              </Reveal>
             </div>
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* Founder story */}
         <section className="px-6 py-20 sm:px-10">
-          <div className="mx-auto max-w-3xl">
-            <p className="text-center text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">faq</p>
-            <h2 className={`${headingFont.className} mt-3 text-center text-3xl font-semibold text-foreground`}>
-              常見問題
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">our story</p>
+            <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>
+              為什麼我們做這個
             </h2>
+            <p className="mt-6 text-[var(--brand-ink-soft)] leading-relaxed">
+              「摯頁」的誕生，來自於一場我們想給朋友的驚喜。
+            </p>
+            <p className="mt-4 text-[var(--brand-ink-soft)] leading-relaxed">
+              當時我們希望能有一張既有儀式感，可以溫柔拆開信封、刮開婚期彩蛋，又能讓賓客一鍵 RSVP
+              回覆的數位喜帖。但找遍了市面上的工具，總覺得少了點質感與溫度，於是我們決定親手為他們打造。
+            </p>
+            <p className="mt-4 text-[var(--brand-ink-soft)] leading-relaxed">
+              婚禮過後，陸續收到身邊朋友問：「這個喜帖太棒了，之後能不能借我用？」這才催生了摯頁，一個讓每對新人都能輕鬆上手、自由編輯並發布的喜帖平台。
+            </p>
+            <p className="mt-4 text-[var(--brand-ink-soft)] leading-relaxed">
+              摯頁目前還是一個剛起步的小小雛形。如果你也喜歡這樣的儀式感，我們無比珍惜、也非常期待能參與你們這份專屬的幸福。
+            </p>
+          </Reveal>
+        </section>
+
+        {/* FAQ */}
+        <section className="bg-white/50 px-6 py-20 sm:px-10">
+          <div className="mx-auto max-w-3xl">
+            <Reveal className="text-center">
+              <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">faq</p>
+              <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>
+                常見問題
+              </h2>
+            </Reveal>
             <div className="mt-10 flex flex-col divide-y divide-[var(--brand-line)] border-y border-[var(--brand-line)]">
-              {FAQS.map((faq) => (
-                <details key={faq.question} className="group py-5">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-foreground">
-                    {faq.question}
-                    <ChevronIcon />
-                  </summary>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--brand-ink-soft)]">{faq.answer}</p>
-                </details>
+              {FAQS.map((faq, i) => (
+                <Reveal key={faq.question} delay={(i % 3) * 80}>
+                  <details className="group py-5">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-foreground">
+                      {faq.question}
+                      <ChevronIcon />
+                    </summary>
+                    <p className="mt-3 text-sm leading-relaxed text-[var(--brand-ink-soft)]">{faq.answer}</p>
+                  </details>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -312,7 +375,7 @@ export default function Home() {
 
         {/* Closing CTA */}
         <section className="px-6 py-20 sm:px-10">
-          <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-2xl bg-[var(--foreground)] px-8 py-16 text-center text-[var(--background)]">
+          <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-2xl bg-[var(--foreground)] px-8 py-16 text-center text-[var(--background)]">
             <h2 className={`${headingFont.className} text-3xl font-semibold`}>準備好開始了嗎？</h2>
             <p className="max-w-md text-white/70">
               不用先註冊，直接試做看看——準備好要儲存時再建立帳號，內容不會遺失。
@@ -323,7 +386,7 @@ export default function Home() {
             >
               開始建立你的喜帖
             </Link>
-          </div>
+          </Reveal>
         </section>
       </main>
 
