@@ -1,11 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 /** Full-screen click-to-zoom viewer shared by both the grid and carousel
  * moments styles - prev/next, Escape, click-outside to close, all driven by
  * the parent's `openIndex` state rather than owning it, since both callers
- * need that index for their own card highlighting too. */
+ * need that index for their own card highlighting too.
+ *
+ * Rendered via a portal to the page's `.classic` root rather than in place:
+ * the carousel style's root has the `.reveal` scroll-in class, which sets a
+ * CSS `transform` (even `translateY(0)` once revealed) - any transform on
+ * an ancestor turns this overlay's `position: fixed` into `position:
+ * absolute` relative to that ancestor instead of the viewport, so without
+ * the portal the "full-screen" backdrop only covers the moments section's
+ * own box. Portaling to `.classic` (rather than all the way to
+ * `document.body`) keeps it outside that transformed ancestor while
+ * staying inside the `.classic .lightbox`-scoped stylesheet. */
 export function MomentsLightbox({
   photoUrls,
   openIndex,
@@ -17,22 +28,37 @@ export function MomentsLightbox({
   onClose: () => void;
   onNavigate: (index: number) => void;
 }) {
+  // Locks background scroll for as long as the lightbox is mounted (open to
+  // close, not re-run per photo navigated to). `overflow: hidden` on body
+  // alone doesn't stop touch-scroll on iOS Safari, which still rubber-bands
+  // the page underneath - pinning body to the current scroll position via
+  // `position: fixed` is the reliable cross-browser way to actually lock it.
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const prev = { position: body.style.position, top: body.style.top, width: body.style.width };
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    return () => {
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.width = prev.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft") onNavigate((openIndex - 1 + photoUrls.length) % photoUrls.length);
       if (e.key === "ArrowRight") onNavigate((openIndex + 1) % photoUrls.length);
     }
-    document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", onKeyDown);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openIndex, photoUrls.length]);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [openIndex, photoUrls.length, onClose, onNavigate]);
 
-  return (
+  return createPortal(
     <div className="lightbox is-open" onClick={onClose}>
       <button type="button" className="lightbox-close" aria-label="關閉" onClick={onClose}>
         &times;
@@ -66,6 +92,7 @@ export function MomentsLightbox({
       >
         &#8250;
       </button>
-    </div>
+    </div>,
+    document.querySelector(".classic") ?? document.body
   );
 }

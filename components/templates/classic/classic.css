@@ -580,6 +580,7 @@
   display: block;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+  cursor: pointer;
 }
 @media (max-width: 720px) {
   .classic .polaroid {

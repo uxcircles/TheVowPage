@@ -10,6 +10,7 @@ import { getMomentsStyle } from "./momentsStyles";
 import { ScratchCard } from "./ScratchCard";
 import { MomentsGrid } from "./MomentsGrid";
 import { MomentsCarousel } from "./MomentsCarousel";
+import { MomentsLightbox } from "./MomentsLightbox";
 import { VenueMap } from "./VenueMap";
 import { RsvpSection } from "./RsvpForm";
 import { useReveal } from "./useReveal";
@@ -67,6 +68,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const timelineItemRefs = useRef<(HTMLElement | undefined)[]>([]);
 
   const [envelopeState, setEnvelopeState] = useState<"locked" | "opening" | "hidden">("locked");
+  const [stackLightboxIndex, setStackLightboxIndex] = useState<number | null>(null);
   const eventDate = data.eventDate ? new Date(data.eventDate) : null;
   const momentsStyle = getMomentsStyle(data.momentsStyle);
 
@@ -480,11 +482,19 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
               <div className="stack-viewport" ref={stackViewportRef}>
                 {data.momentPhotoUrls.map((url, i) => (
                   <div className="polaroid" key={url + i}>
-                    <img src={url} alt="" />
+                    <img src={url} alt="" onClick={() => setStackLightboxIndex(i)} />
                   </div>
                 ))}
               </div>
             </section>
+          )}
+          {stackLightboxIndex !== null && (
+            <MomentsLightbox
+              photoUrls={data.momentPhotoUrls}
+              openIndex={stackLightboxIndex}
+              onClose={() => setStackLightboxIndex(null)}
+              onNavigate={setStackLightboxIndex}
+            />
           )}
         </>
       )}
