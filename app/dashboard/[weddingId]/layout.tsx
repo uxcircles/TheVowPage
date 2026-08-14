@@ -27,7 +27,6 @@ export default async function WeddingLayout({
       brideName={wedding.bride_name}
       groomLabel={wedding.groom_label}
       brideLabel={wedding.bride_label}
-      slug={wedding.slug}
       status={wedding.status}
       plan={wedding.plan}
       expiresAt={wedding.expires_at}

@@ -89,7 +89,6 @@ export function WeddingChrome({
   brideName,
   groomLabel,
   brideLabel,
-  slug,
   status,
   plan,
   expiresAt,
@@ -101,7 +100,6 @@ export function WeddingChrome({
   brideName: string;
   groomLabel: string;
   brideLabel: string;
-  slug: string;
   status: string;
   plan: string;
   expiresAt: string | null;
@@ -122,7 +120,6 @@ export function WeddingChrome({
   );
   const [isPublished, setIsPublished] = useState(status === "published");
   const [publishPending, startPublishTransition] = useTransition();
-  const publicPath = `/w/${slug}`;
   const isPaid = plan !== "draft";
   const expiryDate = expiresAt ? new Date(expiresAt) : null;
   const isExpired = Boolean(expiryDate && expiryDate < new Date());
@@ -243,19 +240,6 @@ export function WeddingChrome({
                   {isPublished ? "已發布" : "草稿"}
                 </span>
               </span>
-              {isPublished && (
-                <>
-                  <span className="text-[var(--brand-line)]">·</span>
-                  <a
-                    href={publicPath}
-                    target="_blank"
-                    rel="noopener"
-                    className="text-[var(--brand-gold)] underline underline-offset-2"
-                  >
-                    {publicPath}
-                  </a>
-                </>
-              )}
               {expiryLabel && (
                 <>
                   <span className="text-[var(--brand-line)]">·</span>

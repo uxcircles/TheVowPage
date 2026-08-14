@@ -823,7 +823,7 @@ export function DraftEditor() {
               {draft.showRsvp ? (
                 <p className="text-sm text-[var(--brand-ink-soft)]">
                   賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在後台的「RSVP
-                  回覆」頁面。
+                  回覆」頁面
                 </p>
               ) : (
                 <HiddenSectionHint />

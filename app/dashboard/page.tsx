@@ -49,12 +49,14 @@ export default async function DashboardPage() {
         {weddings?.map((w) => (
           <li
             key={w.id}
-            className="flex items-start gap-3 rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)] sm:items-center"
+            className="relative flex items-start gap-3 rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)] sm:items-center"
           >
             <Link
               href={`/dashboard/${w.id}/edit`}
-              className="flex flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
-            >
+              className="absolute inset-0"
+              aria-label={`${w.groom_name || w.groom_label} ＆ ${w.bride_name || w.bride_label}`}
+            />
+            <div className="flex flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <span className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
                 <span className="font-medium">
                   {w.groom_name || w.groom_label} ＆ {w.bride_name || w.bride_label}
@@ -68,8 +70,12 @@ export default async function DashboardPage() {
               >
                 {w.status === "published" ? "已發布" : "草稿"}
               </span>
-            </Link>
-            {w.status !== "published" && <WeddingRowMenu weddingId={w.id} />}
+            </div>
+            {w.status !== "published" && (
+              <div className="relative z-10">
+                <WeddingRowMenu weddingId={w.id} />
+              </div>
+            )}
           </li>
         ))}
       </ul>

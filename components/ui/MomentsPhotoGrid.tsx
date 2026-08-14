@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -12,6 +11,7 @@ import {
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { useHasFinePointer } from "@/lib/useHasFinePointer";
 
 export type MomentsPhotoItem = { id: string; url: string };
 
@@ -21,18 +21,6 @@ export type MomentsPhotoItem = { id: string; url: string };
 // drag on devices that report a fine pointer (i.e. a mouse), and falls back
 // to explicit ↑/↓ buttons everywhere else instead of trying to make touch
 // drag work.
-function useHasFinePointer() {
-  const [hasFinePointer, setHasFinePointer] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasFinePointer(mq.matches);
-    const handleChange = (e: MediaQueryListEvent) => setHasFinePointer(e.matches);
-    mq.addEventListener("change", handleChange);
-    return () => mq.removeEventListener("change", handleChange);
-  }, []);
-  return hasFinePointer;
-}
 
 function SortablePhoto({
   item,

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getOwnedWedding } from "@/lib/weddings";
-import { WeddingEditForm, FORM_ID } from "@/components/dashboard/WeddingEditForm";
+import { WeddingEditForm } from "@/components/dashboard/WeddingEditForm";
+import { SlugField } from "@/components/dashboard/SlugField";
 import { WeddingStylePicker } from "@/components/dashboard/WeddingStylePicker";
 import { MomentsStyleField } from "@/components/dashboard/MomentsStyleField";
 import { PhotoSlot } from "@/components/dashboard/PhotoSlot";
@@ -41,16 +42,7 @@ export default async function EditWeddingPage({
             the content fields further down) while still submitting through
             the same 儲存 action via the form attribute. */}
         <EditorCard>
-          <label className="flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]">
-            喜帖的公開網址（thevowpage.com/w/...）
-            <input
-              name="slug"
-              defaultValue={wedding.slug}
-              required
-              form={FORM_ID}
-              className="rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground"
-            />
-          </label>
+          <SlugField slug={wedding.slug} />
         </EditorCard>
       </section>
 

@@ -443,7 +443,7 @@ export function WeddingEditForm({
         <input type="hidden" name="showRsvp" value={showRsvp ? "on" : "off"} />
         {showRsvp ? (
           <p className="text-sm text-[var(--brand-ink-soft)]">
-            賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在「RSVP 回覆」頁面。
+            賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在「RSVP 回覆」頁面
           </p>
         ) : (
           <HiddenSectionHint />
