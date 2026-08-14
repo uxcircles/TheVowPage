@@ -398,8 +398,16 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-[var(--brand-line)]/60 px-6 py-8 text-center text-xs text-[var(--brand-ink-soft)]">
-        © {new Date().getFullYear()} The Vow Page 摯頁
+      <footer className="flex flex-col items-center gap-3 border-t border-[var(--brand-line)]/60 px-6 py-8 text-center text-xs text-[var(--brand-ink-soft)]">
+        <div className="flex items-center gap-4">
+          <Link href="/terms" className="hover:text-[var(--brand-gold)]">
+            服務條款
+          </Link>
+          <Link href="/privacy" className="hover:text-[var(--brand-gold)]">
+            隱私權政策
+          </Link>
+        </div>
+        <p>© {new Date().getFullYear()} The Vow Page 摯頁</p>
       </footer>
     </div>
   );
