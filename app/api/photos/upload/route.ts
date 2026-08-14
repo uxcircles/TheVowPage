@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { validatePhotoFile, MAX_MOMENT_PHOTOS } from "@/lib/photoLimits";
 
 // Route Handler (not a Server Action) specifically so the browser can XHR
 // this directly and get real upload-progress events - see
@@ -23,6 +24,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "請求格式錯誤。" }, { status: 400 });
   }
 
+  const validationError = validatePhotoFile(file);
+  if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
+
   const { data: wedding } = await supabase
     .from("weddings")
     .select("id")
@@ -30,6 +34,17 @@ export async function POST(req: NextRequest) {
     .eq("owner_id", user.id)
     .maybeSingle();
   if (!wedding) return NextResponse.json({ error: "找不到這份喜帖。" }, { status: 404 });
+
+  if (kind === "moment") {
+    const { count } = await supabase
+      .from("wedding_photos")
+      .select("id", { count: "exact", head: true })
+      .eq("wedding_id", weddingId)
+      .eq("kind", "moment");
+    if ((count ?? 0) >= MAX_MOMENT_PHOTOS) {
+      return NextResponse.json({ error: `婚紗相簿最多只能上傳 ${MAX_MOMENT_PHOTOS} 張照片。` }, { status: 400 });
+    }
+  }
 
   if (SINGLE_PHOTO_KINDS.has(kind)) {
     const { data: existing } = await supabase

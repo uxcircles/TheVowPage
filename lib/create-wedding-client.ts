@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { wallTimeToUtcIso } from "@/lib/timezone";
+import { validatePhotoFile } from "@/lib/photoLimits";
 import type { ScheduleItem } from "@/components/templates/classic/types";
 
 const DEFAULT_TIMEZONE = "Asia/Taipei";
@@ -138,6 +139,8 @@ export async function saveDraftAsWedding(
   const weddingId = wedding.id as string;
 
   async function uploadOne(kind: string, file: File, sortOrder: number) {
+    const validationError = validatePhotoFile(file);
+    if (validationError) throw new Error(validationError);
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${weddingId}/${kind}-${Date.now()}-${sortOrder}.${ext}`;
     const { error: uploadError } = await supabase.storage

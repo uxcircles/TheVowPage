@@ -24,6 +24,8 @@ import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
 import { headingFont } from "@/lib/fonts";
+import { validatePhotoType, validatePhotoSize, MAX_MOMENT_PHOTOS } from "@/lib/photoLimits";
+import { compressImage } from "@/lib/compressImage";
 import {
   emptySchedule,
   SCHEDULE_PLACEHOLDERS,
@@ -101,6 +103,8 @@ function PhotoPicker({
   onChange: (file: File | null) => void;
 }) {
   const url = useObjectUrl(file);
+  const showToast = useToast();
+  const [compressing, setCompressing] = useState(false);
 
   return (
     <div className="flex flex-col gap-2">
@@ -112,12 +116,35 @@ function PhotoPicker({
       </div>
       <div className="flex gap-2">
         <label className="flex-1 cursor-pointer rounded border border-[var(--brand-line)] px-3 py-1.5 text-center text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
-          {file ? "更換" : "上傳"}
+          {compressing ? "壓縮中..." : file ? "更換" : "上傳"}
           <input
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+            disabled={compressing}
+            onChange={async (e) => {
+              const picked = e.target.files?.[0] ?? null;
+              if (!picked) return;
+              const typeError = validatePhotoType(picked);
+              if (typeError) {
+                showToast(typeError, "error");
+                e.target.value = "";
+                return;
+              }
+
+              setCompressing(true);
+              const compressed = await compressImage(picked);
+              setCompressing(false);
+
+              const sizeError = validatePhotoSize(compressed);
+              if (sizeError) {
+                showToast(sizeError, "error");
+                e.target.value = "";
+                return;
+              }
+              e.target.value = "";
+              onChange(compressed);
+            }}
           />
         </label>
         {file && (
@@ -169,6 +196,7 @@ export function DraftEditor() {
   const [saving, setSaving] = useState(false);
   const [resumeUser, setResumeUser] = useState<User | null>(null);
   const momentsInputRef = useRef<HTMLInputElement>(null);
+  const [momentsCompressing, setMomentsCompressing] = useState(false);
   const momentFiles = useMemo(() => photos.moments.map((m) => m.file), [photos.moments]);
   const momentUrls = useObjectUrls(momentFiles);
   const momentItems = photos.moments.map((m, i) => ({ id: m.id, url: momentUrls[i] ?? "" }));
@@ -471,24 +499,61 @@ export function DraftEditor() {
                   photos.moments.length > 0 ? "mt-4" : ""
                 }`}
               >
-                + 新增照片（可多選）
+                {momentsCompressing ? "壓縮中..." : "+ 新增照片（可多選）"}
                 <input
                   ref={momentsInputRef}
                   type="file"
                   accept="image/*"
                   multiple
                   className="hidden"
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files ?? []);
+                  disabled={momentsCompressing}
+                  onChange={async (e) => {
+                    const selected = Array.from(e.target.files ?? []);
+                    if (momentsInputRef.current) momentsInputRef.current.value = "";
+                    if (selected.length === 0) return;
+
+                    const remainingSlots = MAX_MOMENT_PHOTOS - photos.moments.length;
+                    const overLimitCount = Math.max(0, selected.length - remainingSlots);
+                    const withinLimit = selected.slice(0, Math.max(0, remainingSlots));
+
+                    const typeValidFiles: File[] = [];
+                    let invalidCount = 0;
+                    for (const file of withinLimit) {
+                      if (validatePhotoType(file)) invalidCount++;
+                      else typeValidFiles.push(file);
+                    }
+
+                    if (overLimitCount > 0) {
+                      showToast(`婚紗相簿最多只能上傳 ${MAX_MOMENT_PHOTOS} 張，已略過 ${overLimitCount} 張。`, "error");
+                    }
+                    if (typeValidFiles.length === 0) {
+                      if (invalidCount > 0) {
+                        showToast(`${invalidCount} 張照片格式不符，已略過。`, "error");
+                      }
+                      return;
+                    }
+
+                    setMomentsCompressing(true);
+                    const validFiles: File[] = [];
+                    for (const file of typeValidFiles) {
+                      const compressed = await compressImage(file);
+                      if (validatePhotoSize(compressed)) invalidCount++;
+                      else validFiles.push(compressed);
+                    }
+                    setMomentsCompressing(false);
+
+                    if (invalidCount > 0) {
+                      showToast(`${invalidCount} 張照片格式或大小不符，已略過。`, "error");
+                    }
+                    if (validFiles.length === 0) return;
+
                     setPhotos((p) => ({
                       ...p,
                       moments: [
                         ...p.moments,
-                        ...files.map((file) => ({ id: crypto.randomUUID(), file })),
+                        ...validFiles.map((file) => ({ id: crypto.randomUUID(), file })),
                       ],
                     }));
-                    if (momentsInputRef.current)
-                      momentsInputRef.current.value = "";
                   }}
                 />
               </label>
