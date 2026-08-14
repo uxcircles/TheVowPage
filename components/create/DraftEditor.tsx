@@ -23,6 +23,7 @@ import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
+import { headingFont } from "@/lib/fonts";
 import {
   emptySchedule,
   SCHEDULE_PLACEHOLDERS,
@@ -387,7 +388,7 @@ export function DraftEditor() {
   return (
     <>
       <header className="flex items-center justify-between px-6 py-5">
-        <Link href="/" className="text-lg font-medium text-[var(--brand-gold)]">
+        <Link href="/" className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>
           The Vow Page 摯頁
         </Link>
         <Link

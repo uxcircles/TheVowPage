@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EB_Garamond, Chiron_Sung_HK } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import { getPublicWeddingData } from "@/lib/weddings";
+import { headingFont } from "@/lib/fonts";
 
 const displayFont = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"] });
-const headingFont = Chiron_Sung_HK({ subsets: ["latin"], weight: ["500", "600"] });
 
 // Distinct from not-found.tsx's "doesn't exist / not published" state -
 // this is a wedding that *was* live and now has an expired one-year term,
@@ -37,7 +37,7 @@ function ExpiredNotice() {
           <br />
           如果你是新人本人，登入後台即可續約重新上線。
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8 flex flex-col items-center gap-4">
           <Link
             href="/login"
             className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-sm text-white transition-opacity hover:opacity-90"

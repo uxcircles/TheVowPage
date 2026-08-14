@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { EB_Garamond, Chiron_Sung_HK } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
+import { headingFont } from "@/lib/fonts";
 
 const displayFont = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"] });
-const headingFont = Chiron_Sung_HK({ subsets: ["latin"], weight: ["500", "600"] });
 
 export default function NotFound() {
   return (
@@ -31,7 +31,7 @@ export default function NotFound() {
           <br />
           如果你是新人本人，登入後台即可確認發布狀態。
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8 flex flex-col items-center gap-4">
           <Link
             href="/"
             className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-sm text-white transition-opacity hover:opacity-90"

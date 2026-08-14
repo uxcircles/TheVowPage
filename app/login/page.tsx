@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signIn } from "@/lib/actions/auth";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { useToast, useActionErrorToast } from "@/components/ui/Toast";
+import { headingFont } from "@/lib/fonts";
 
 // Reads the `?error=oauth` param /auth/callback redirects here with on
 // failure. Isolated in its own component so useSearchParams's Suspense
@@ -29,7 +30,7 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm">
-        <h1 className="text-center text-2xl font-medium text-[var(--brand-gold)]">The Vow Page 摯頁</h1>
+        <h1 className={`${headingFont.className} text-center text-2xl text-[var(--brand-gold)]`}>The Vow Page 摯頁</h1>
         <p className="mt-2 text-center text-sm text-[var(--brand-ink-soft)]">登入你的帳號</p>
         <Suspense fallback={null}>
           <OAuthErrorNotice />

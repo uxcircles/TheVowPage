@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { EB_Garamond, Chiron_Sung_HK } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
 import { InvitationCardVisual, InvitationPreviewCard } from "@/components/marketing/InvitationPreviewCard";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
+import { headingFont } from "@/lib/fonts";
 
 const displayFont = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"] });
-const headingFont = Chiron_Sung_HK({ subsets: ["latin"], weight: ["500", "600"] });
 
 const BENEFITS = [
   {

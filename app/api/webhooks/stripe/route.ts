@@ -45,6 +45,7 @@ export async function POST(request: Request) {
         .from("weddings")
         .update({
           plan: "standard",
+          status: "published",
           paid_at: now.toISOString(),
           expires_at: expiresAt.toISOString(),
           stripe_checkout_session_id: session.id,

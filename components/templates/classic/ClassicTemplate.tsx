@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { EB_Garamond, Noto_Serif_TC } from "next/font/google";
 import "./classic.css";
 import { THANKS_MESSAGE_FALLBACK, type ClassicTemplateData } from "./types";
@@ -39,6 +39,14 @@ function lerp(a: number, b: number, t: number) {
 }
 function easeOutCubic(t: number) {
   return 1 - Math.pow(1 - t, 3);
+}
+
+function hexToUnitRgb(hex: string): [number, number, number] {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16) / 255;
+  const g = parseInt(clean.slice(2, 4), 16) / 255;
+  const b = parseInt(clean.slice(4, 6), 16) / 255;
+  return [r, g, b];
 }
 
 export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
@@ -343,6 +351,16 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const theme = getClassicTheme(data.theme);
   const seal = getSealDesign(data.sealDesign);
   const envelopeImages = getEnvelopeImages(theme.id);
+  // The decorative bg-illus PNGs (floral sprigs, the rings divider, etc.)
+  // are pre-rendered in a single flat gold tone with no per-theme variants
+  // (unlike the envelope/wax-seal art) - this SVG filter recolors them to
+  // match the current theme.gold exactly, regardless of source pixel
+  // color, by zeroing out the RGB inputs and outputting theme.gold as a
+  // constant while passing alpha through untouched. useId keeps the filter
+  // id collision-free when multiple instances render on one page (e.g.
+  // the dashboard's live preview alongside the editor).
+  const illusFilterId = `classic-illus-recolor-${useId().replace(/:/g, "")}`;
+  const [illusR, illusG, illusB] = hexToUnitRgb(theme.gold);
 
   return (
     <div
@@ -357,9 +375,20 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           "--gold": theme.gold,
           "--line": theme.line,
           "--envelope-shadow-rgb": theme.envelopeShadowRgb,
+          "--illus-filter": `url(#${illusFilterId})`,
         } as React.CSSProperties
       }
     >
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+        <defs>
+          <filter id={illusFilterId}>
+            <feColorMatrix
+              type="matrix"
+              values={`0 0 0 0 ${illusR}  0 0 0 0 ${illusG}  0 0 0 0 ${illusB}  0 0 0 1 0`}
+            />
+          </filter>
+        </defs>
+      </svg>
       <div
         className={`envelope-intro${envelopeState === "opening" ? " is-opening" : ""}${
           envelopeState === "hidden" ? " is-hidden" : ""
@@ -557,7 +586,10 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           {data.groomName}　＆　{data.brideName}
         </p>
         <p className="credit" ref={footerCreditRef}>
-          Made with The Vow Page 摯頁
+          Made with{" "}
+          <a href="/" target="_blank" rel="noopener">
+            The Vow Page 摯頁
+          </a>
         </p>
       </footer>
     </div>

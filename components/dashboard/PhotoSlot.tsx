@@ -49,15 +49,19 @@ export function PhotoSlot({
       </div>
       {progress !== null && (
         <div className="h-1.5 overflow-hidden rounded-full bg-[var(--brand-line)]/40">
-          <div
-            className="h-full rounded-full bg-[var(--brand-gold)] transition-[width] duration-150 ease-out"
-            style={{ width: `${progress}%` }}
-          />
+          {progress < 100 ? (
+            <div
+              className="h-full rounded-full bg-[var(--brand-gold)] transition-[width] duration-150 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          ) : (
+            <div className="upload-indeterminate h-full rounded-full" />
+          )}
         </div>
       )}
       <div className="flex gap-2">
         <label className="flex-1 cursor-pointer rounded border border-[var(--brand-line)] px-3 py-1.5 text-center text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
-          {progress !== null ? `上傳中... ${progress}%` : photoUrl ? "更換" : "上傳"}
+          {progress === null ? (photoUrl ? "更換" : "上傳") : progress < 100 ? `上傳中... ${progress}%` : "處理中..."}
           <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={pending} />
         </label>
         {photoId && (
