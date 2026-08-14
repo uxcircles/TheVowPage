@@ -210,38 +210,46 @@ export default function Home() {
       <main className="flex flex-1 flex-col">
         {/* Hero */}
         <section className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 px-6 py-16 sm:px-10 sm:py-24 lg:grid-cols-2">
-          <Reveal>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--brand-gold)]/10 px-3 py-1 text-xs font-medium text-[var(--brand-gold-dark)]">
-              🎉 前 20 組新人限定優惠
-            </span>
-            <p className="mt-4 text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">wedding invitation</p>
-            <h1
-              className={`${headingFont.className} mt-4 text-4xl font-semibold leading-tight text-foreground sm:text-5xl`}
-            >
-              5 分鐘打造
-              <br />
-              質感電子喜帖
-            </h1>
-            <p className="mt-6 max-w-md text-[var(--brand-ink-soft)]">
-              輕鬆收集 RSVP、傳遞你的專屬浪漫——不用懂設計，也不用寫程式，挑模板、放照片、填資訊就完成。
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link
-                href="/create"
-                className="rounded bg-[var(--brand-gold-dark)] px-8 py-3 text-white transition-opacity hover:opacity-90"
+          <div>
+            <Reveal>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--brand-gold)]/10 px-3 py-1 text-xs font-medium text-[var(--brand-gold-dark)]">
+                🎉 前 20 組新人限定優惠
+              </span>
+            </Reveal>
+            <Reveal delay={120}>
+              <p className="mt-4 text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">wedding invitation</p>
+              <h1
+                className={`${headingFont.className} mt-4 text-4xl font-semibold leading-tight text-foreground sm:text-5xl`}
               >
-                開始建立你的喜帖
-              </Link>
-              <a
-                href="#showcase"
-                className="text-sm text-[var(--brand-ink-soft)] underline underline-offset-4 hover:text-[var(--brand-gold)]"
-              >
-                先看看作品範例
-              </a>
-            </div>
-          </Reveal>
+                5 分鐘打造
+                <br />
+                質感電子喜帖
+              </h1>
+            </Reveal>
+            <Reveal delay={240}>
+              <p className="mt-6 max-w-md text-[var(--brand-ink-soft)]">
+                輕鬆收集 RSVP、傳遞你的專屬浪漫——不用懂設計，也不用寫程式，挑模板、放照片、填資訊就完成。
+              </p>
+            </Reveal>
+            <Reveal delay={360}>
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <Link
+                  href="/create"
+                  className="rounded bg-[var(--brand-gold-dark)] px-8 py-3 text-white transition-opacity hover:opacity-90"
+                >
+                  開始建立你的喜帖
+                </Link>
+                <a
+                  href="#showcase"
+                  className="text-sm text-[var(--brand-ink-soft)] underline underline-offset-4 hover:text-[var(--brand-gold)]"
+                >
+                  先看看作品範例
+                </a>
+              </div>
+            </Reveal>
+          </div>
 
-          <Reveal delay={150} className="relative mx-auto w-full max-w-sm">
+          <Reveal delay={480} className="relative mx-auto w-full max-w-sm">
             <div className="absolute -right-4 -top-4 w-full rotate-3 opacity-60">
               <InvitationCardVisual theme={CLASSIC_THEMES[1]} />
             </div>
