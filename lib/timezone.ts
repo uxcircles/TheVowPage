@@ -54,3 +54,20 @@ export function toDatetimeLocalValue(iso: string | null, timeZone: string): stri
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${p.year}-${pad(p.month)}-${pad(p.day)}T${pad(p.hour)}:${pad(p.minute)}`;
 }
+
+/** Renders an IANA zone like "Asia/Taipei" as a Chinese name like "台北標準
+ * 時間" for display - venue-derived timezones can be anywhere in the world,
+ * so this leans on ICU's built-in zh-Hant data instead of a hand-maintained
+ * translation table. Falls back to the raw identifier if the runtime's ICU
+ * data doesn't cover it. */
+export function formatTimezoneLabel(timeZone: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat("zh-Hant", {
+      timeZone,
+      timeZoneName: "long",
+    }).formatToParts(new Date());
+    return parts.find((p) => p.type === "timeZoneName")?.value ?? timeZone;
+  } catch {
+    return timeZone;
+  }
+}

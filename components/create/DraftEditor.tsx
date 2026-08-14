@@ -11,7 +11,7 @@ import {
   type DraftContent,
   type DraftPhotos,
 } from "@/lib/create-wedding-client";
-import { wallTimeToUtcIso } from "@/lib/timezone";
+import { wallTimeToUtcIso, formatTimezoneLabel } from "@/lib/timezone";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { Toggle } from "@/components/ui/Toggle";
@@ -748,7 +748,7 @@ export function DraftEditor() {
                       <p className="text-sm text-[var(--brand-ink-soft)]">
                         已定位，判斷時區為：
                         <span className="font-medium text-foreground">
-                          {timezone}
+                          {formatTimezoneLabel(timezone)}
                         </span>
                       </p>
                       <div className="h-48 overflow-hidden rounded border border-[var(--brand-line)]">
@@ -775,7 +775,7 @@ export function DraftEditor() {
                 />
               </label>
               <p className="mt-2 flex items-center gap-1.5 text-sm text-[var(--brand-ink-soft)]">
-                時區：<span className="font-medium text-foreground">{timezone}</span>
+                時區：<span className="font-medium text-foreground">{formatTimezoneLabel(timezone)}</span>
                 <InfoTooltip
                   text={
                     timezone === DEFAULT_TIMEZONE

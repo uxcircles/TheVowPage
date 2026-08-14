@@ -3,7 +3,7 @@
 import { useActionState, useCallback, useRef, useState } from "react";
 import { updateWeddingContent } from "@/lib/actions/weddings";
 import { fetchGeocode } from "@/lib/create-wedding-client";
-import { toDatetimeLocalValue, wallTimeToUtcIso } from "@/lib/timezone";
+import { toDatetimeLocalValue, wallTimeToUtcIso, formatTimezoneLabel } from "@/lib/timezone";
 import { Toggle } from "@/components/ui/Toggle";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { TrashIcon } from "@/components/ui/TrashIcon";
@@ -342,7 +342,7 @@ export function WeddingEditForm({
             {locationPreview && (
               <div className="mt-3 flex flex-col gap-2">
                 <p className="text-sm text-[var(--brand-ink-soft)]">
-                  已定位，判斷時區為：<span className="font-medium text-foreground">{previewTimezone}</span>
+                  已定位，判斷時區為：<span className="font-medium text-foreground">{previewTimezone && formatTimezoneLabel(previewTimezone)}</span>
                 </p>
                 <div className="h-48 overflow-hidden rounded border border-[var(--brand-line)]">
                   <VenueMap
@@ -368,7 +368,7 @@ export function WeddingEditForm({
           />
         </label>
         <p className="mt-2 flex items-center gap-1.5 text-sm text-[var(--brand-ink-soft)]">
-          時區：<span className="font-medium text-foreground">{wedding.timezone}</span>
+          時區：<span className="font-medium text-foreground">{formatTimezoneLabel(wedding.timezone)}</span>
           <InfoTooltip text="系統會依場地位置自動判斷時區，儲存後會依最新的場地位置重新確認。" />
         </p>
       </EditorCard>
