@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteWeddingPhoto, moveMomentPhoto, reorderMomentPhotos } from "@/lib/actions/weddings";
 import { uploadPhotoWithProgress } from "@/lib/uploadPhotoWithProgress";
@@ -36,6 +36,38 @@ export function MomentsGallery({
   // than something that needs active pruning.
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
   const visiblePhotos = photos.filter((p) => !removedIds.has(p.id));
+
+  // Optimistic add, same reasoning as PhotoSlot's optimistic replace: the
+  // grid is driven by the `photos` prop, which only reflects newly
+  // uploaded photos once router.refresh()'s server round trip finishes -
+  // appending local object-URL previews as each file finishes uploading
+  // means the grid grows immediately instead of sitting unchanged for a
+  // few seconds after the progress bar disappears. The whole grid is
+  // already disabled while `pending` is true (including through the
+  // refresh, since it's called inside this same transition), so there's
+  // no need to separately guard these from being reordered/removed before
+  // they have a real id.
+  const [pendingPreviews, setPendingPreviews] = useState<{ id: string; url: string }[]>([]);
+  const displayedPhotos = [...visiblePhotos, ...pendingPreviews];
+
+  // Once the server-confirmed photos prop catches up (after
+  // router.refresh() resolves), the real rows have taken their place -
+  // drop the optimistic previews and release their object URLs.
+  useEffect(() => {
+    if (pendingPreviews.length === 0) return;
+    pendingPreviews.forEach((p) => URL.revokeObjectURL(p.url));
+    setPendingPreviews([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photos]);
+
+  // Revoke on unmount too, in case the user navigates away before the
+  // refresh above ever lands.
+  useEffect(() => {
+    return () => {
+      pendingPreviews.forEach((p) => URL.revokeObjectURL(p.url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const pending = uploading || otherPending;
@@ -107,7 +139,15 @@ export function MomentsGallery({
             phase: filePercent >= 100 ? "processing" : "uploading",
           });
         });
-        if (result.error) failures++;
+        if (result.error) {
+          failures++;
+        } else {
+          // Show the photo the moment it's confirmed uploaded, rather than
+          // waiting for the whole batch (and the refresh after it) to
+          // finish - each successfully uploaded file appears in the grid
+          // right away.
+          setPendingPreviews((prev) => [...prev, { id: `pending-${weddingId}-${i}-${Date.now()}`, url: URL.createObjectURL(compressed) }]);
+        }
         setBatch({ done: i + 1, total, percent: Math.round(((i + 1) / total) * 100), phase: "uploading" });
       }
       setBatch(null);
@@ -120,7 +160,7 @@ export function MomentsGallery({
   return (
     <div>
       <MomentsPhotoGrid
-        items={visiblePhotos}
+        items={displayedPhotos}
         disabled={pending}
         onMove={(id, direction) => startOtherTransition(() => moveMomentPhoto(weddingId, id, direction))}
         onReorder={(orderedIds) => startOtherTransition(() => reorderMomentPhotos(weddingId, orderedIds))}
