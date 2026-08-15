@@ -222,8 +222,7 @@ export default function Home() {
             </Reveal>
             <Reveal delay={240}>
               <p className="mt-6 max-w-md text-[var(--brand-ink-soft)]">
-                專為現代新人設計的互動式喜帖。融合封蠟拆封儀式與流暢的 RSVP
-                收集，只需挑選喜愛配色、放入婚紗照，即刻優雅呈現。
+                融合封蠟拆封儀式與 RSVP 回覆，輕鬆打造專屬於你們的互動喜帖。
               </p>
             </Reveal>
             <Reveal delay={360}>
@@ -242,7 +241,7 @@ export default function Home() {
                 </a>
               </div>
               <p className="mt-3 text-sm text-[var(--brand-ink-soft)]">
-                全程免費編輯預覽・滿意再以 £39 一次性發布
+                完全免費試做・滿意再付款發布
               </p>
             </Reveal>
           </div>
