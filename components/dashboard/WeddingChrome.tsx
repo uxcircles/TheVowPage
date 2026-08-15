@@ -277,6 +277,11 @@ export function WeddingChrome({
         {showBottomBar && (
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
             <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
+              {!isPaid && !isPublished && (
+                <p className="text-xs text-[var(--brand-ink-soft)]">
+                  🛡️ 14 天安心退款保證：賓客尚未開始回覆前，可全額退款
+                </p>
+              )}
               <div className="flex items-center justify-end gap-3">
                 {saveBar && (
                   <button

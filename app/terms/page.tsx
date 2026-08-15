@@ -30,11 +30,13 @@ const SECTIONS = [
     ],
   },
   {
-    title: "四、付款與退款",
+    title: "四、付款與 14 天安心退款保證",
     body: [
       "本服務透過第三方金流服務商 Stripe 處理付款，我們不會直接接觸或儲存您的信用卡卡號等付款資訊。",
-      "由於發布服務屬於數位內容即時提供之性質，一經付款發布成功後，原則上不提供退款；若因系統錯誤導致重複扣款或服務無法正常提供，請於 7 日內與我們聯絡，我們將協助處理。",
-      "您同意按下「付款發布」後，我們將立即開始提供數位內容與公開網址服務。依據英國《消費者合約條例》（Consumer Contracts Regulations）及類似消費者保護法規，數位服務一經即時提供開始，即代表您同意放棄原本可能享有之 14 天猶豫期取消與退款權利。",
+      "您同意按下「付款發布」後，我們將立即開始提供數位內容與公開網址服務。依據英國《消費者合約條例》（Consumer Contracts Regulations）及類似消費者保護法規，數位服務一經即時提供開始，即代表您同意放棄原本可能享有之無條件 14 天猶豫期取消與退款權利。",
+      "儘管如此，我們仍自願提供「14 天安心退款保證」：自付款完成日起 14 天內，若您尚未收到任何賓客的 RSVP 回覆，可透過 thevowpage@gmail.com 申請全額退款；退款成功後，該喜帖網址將立即轉為草稿狀態並停止公開瀏覽。",
+      "以下情形不適用本保證：（一）已有賓客透過公開喜帖頁面提交 RSVP 回覆（不含您自行測試用途的回覆）；（二）您的宴客日（喜帖內設定之婚禮日期）已於申請退款前到來。此時視為服務已實質履行。",
+      "若因系統錯誤導致重複扣款或服務無法正常提供，不受上述條件限制，請與我們聯絡，我們將協助處理。",
     ],
   },
   {
@@ -114,7 +116,7 @@ export default function TermsPage() {
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16 sm:px-10">
         <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">terms of service</p>
         <h1 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>服務條款</h1>
-        <p className="mt-3 text-sm text-[var(--brand-ink-soft)]">最後更新日期：2026 年 8 月 14 日</p>
+        <p className="mt-3 text-sm text-[var(--brand-ink-soft)]">最後更新日期：2026 年 8 月 15 日</p>
 
         <div className="mt-10 flex flex-col gap-10">
           {SECTIONS.map((section) => (

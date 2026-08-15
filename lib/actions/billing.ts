@@ -46,6 +46,11 @@ export async function createCheckoutSession(
     mode: "payment",
     line_items: [{ price: priceId, quantity: 1 }],
     allow_promotion_codes: true,
+    custom_text: {
+      submit: {
+        message: "🛡️ 14 天安心退款保證：付款後 14 天內，只要賓客尚未開始回覆，即可全額退款。",
+      },
+    },
     client_reference_id: weddingId,
     metadata: { weddingId },
     customer_email: user.email,
