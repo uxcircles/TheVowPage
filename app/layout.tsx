@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_TC } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="zh-Hant" className={`${notoSansTC.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         <ToastProvider>{children}</ToastProvider>
+        <Analytics />
       </body>
     </html>
   );
