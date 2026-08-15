@@ -1071,12 +1071,27 @@
   gap: 10px 20px;
 }
 .classic .rsvp-diet legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 13px;
   letter-spacing: 0.05em;
   color: var(--ink-soft);
   padding: 0;
   margin-bottom: 6px;
   width: 100%;
+}
+.classic .rsvp-diet-warning-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.classic .rsvp-diet-hint {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: -2px 0 10px;
 }
 .classic .rsvp-diet label {
   flex-direction: row;

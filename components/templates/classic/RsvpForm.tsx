@@ -3,7 +3,28 @@
 import { useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-const DIET_OPTIONS = ["素食", "不吃牛肉", "不吃豬肉", "海鮮過敏", "其他"];
+function WarningIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="rsvp-diet-warning-icon"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.5 2.5 20h19L12 3.5Z" />
+      <path strokeLinecap="round" d="M12 9.5v4.5" />
+      <circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+const DIET_OPTIONS = ["素食", "全素", "不吃牛肉", "不吃豬肉", "海鮮過敏", "堅果過敏", "無麩質", "其他"];
+// Vegetarian/vegan already rule out beef/pork/seafood, so checking either
+// clears and disables those instead of leaving a contradictory combination
+// (matches v3's rsvp-diet behavior). Nut allergy and gluten-free are left
+// alone - those are independent of diet philosophy, not moot by it.
 const MEAT_DIET_OPTIONS = new Set(["不吃牛肉", "不吃豬肉", "海鮮過敏"]);
 
 export function RsvpSection({ weddingId }: { weddingId: string }) {
@@ -14,10 +35,7 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Vegetarian already rules out beef/pork/seafood, so checking it clears
-  // and disables those instead of leaving a contradictory combination
-  // (matches v3's rsvp-diet behavior).
-  const vegetarian = diet.has("素食");
+  const vegetarianOrVegan = diet.has("素食 Vegetarian") || diet.has("全素 Vegan");
 
   function toggleDiet(option: string) {
     setDiet((prev) => {
@@ -26,7 +44,7 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
         next.delete(option);
       } else {
         next.add(option);
-        if (option === "素食") {
+        if (option === "素食 Vegetarian" || option === "全素 Vegan") {
           for (const meat of MEAT_DIET_OPTIONS) next.delete(meat);
         }
       }
@@ -155,13 +173,17 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
                 </label>
               </div>
               <fieldset className="rsvp-diet">
-                <legend>飲食需求（可複選）</legend>
+                <legend>
+                  <WarningIcon />
+                  飲食需求與過敏（可複選）
+                </legend>
+                <p className="rsvp-diet-hint">請務必勾選您的飲食禁忌或過敏，方便新人為您安排合適的餐點。</p>
                 {DIET_OPTIONS.map((option) => (
                   <label key={option}>
                     <input
                       type="checkbox"
                       checked={diet.has(option)}
-                      disabled={vegetarian && MEAT_DIET_OPTIONS.has(option)}
+                      disabled={vegetarianOrVegan && MEAT_DIET_OPTIONS.has(option)}
                       onChange={() => toggleDiet(option)}
                     />{" "}
                     {option}
