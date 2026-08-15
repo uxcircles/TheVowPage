@@ -4,24 +4,37 @@ export type GeocodeResult = { lat: number; lng: number; timezone: string; addres
 
 const DEFAULT_TIMEZONE = "Asia/Taipei";
 
+// This product's two stated markets ([[vowpage_business_entity_and_markets]]).
+// Nominatim's free-text search has no idea which "台北..." or "London..." a
+// short venue name means and will happily return its best global guess -
+// for an unusual/misspelled name that can be a same-ish-sounding place on
+// the other side of the world with a tiny importance score, placed on the
+// map with just as much apparent confidence as a real match. Biasing to
+// these two countries first cuts that failure mode down for the vast
+// majority of real users without blocking anyone actually planning a
+// wedding elsewhere - see the unrestricted retry below.
+const PRIMARY_MARKET_COUNTRY_CODES = "tw,gb";
+
 /** Single lookup against OpenStreetMap Nominatim (same provider already used
  * for the venue map tiles, no API key needed). Only call this server-side -
  * Nominatim's usage policy wants a real identifying User-Agent, which
  * browsers won't let client code set. */
-async function geocodeQuery(query: string): Promise<{ lat: number; lng: number; displayName: string } | null> {
+async function geocodeQuery(
+  query: string,
+  countryCodes?: string
+): Promise<{ lat: number; lng: number; displayName: string } | null> {
   const trimmed = query.trim();
   if (!trimmed) return null;
 
   try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(trimmed)}`,
-      {
-        headers: {
-          "User-Agent": "wedding-invite-app (contact: designlcc@gmail.com)",
-          "Accept-Language": "zh-TW",
-        },
-      }
-    );
+    const params = new URLSearchParams({ format: "json", limit: "1", q: trimmed });
+    if (countryCodes) params.set("countrycodes", countryCodes);
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+      headers: {
+        "User-Agent": "wedding-invite-app (contact: designlcc@gmail.com)",
+        "Accept-Language": "zh-TW",
+      },
+    });
     if (!res.ok) return null;
     const data: unknown = await res.json();
     if (!Array.isArray(data) || data.length === 0) return null;
@@ -54,9 +67,23 @@ export function timezoneForCoords(lat: number, lng: number): string {
  * nothing - so try the venue name first and only fall back to the street
  * address if that fails. When found by name, Nominatim's own formatted
  * address is returned too, so the caller can offer to fill in the address
- * field for someone who only typed a venue name. */
+ * field for someone who only typed a venue name.
+ *
+ * Deliberately restricted to PRIMARY_MARKET_COUNTRY_CODES with no
+ * unrestricted global fallback: Nominatim's `importance` score reflects
+ * general prominence, not match confidence, so a real, correctly-matched
+ * small-town Taiwanese venue can score just as low as a completely wrong
+ * match on the other side of the world (confirmed empirically) - there's
+ * no reliable signal to tell "obscure but right" apart from "confidently
+ * wrong country". A misspelled/unusual name failing to match within these
+ * two markets returning null (which the caller already handles - the
+ * venue form falls back to letting the user enter coordinates manually)
+ * is far better than silently placing the pin on a random hotel in the
+ * wrong country. */
 export async function geocodeVenue(venueName: string, address: string): Promise<GeocodeResult | null> {
-  const found = (await geocodeQuery(venueName)) ?? (await geocodeQuery(address));
+  const found =
+    (await geocodeQuery(venueName, PRIMARY_MARKET_COUNTRY_CODES)) ??
+    (await geocodeQuery(address, PRIMARY_MARKET_COUNTRY_CODES));
   if (!found) return null;
   return {
     lat: found.lat,
