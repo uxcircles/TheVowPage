@@ -35,7 +35,7 @@ export function Reveal({
   return (
     <div
       ref={ref}
-      className={`transition-[filter,opacity,transform] duration-700 ease-out ${
+      className={`transition-[filter,opacity,translate] duration-700 ease-out ${
         visible ? "translate-y-0 opacity-100 blur-none" : "translate-y-8 opacity-0 blur-md"
       } ${className}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
