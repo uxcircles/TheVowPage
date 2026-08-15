@@ -5,6 +5,36 @@ import Link from "next/link";
 import { Reveal } from "./Reveal";
 import type { ClassicTheme } from "@/components/templates/classic/themes";
 
+// The card shows a fixed aspect-[4/5] window (matches the old hero-only
+// crop) onto the *top* of a full-page screenshot that's much taller than
+// that window. `--scroll-pct` is how far up (in % of the image's own
+// height) the image needs to translate for its bottom edge to reach the
+// window's bottom - computed per image since each demo page is a
+// different total height. Hover-only slow scroll-through, gated by the
+// same `@media (hover: hover)` Tailwind's group-hover already implies, so
+// touch devices just keep the static top crop (matching their tap-to-open
+// fallback link below).
+const CONTAINER_ASPECT = 5 / 4; // aspect-[4/5] → height / width
+
+function applyShowcaseScrollPct(img: HTMLImageElement) {
+  const imageAspect = img.naturalHeight / img.naturalWidth;
+  const scrollPct = Math.max(0, (1 - CONTAINER_ASPECT / imageAspect) * 100);
+  img.style.setProperty("--scroll-pct", `-${scrollPct}%`);
+}
+
+// A plain `onLoad` prop misses images the browser serves from its disk
+// cache and finishes loading before React hydrates and attaches the
+// listener - checking `img.complete` in the ref callback covers that race
+// as well as the normal not-yet-loaded case.
+function showcaseImageRef(img: HTMLImageElement | null) {
+  if (!img) return;
+  if (img.complete && img.naturalWidth > 0) {
+    applyShowcaseScrollPct(img);
+  } else {
+    img.addEventListener("load", () => applyShowcaseScrollPct(img), { once: true });
+  }
+}
+
 /** Cycles a "熱門配色" highlight across the theme cards so the showcase grid
  * has some motion instead of sitting static once revealed. Each card links
  * to a real, published demo wedding (/w/demo-{themeId}) rather than just
@@ -19,8 +49,8 @@ import type { ClassicTheme } from "@/components/templates/classic/themes";
  * `@media (hover: hover)`, so the overlay is inert (not just invisible)
  * on touch - no double-tap-to-follow-the-link surprise.
  *
- * The card visual itself is a real screenshot of the matching demo wedding
- * (public/showcase/demo-{themeId}.jpg, regenerate via
+ * The card visual itself is a real, full-page screenshot of the matching
+ * demo wedding (public/showcase/demo-{themeId}.jpg, regenerate via
  * scripts/capture-showcase-screenshots.mjs if the demo content changes),
  * not the abstract InvitationCardVisual mockup - a real photo of the actual
  * product reads as more convincing than a generic placeholder. */
@@ -42,18 +72,21 @@ export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
               active === i ? "-translate-y-2" : ""
             }`}
           >
-            <div className="relative rounded-lg">
+            <div className="relative aspect-[4/5] w-full rounded-lg shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]">
               {active === i && (
                 <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--brand-gold-dark)] px-3 py-1 text-xs text-white shadow-sm">
                   熱門配色
                 </span>
               )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/showcase/demo-${theme.id}.jpg`}
-                alt={`${theme.name} 範例喜帖畫面`}
-                className="aspect-[4/5] w-full rounded-lg object-cover shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]"
-              />
+              <div className="absolute inset-0 overflow-hidden rounded-lg">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  ref={showcaseImageRef}
+                  src={`/showcase/demo-${theme.id}.jpg`}
+                  alt={`${theme.name} 範例喜帖畫面`}
+                  className="absolute inset-x-0 top-[-11%] w-full translate-y-0 transition-transform duration-[6000ms] ease-in-out group-hover:translate-y-[var(--scroll-pct)] group-hover:duration-[14000ms] group-hover:ease-linear"
+                />
+              </div>
               <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
                 <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
                   查看完整範例 →
