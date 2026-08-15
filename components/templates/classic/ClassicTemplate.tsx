@@ -260,32 +260,32 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       return clamp(total > 0 ? scrolled / total : 0, 0, 1);
     }
 
-    function scrollBandProgress(startScrollY: number) {
-      const vh = getStableVH();
-      const endScrollY = document.documentElement.scrollHeight - vh;
-      const total = endScrollY - startScrollY;
-      const scrolled = window.scrollY - startScrollY;
-      return clamp(total > 0 ? scrolled / total : 0, 0, 1);
-    }
-
     function update() {
       if (wrap && path) {
         const flowerProgress = bandProgress(wrap, 0.8, -0.6);
         path.style.strokeDashoffset = String(len * (1 - flowerProgress));
       }
 
-      const itemsStart = section!.offsetTop - getStableVH() * 0.7;
-      const itemsProgress = scrollBandProgress(itemsStart);
-      // Each item's own reveal (fade + slide) takes this fraction of the
-      // scroll band. Start positions are spread evenly across the
-      // remaining [0, 1 - duration] range so the count of items - which
-      // varies with the couple's schedule length - can't push any item's
-      // start past the point where it'd never reach full opacity.
-      const revealDuration = 0.19;
-      items.forEach((li, i) => {
-        const start =
-          items.length > 1 ? (i / (items.length - 1)) * (1 - revealDuration) : 0;
-        const p = clamp((itemsProgress - start) / revealDuration, 0, 1);
+      // Each item reveals based on its own position scrolling into view,
+      // not a shared band stretched across the rest of the page - the
+      // previous approach spread items.length items evenly across
+      // [itemsStart, page bottom], so schedule items (early in the
+      // combined schedule+footer items array) needed scrolling most of
+      // the way to the footer to fully reveal whenever dress code/RSVP
+      // added enough length after the schedule section, leaving them
+      // visibly stuck at partial opacity while still reading the
+      // schedule itself.
+      //
+      // The last few items (footer name/credit) sit at the very bottom of
+      // the page, where there's no more scroll room left to push their
+      // top up to the band's completion point - bandProgress alone would
+      // leave them permanently stuck below full opacity once the page
+      // can't scroll any further. Once at (or within a hair of) max
+      // scroll, force every item fully revealed rather than hold that
+      // impossible-to-reach state forever.
+      const atMaxScroll = window.scrollY >= document.documentElement.scrollHeight - getStableVH() - 1;
+      items.forEach((li) => {
+        const p = atMaxScroll ? 1 : bandProgress(li, 0.85, 0.55);
         li.style.opacity = String(p);
         li.style.transform = `translateY(${lerp(16, 0, p)}px)`;
       });
