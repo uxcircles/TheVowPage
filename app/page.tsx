@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { EB_Garamond } from "next/font/google";
-import { InvitationCardVisual, InvitationPhotoCard } from "@/components/marketing/InvitationPreviewCard";
 import { Reveal } from "@/components/marketing/Reveal";
 import { ShowcaseCarousel } from "@/components/marketing/ShowcaseCarousel";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
@@ -243,13 +242,13 @@ export default function Home() {
             </Reveal>
           </div>
 
-          <Reveal delay={480} className="relative mx-auto w-full max-w-sm">
-            <div className="absolute -right-4 -top-4 w-full rotate-3 opacity-60">
-              <InvitationCardVisual theme={CLASSIC_THEMES[1]} />
-            </div>
-            <div className="relative -rotate-2">
-              <InvitationPhotoCard theme={CLASSIC_THEMES[0]} />
-            </div>
+          <Reveal delay={480} className="mx-auto w-full max-w-lg">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/templates/classic/hero-iphone-mockup.webp"
+              alt="喜帖範例畫面"
+              className="w-full"
+            />
           </Reveal>
         </section>
 
