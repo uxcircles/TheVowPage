@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { EB_Garamond } from "next/font/google";
-import { InvitationCardVisual, InvitationPreviewCard } from "@/components/marketing/InvitationPreviewCard";
+import { InvitationCardVisual, InvitationPhotoCard } from "@/components/marketing/InvitationPreviewCard";
 import { Reveal } from "@/components/marketing/Reveal";
 import { ShowcaseCarousel } from "@/components/marketing/ShowcaseCarousel";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
@@ -104,32 +104,32 @@ const BENEFITS = [
   {
     icon: ShareIcon,
     title: "免印刷、免寄送",
-    description: "一個連結分享給所有賓客，省下印製與郵寄的時間與費用。",
+    description: "一個連結分享給所有賓客，省下印製與郵寄的時間與費用",
   },
   {
     icon: LeafIcon,
     title: "環保無紙化",
-    description: "不製造紙本浪費，符合現代新人重視的永續價值觀。",
+    description: "不製造紙本浪費，符合現代新人重視的永續價值觀",
   },
   {
     icon: ClipboardCheckIcon,
     title: "RSVP 即時統計",
-    description: "賓客直接線上回覆，出席人數自動彙整，不用再逐一電話確認。",
+    description: "賓客直接線上回覆，出席人數自動彙整，不用再逐一電話確認",
   },
   {
     icon: MapPinIcon,
     title: "地圖與時區自動換算",
-    description: "打上場地名稱，自動標出位置並換算時區，海外賓客也不會搞錯時間。",
+    description: "打上場地名稱，自動標出位置並換算時區，海外賓客也不會搞錯時間",
   },
   {
     icon: EditIcon,
     title: "隨時修改內容",
-    description: "婚期異動、場地變更，後台直接更新，不用重新印製或補寄。",
+    description: "婚期異動、場地變更，後台直接更新，不用重新印製或補寄",
   },
   {
     icon: PhoneIcon,
     title: "手機也完美呈現",
-    description: "拆信封、刮刮卡等互動效果，在手機上一樣流暢動人。",
+    description: "拆信封、刮刮卡等互動效果，在手機上一樣流暢動人",
   },
 ];
 
@@ -137,17 +137,17 @@ const STEPS = [
   {
     number: "01",
     title: "挑選模板與配色",
-    description: "選擇喜歡的樣式與色調，一鍵套用到你的喜帖。",
+    description: "選擇喜歡的樣式與色調，一鍵套用到你的喜帖",
   },
   {
     number: "02",
     title: "填寫資訊、上傳照片",
-    description: "新人資訊、婚期地點、婚紗照，幾分鐘內就能完成。",
+    description: "新人資訊、婚期地點、婚紗照，幾分鐘內就能完成",
   },
   {
     number: "03",
     title: "分享連結、收 RSVP",
-    description: "傳給賓客，即時收到出席回覆與人數統計。",
+    description: "傳給賓客，即時收到出席回覆與人數統計",
   },
 ];
 
@@ -205,7 +205,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col">
         {/* Hero */}
         <section className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 px-6 py-16 sm:px-10 sm:py-24 lg:grid-cols-2">
-          <div>
+          <div className="lg:-translate-y-10">
             <Reveal>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--brand-gold)]/10 px-3 py-1 text-xs font-medium text-[var(--brand-gold-dark)]">
                 <SparkleIcon />
@@ -222,7 +222,7 @@ export default function Home() {
             </Reveal>
             <Reveal delay={240}>
               <p className="mt-6 max-w-md text-[var(--brand-ink-soft)]">
-                融合封蠟拆封儀式與 RSVP 回覆，輕鬆打造專屬於你們的互動喜帖。
+                融合封蠟拆封與 RSVP 回覆，輕鬆打造專屬互動喜帖
               </p>
             </Reveal>
             <Reveal delay={360}>
@@ -240,9 +240,6 @@ export default function Home() {
                   欣賞範例喜帖
                 </a>
               </div>
-              <p className="mt-3 text-sm text-[var(--brand-ink-soft)]">
-                完全免費試做・滿意再付款發布
-              </p>
             </Reveal>
           </div>
 
@@ -251,7 +248,7 @@ export default function Home() {
               <InvitationCardVisual theme={CLASSIC_THEMES[1]} />
             </div>
             <div className="relative -rotate-2">
-              <InvitationPreviewCard theme={CLASSIC_THEMES[0]} />
+              <InvitationPhotoCard theme={CLASSIC_THEMES[0]} />
             </div>
           </Reveal>
         </section>
@@ -265,7 +262,7 @@ export default function Home() {
                 為什麼新人都選擇電子喜帖
               </h2>
               <p className="mt-3 max-w-lg text-[var(--brand-ink-soft)]">
-                紙本喜帖印刷、寄送耗時耗力，場地或時間異動時還常常來不及通知——這些麻煩，電子喜帖都幫你省下來。
+                紙本喜帖印刷、寄送耗時耗力，場地或時間異動時還常常來不及通知，這些麻煩，電子喜帖都幫你省下來
               </p>
             </Reveal>
             <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -310,7 +307,7 @@ export default function Home() {
               <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">showcase</p>
               <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>作品範例</h2>
               <p className="mt-3 max-w-lg text-[var(--brand-ink-soft)]">
-                目前提供「經典」模板，可自由選擇配色氛圍；更多版面模板陸續推出中。
+                目前提供「經典」模板，可自由選擇配色氛圍；更多版面模板陸續推出
               </p>
             </Reveal>
             <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -377,17 +374,26 @@ export default function Home() {
 
         {/* Closing CTA */}
         <section className="px-6 py-20 sm:px-10">
-          <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-2xl bg-[var(--foreground)] px-8 py-16 text-center text-[var(--background)]">
-            <h2 className={`${headingFont.className} text-3xl font-semibold`}>為你們的婚禮，開啟第一頁浪漫</h2>
-            <p className="max-w-md text-white/70">
-              無需事先註冊，隨心挑選封蠟與配色，親手拼湊出滿意的模樣後再為你們留下。
-            </p>
-            <Link
-              href="/create"
-              className="rounded bg-[var(--brand-gold)] px-8 py-3 text-white transition-opacity hover:opacity-90"
-            >
-              免費開始創作喜帖
-            </Link>
+          <Reveal className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl bg-[var(--foreground)] px-8 py-16 text-center text-[var(--background)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/templates/classic/illus-cherub.png"
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-10 bottom-0 w-64 opacity-40 sm:w-80"
+            />
+            <div className="relative z-10 flex flex-col items-center gap-6">
+              <h2 className={`${headingFont.className} text-3xl font-semibold`}>為你們的婚禮，開啟第一頁浪漫</h2>
+              <p className="max-w-md text-white/70">
+                無需事先註冊，隨心挑選封蠟與配色，親手拼湊出滿意的模樣後再為你們留下
+              </p>
+              <Link
+                href="/create"
+                className="rounded bg-[var(--brand-gold)] px-8 py-3 text-white transition-opacity hover:opacity-90"
+              >
+                免費開始創作喜帖
+              </Link>
+            </div>
           </Reveal>
         </section>
       </main>

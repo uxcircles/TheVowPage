@@ -38,14 +38,20 @@ export function InvitationCardVisual({ theme }: { theme: ClassicTheme }) {
   );
 }
 
-/** A stylized static mockup of the Classic invitation's envelope + wax seal
- * moment, re-themed by color - not the live interactive template, which
- * would be far too heavy (Leaflet, canvas scratch card, IntersectionObserver
- * reveals) to mount three times on a marketing page. */
-export function InvitationPreviewCard({ theme }: { theme: ClassicTheme }) {
+/** Same caption layout as the hero photo card, but the visual is a real
+ * screenshot of a live demo wedding (public/showcase/demo-{themeId}.jpg)
+ * instead of the abstract mockup - for the marketing homepage's hero,
+ * where a real photo of the actual product reads as more convincing than
+ * generic placeholder text. */
+export function InvitationPhotoCard({ theme }: { theme: ClassicTheme }) {
   return (
     <div className="flex flex-col gap-4">
-      <InvitationCardVisual theme={theme} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/showcase/demo-${theme.id}.jpg`}
+        alt={`${theme.name} 喜帖範例畫面`}
+        className="aspect-[4/5] w-full rounded-lg object-cover object-top shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]"
+      />
       <div>
         <p className="font-medium text-foreground">{theme.name}</p>
         <p className="text-sm text-[var(--brand-ink-soft)]">{theme.tagline}</p>
