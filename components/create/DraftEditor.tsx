@@ -267,6 +267,21 @@ export function DraftEditor() {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   }, [draft, draftHydrated]);
 
+  // Text content survives a refresh via sessionStorage above, but selected
+  // photos are plain File objects only held in memory - a refresh silently
+  // loses them. Warn before that happens, but only when there's actually
+  // something to lose (a lone text-only visitor gets no interruption).
+  useEffect(() => {
+    const hasPhotos = Boolean(photos.hero || photos.family || photos.footer) || photos.moments.length > 0;
+    if (!hasPhotos) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [photos]);
+
   function update<K extends keyof DraftContent>(
     key: K,
     value: DraftContent[K],
