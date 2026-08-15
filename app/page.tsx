@@ -16,6 +16,18 @@ function IconWrap({ children }: { children: React.ReactNode }) {
   );
 }
 
+function SparkleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-3.5 w-3.5" aria-hidden="true">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3.5c.6 2.8 1.4 4.6 2.6 5.9 1.2 1.2 3 2 5.9 2.6-2.8.6-4.6 1.4-5.9 2.6-1.2 1.2-2 3-2.6 5.9-.6-2.8-1.4-4.6-2.6-5.9-1.2-1.2-3-2-5.9-2.6 2.8-.6 4.6-1.4 5.9-2.6 1.2-1.2 2-3 2.6-5.9Z"
+      />
+    </svg>
+  );
+}
+
 function ShareIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5" aria-hidden="true">
@@ -73,26 +85,6 @@ function PhoneIcon() {
   );
 }
 
-function PaletteIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2a2 2 0 0 1 2-2h1a3 3 0 0 0 3-3c0-6-3.6-11-8-11Z" />
-      <circle cx="7.5" cy="11" r="1" fill="currentColor" stroke="none" />
-      <circle cx="10" cy="7.5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="15" cy="7.5" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function UploadIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15V4M12 4l-4 4M12 4l4 4" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-    </svg>
-  );
-}
-
 function ChevronIcon() {
   return (
     <svg
@@ -143,19 +135,16 @@ const BENEFITS = [
 
 const STEPS = [
   {
-    icon: PaletteIcon,
     number: "01",
     title: "挑選模板與配色",
     description: "選擇喜歡的樣式與色調，一鍵套用到你的喜帖。",
   },
   {
-    icon: UploadIcon,
     number: "02",
     title: "填寫資訊、上傳照片",
     description: "新人資訊、婚期地點、婚紗照，幾分鐘內就能完成。",
   },
   {
-    icon: ShareIcon,
     number: "03",
     title: "分享連結、收 RSVP",
     description: "傳給賓客，即時收到出席回覆與人數統計。",
@@ -169,7 +158,13 @@ const FAQS = [
   },
   {
     question: "什麼時候需要付費？",
-    answer: "只有在你要「發布」喜帖、產生可分享的公開網址時才需要付費，是一次性費用，不是訂閱制，設計與編輯階段完全免費。",
+    answer:
+      "只有在你要「發布」喜帖、產生可分享的公開網址時才需要付費，一次性 £39，不是訂閱制，設計與編輯階段完全免費。發布後提供一整年的公開瀏覽期，涵蓋婚禮前後所有需要賓客查看的時間。",
+  },
+  {
+    question: "如果不滿意可以退款嗎？",
+    answer:
+      "可以。我們提供 14 天安心退款保證：付款後 14 天內，只要賓客尚未開始回覆 RSVP、且婚禮尚未舉行，都能透過信箱申請全額退款。",
   },
   {
     question: "賓客需要下載 App 或註冊帳號嗎？",
@@ -213,7 +208,8 @@ export default function Home() {
           <div>
             <Reveal>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--brand-gold)]/10 px-3 py-1 text-xs font-medium text-[var(--brand-gold-dark)]">
-                🎉 前 20 組新人限定優惠
+                <SparkleIcon />
+                開幕限定・前 20 組新人獨享優惠
               </span>
             </Reveal>
             <Reveal delay={120}>
@@ -221,14 +217,13 @@ export default function Home() {
               <h1
                 className={`${headingFont.className} mt-4 text-4xl font-semibold leading-tight text-foreground sm:text-5xl`}
               >
-                5 分鐘打造
-                <br />
-                質感電子喜帖
+                親手打造，專屬於你們的質感喜帖
               </h1>
             </Reveal>
             <Reveal delay={240}>
               <p className="mt-6 max-w-md text-[var(--brand-ink-soft)]">
-                輕鬆收集 RSVP、傳遞你的專屬浪漫——不用懂設計，也不用寫程式，挑模板、放照片、填資訊就完成。
+                專為現代新人設計的互動式喜帖。融合封蠟拆封儀式與流暢的 RSVP
+                收集，只需挑選喜愛配色、放入婚紗照，即刻優雅呈現。
               </p>
             </Reveal>
             <Reveal delay={360}>
@@ -237,15 +232,18 @@ export default function Home() {
                   href="/create"
                   className="rounded bg-[var(--brand-gold-dark)] px-8 py-3 text-white transition-opacity hover:opacity-90"
                 >
-                  開始建立你的喜帖
+                  免費體驗試做
                 </Link>
                 <a
                   href="#showcase"
                   className="text-sm text-[var(--brand-ink-soft)] underline underline-offset-4 hover:text-[var(--brand-gold)]"
                 >
-                  先看看作品範例
+                  欣賞範例喜帖
                 </a>
               </div>
+              <p className="mt-3 text-sm text-[var(--brand-ink-soft)]">
+                全程免費編輯預覽・滿意再以 £39 一次性發布
+              </p>
             </Reveal>
           </div>
 
@@ -295,11 +293,8 @@ export default function Home() {
             <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
               {STEPS.map((step, i) => (
                 <Reveal key={step.title} delay={i * 120}>
-                  <div className="flex items-center gap-3">
-                    <IconWrap>
-                      <step.icon />
-                    </IconWrap>
-                    <p className={`${headingFont.className} text-4xl text-[var(--brand-gold)]/40`}>{step.number}</p>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-gold)]/10">
+                    <span className={`${headingFont.className} text-xl text-[var(--brand-gold)]`}>{step.number}</span>
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[var(--brand-ink-soft)]">{step.description}</p>
@@ -384,15 +379,15 @@ export default function Home() {
         {/* Closing CTA */}
         <section className="px-6 py-20 sm:px-10">
           <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-2xl bg-[var(--foreground)] px-8 py-16 text-center text-[var(--background)]">
-            <h2 className={`${headingFont.className} text-3xl font-semibold`}>準備好開始了嗎？</h2>
+            <h2 className={`${headingFont.className} text-3xl font-semibold`}>為你們的婚禮，開啟第一頁浪漫</h2>
             <p className="max-w-md text-white/70">
-              不用先註冊，直接試做看看——準備好要儲存時再建立帳號，內容不會遺失。
+              無需事先註冊，隨心挑選封蠟與配色，親手拼湊出滿意的模樣後再為你們留下。
             </p>
             <Link
               href="/create"
               className="rounded bg-[var(--brand-gold)] px-8 py-3 text-white transition-opacity hover:opacity-90"
             >
-              開始建立你的喜帖
+              免費開始創作喜帖
             </Link>
           </Reveal>
         </section>
