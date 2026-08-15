@@ -62,6 +62,15 @@ function EditIcon() {
   );
 }
 
+function HomeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 10.5 12 4l8 6.5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 9.5V20h5v-6h2v6h5V9.5" />
+    </svg>
+  );
+}
+
 // Floating CTA shown only on the permanent showcase demo weddings ([[vowpage_showcase_demo_weddings]]),
 // never on a real customer's own invitation - carries the demo's theme/seal/moments
 // style over to /create via query params so "I like this one" leads straight into
@@ -69,7 +78,14 @@ function EditIcon() {
 function TryThisDesignCta({ theme, seal, momentsStyle }: { theme: string; seal: string; momentsStyle: string }) {
   const href = `/create?theme=${encodeURIComponent(theme)}&seal=${encodeURIComponent(seal)}&moments=${encodeURIComponent(momentsStyle)}`;
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4">
+    <div className="fixed inset-x-0 bottom-0 z-50 flex items-center justify-center gap-3 px-4 pb-4">
+      <Link
+        href="/#showcase"
+        aria-label="返回首頁"
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[var(--foreground)] shadow-lg transition-opacity hover:opacity-90"
+      >
+        <HomeIcon />
+      </Link>
       <Link
         href={href}
         className="inline-flex items-center gap-2 rounded-full bg-[var(--foreground)] px-6 py-3 text-sm font-medium text-white shadow-lg transition-opacity hover:opacity-90"
