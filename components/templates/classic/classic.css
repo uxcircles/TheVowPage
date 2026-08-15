@@ -935,9 +935,14 @@
   padding: 14px 40px;
   border-radius: 2px;
   cursor: pointer;
-  transition: opacity 0.25s ease;
 }
 .classic .rsvp-btn:hover {
+  /* Scoped to :hover (not the base rule) so it doesn't override the
+     .reveal class's own `transition: opacity 1s ease, transform 1s ease`
+     - the CSS `transition` shorthand replaces the whole property list,
+     not merges it, so putting this on the base rule silently killed the
+     scroll-in slide (no transform in this list) and sped up the fade. */
+  transition: opacity 0.25s ease;
   opacity: 0.85;
 }
 

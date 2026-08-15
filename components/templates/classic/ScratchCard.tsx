@@ -261,7 +261,7 @@ export function ScratchCard({
   return (
     <section className="scratch-section">
       <p className="eyebrow reveal">save the date</p>
-      <div className="scratch-card" ref={cardRef}>
+      <div className="scratch-card reveal" ref={cardRef}>
         <div className="scratch-reveal">
           <p className="cn">{eventDate ? formatDateLabel(eventDate, timeZone) : "日期籌備中"}</p>
           <p className="detail">{eventDate ? formatTimeLabel(eventDate, timeZone) : ""}</p>

@@ -38,7 +38,6 @@ export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
         <Reveal key={theme.name} delay={(i % 4) * 100}>
           <Link
             href={`/w/demo-${theme.id}`}
-            target="_blank"
             className={`group block transition-transform duration-500 ease-out ${
               active === i ? "-translate-y-2" : ""
             }`}

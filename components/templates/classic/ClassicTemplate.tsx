@@ -160,13 +160,20 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
 
         if (e < 1) {
           const te = easeOutCubic(e);
+          // Opacity races ahead of position/scale/rotation - fully visible
+          // by 40% into the entrance instead of exactly when it finishes
+          // settling, so each photo (especially the last one, whose
+          // entrance window sits at the very end of the whole stack's
+          // scroll range) doesn't require scrolling through its entire
+          // slide-in distance just to stop looking faded.
+          const opacityT = easeOutCubic(clamp(e / 0.4, 0, 1));
           const startX = dir * (window.innerWidth / 2 + 220);
           const startY = -40;
           const startRot = rot + dir * 18;
           x = lerp(startX, 0, te);
           y = lerp(startY, 0, te);
           scale = lerp(1.04, 1, te);
-          opacity = lerp(0, 1, te);
+          opacity = lerp(0, 1, opacityT);
           rotation = lerp(startRot, rot, te);
         } else {
           const lo = Math.floor(a);
