@@ -53,6 +53,34 @@ function ExpiredNotice() {
   );
 }
 
+function EditIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20l1-4L16 5l3 3L8 19l-4 1Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 7l3 3" />
+    </svg>
+  );
+}
+
+// Floating CTA shown only on the permanent showcase demo weddings ([[vowpage_showcase_demo_weddings]]),
+// never on a real customer's own invitation - carries the demo's theme/seal/moments
+// style over to /create via query params so "I like this one" leads straight into
+// editing with the same look already selected.
+function TryThisDesignCta({ theme, seal, momentsStyle }: { theme: string; seal: string; momentsStyle: string }) {
+  const href = `/create?theme=${encodeURIComponent(theme)}&seal=${encodeURIComponent(seal)}&moments=${encodeURIComponent(momentsStyle)}`;
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4">
+      <Link
+        href={href}
+        className="inline-flex items-center gap-2 rounded-full bg-[var(--foreground)] px-6 py-3 text-sm font-medium text-white shadow-lg transition-opacity hover:opacity-90"
+      >
+        套用此設計，開始編輯
+        <EditIcon />
+      </Link>
+    </div>
+  );
+}
+
 export default async function PublicWeddingPage({
   params,
 }: {
@@ -64,5 +92,16 @@ export default async function PublicWeddingPage({
   if (result.status === "not_found") notFound();
   if (result.status === "expired") return <ExpiredNotice />;
 
-  return <ClassicTemplate data={result.data} />;
+  return (
+    <>
+      <ClassicTemplate data={result.data} />
+      {result.isDemo && (
+        <TryThisDesignCta
+          theme={result.data.theme}
+          seal={result.data.sealDesign}
+          momentsStyle={result.data.momentsStyle}
+        />
+      )}
+    </>
+  );
 }

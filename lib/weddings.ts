@@ -22,7 +22,7 @@ export const getOwnedWedding = cache(async (weddingId: string): Promise<Tables<"
 });
 
 export type PublicWeddingResult =
-  | { status: "ok"; data: ClassicTemplateData }
+  | { status: "ok"; data: ClassicTemplateData; isDemo: boolean }
   | { status: "not_found" }
   | { status: "expired" };
 
@@ -90,5 +90,5 @@ export async function getPublicWeddingData(slug: string): Promise<PublicWeddingR
     showDressCode: wedding.show_dress_code,
     showRsvp: wedding.show_rsvp,
   };
-  return { status: "ok", data };
+  return { status: "ok", data, isDemo: wedding.is_demo };
 }

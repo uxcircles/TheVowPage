@@ -161,6 +161,7 @@ export type Database = {
           groom_parents: string
           groom_parents_relation: string
           id: string
+          is_demo: boolean
           moments_style: string
           owner_id: string
           paid_at: string | null
@@ -199,6 +200,7 @@ export type Database = {
           groom_parents?: string
           groom_parents_relation?: string
           id?: string
+          is_demo?: boolean
           moments_style?: string
           owner_id: string
           paid_at?: string | null
@@ -237,6 +239,7 @@ export type Database = {
           groom_parents?: string
           groom_parents_relation?: string
           id?: string
+          is_demo?: boolean
           moments_style?: string
           owner_id?: string
           paid_at?: string | null

@@ -18,6 +18,9 @@ import { Toggle } from "@/components/ui/Toggle";
 import { ThemePicker } from "@/components/ui/ThemePicker";
 import { SealPicker } from "@/components/ui/SealPicker";
 import { MomentsStylePicker } from "@/components/ui/MomentsStylePicker";
+import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
+import { SEAL_DESIGNS } from "@/components/templates/classic/seals";
+import { MOMENTS_STYLES } from "@/components/templates/classic/momentsStyles";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
@@ -219,14 +222,39 @@ export function DraftEditor() {
     // window entirely on the server or cause a hydration mismatch when a
     // draft exists.
     const saved = sessionStorage.getItem(STORAGE_KEY);
+    let hydrated = EMPTY_DRAFT;
     if (saved) {
       try {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setDraft({ ...EMPTY_DRAFT, ...JSON.parse(saved) });
+        hydrated = { ...EMPTY_DRAFT, ...JSON.parse(saved) };
       } catch {
         // ignore malformed saved draft
       }
     }
+
+    // Arriving from a demo wedding's "套用此設計，開始編輯" link
+    // (/create?theme=...&seal=...&moments=...) carries that look over,
+    // taking priority over whatever a resumed session had - clicking that
+    // link is an explicit, fresh choice of style, even if the visitor also
+    // has an older in-progress draft sitting in this browser. Only the
+    // three style fields are touched; the rest of a resumed draft (photos,
+    // text content) is left alone. Values are validated against the known
+    // id lists rather than trusted blindly, since they arrive via URL.
+    const params = new URLSearchParams(window.location.search);
+    const themeParam = params.get("theme");
+    const sealParam = params.get("seal");
+    const momentsParam = params.get("moments");
+    if (themeParam && CLASSIC_THEMES.some((t) => t.id === themeParam)) {
+      hydrated = { ...hydrated, theme: themeParam };
+    }
+    if (sealParam && SEAL_DESIGNS.some((s) => s.id === sealParam)) {
+      hydrated = { ...hydrated, sealDesign: sealParam };
+    }
+    if (momentsParam && MOMENTS_STYLES.some((m) => m.id === momentsParam)) {
+      hydrated = { ...hydrated, momentsStyle: momentsParam };
+    }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDraft(hydrated);
     setDraftHydrated(true);
   }, []);
 
