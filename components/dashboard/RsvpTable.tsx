@@ -1,9 +1,10 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { deleteRsvp } from "@/lib/actions/rsvps";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { useToast } from "@/components/ui/Toast";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export function RsvpTable({
@@ -15,8 +16,10 @@ export function RsvpTable({
 }) {
   const showToast = useToast();
   const [pending, startTransition] = useTransition();
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   function handleDelete(rsvpId: string) {
+    setConfirmingId(null);
     startTransition(async () => {
       try {
         await deleteRsvp(weddingId, rsvpId);
@@ -70,7 +73,7 @@ export function RsvpTable({
                   <button
                     type="button"
                     disabled={pending}
-                    onClick={() => handleDelete(r.id)}
+                    onClick={() => setConfirmingId(r.id)}
                     aria-label="刪除"
                     className="text-[var(--brand-ink-soft)] hover:text-red-500"
                   >
@@ -82,6 +85,16 @@ export function RsvpTable({
           </tbody>
         </table>
       </div>
+      {confirmingId && (
+        <ConfirmDialog
+          title="刪除回覆"
+          message="確定要刪除這筆 RSVP 回覆嗎？刪除後無法復原。"
+          confirmLabel="刪除"
+          danger
+          onConfirm={() => handleDelete(confirmingId)}
+          onCancel={() => setConfirmingId(null)}
+        />
+      )}
     </div>
   );
 }

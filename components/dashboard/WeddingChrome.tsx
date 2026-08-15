@@ -13,12 +13,13 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { setWeddingStatus } from "@/lib/actions/weddings";
 import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import type { ClassicTemplateData } from "@/components/templates/classic/types";
 import { useToast } from "@/components/ui/Toast";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 type SaveBarState = {
   formId: string;
@@ -33,6 +34,7 @@ const EditChromeContext = createContext<{
   saveBar: SaveBarState;
   setSaveBar: (s: SaveBarState) => void;
   setPreviewSnapshot: Dispatch<SetStateAction<PreviewSnapshotFn>>;
+  setDirty: (d: boolean) => void;
 } | null>(null);
 
 /** Lets a form deep in the tree (e.g. WeddingEditForm) publish its
@@ -83,6 +85,20 @@ export function useEditPreview(getSnapshot: () => ClassicTemplateData) {
   }, [setPreviewSnapshot]);
 }
 
+/** Raw access to the shared dirty flag, so the chrome can warn before a tab
+ * switch, the "← 返回" link, or a browser close/refresh/back throws away
+ * unsaved changes. A plain setter rather than a single "report my dirty
+ * state" hook because the fields that need to mark it live in more than
+ * one component: most of the form's own inputs (WeddingEditForm, via a
+ * single delegated input/change listener) but also the theme/seal/moments
+ * pickers, which render as sibling EditorCards *outside* the actual
+ * &lt;form&gt; DOM subtree (they only associate via the `form=` attribute
+ * for submission), so a listener on the form itself never sees their
+ * changes - each caller flips this on directly instead. */
+export function useSetDirty() {
+  return useContext(EditChromeContext)?.setDirty ?? (() => {});
+}
+
 export function WeddingChrome({
   weddingId,
   groomName,
@@ -107,12 +123,14 @@ export function WeddingChrome({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const showToast = useToast();
   const [saveBar, setSaveBar] = useState<SaveBarState>(null);
   const [previewSnapshot, setPreviewSnapshot] =
     useState<PreviewSnapshotFn>(null);
+  const [dirty, setDirty] = useState(false);
   const contextValue = useMemo(
-    () => ({ saveBar, setSaveBar, setPreviewSnapshot }),
+    () => ({ saveBar, setSaveBar, setPreviewSnapshot, setDirty }),
     [saveBar],
   );
   const [previewData, setPreviewData] = useState<ClassicTemplateData | null>(
@@ -132,6 +150,35 @@ export function WeddingChrome({
   // to show - both hooks below register their state as null on unmount,
   // so switching tabs clears these correctly.
   const showBottomBar = Boolean(saveBar || previewSnapshot);
+
+  // Closing the tab, refreshing, or typing a new URL bypasses React/Next
+  // entirely - only the browser's own beforeunload prompt can catch that.
+  // Its text is browser-controlled (can't be customized in modern
+  // browsers), which is a platform limitation, not a bug.
+  useEffect(() => {
+    if (!dirty) return;
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [dirty]);
+
+  // In-app navigation (the "← 返回" link, the tab bar) is client-side
+  // routing, which beforeunload never sees - guard it separately so
+  // switching tabs with unsaved text doesn't silently discard it. Uses the
+  // same ConfirmDialog as deleting a draft wedding, not the native
+  // window.confirm() browser dialog: this navigation is fully within our
+  // own control (unlike beforeunload's dialog, which the browser owns and
+  // won't let a page restyle), so there's no reason to fall back to the
+  // plain OS box here when it'd look out of place next to the rest of the
+  // dashboard's styling.
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  function guardNavigation(e: React.MouseEvent, href: string) {
+    if (!dirty) return;
+    e.preventDefault();
+    setPendingHref(href);
+  }
 
   // Fires a toast on the pending->not-pending edge (not just whenever
   // success/error is truthy) since saveBar.success/error stays set until
@@ -222,6 +269,7 @@ export function WeddingChrome({
           <div className="mx-auto max-w-4xl pt-3">
             <Link
               href="/dashboard"
+              onClick={(e) => guardNavigation(e, "/dashboard")}
               className="text-sm text-[var(--brand-gold)] hover:underline"
             >
               ← 返回
@@ -256,6 +304,7 @@ export function WeddingChrome({
                   <Link
                     key={tab.href}
                     href={tab.href}
+                    onClick={(e) => guardNavigation(e, tab.href)}
                     className={`border-b-2 pb-2 text-sm transition-colors ${
                       active
                         ? "border-[var(--brand-gold)] font-medium text-foreground"
@@ -329,6 +378,21 @@ export function WeddingChrome({
           </div>
         )}
       </div>
+      {pendingHref && (
+        <ConfirmDialog
+          title="尚未儲存"
+          message="您有尚未儲存的變更，確定要離開嗎？"
+          confirmLabel="離開"
+          danger
+          onConfirm={() => {
+            const href = pendingHref;
+            setPendingHref(null);
+            setDirty(false);
+            router.push(href);
+          }}
+          onCancel={() => setPendingHref(null)}
+        />
+      )}
     </EditChromeContext.Provider>
   );
 }

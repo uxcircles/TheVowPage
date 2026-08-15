@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useRef, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { updateWeddingContent } from "@/lib/actions/weddings";
 import { fetchGeocode } from "@/lib/create-wedding-client";
 import { toDatetimeLocalValue, wallTimeToUtcIso, formatTimezoneLabel } from "@/lib/timezone";
@@ -10,7 +10,7 @@ import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
-import { useEditSaveBar, useEditPreview } from "@/components/dashboard/WeddingChrome";
+import { useEditSaveBar, useEditPreview, useSetDirty } from "@/components/dashboard/WeddingChrome";
 import type { Tables } from "@/lib/supabase/database.types";
 import {
   SCHEDULE_PLACEHOLDERS,
@@ -57,6 +57,44 @@ export function WeddingEditForm({
   const [state, formAction, pending] = useActionState(action, undefined);
   useEditSaveBar({ formId: FORM_ID, pending, error: state?.error, success: state?.success });
   const formRef = useRef<HTMLFormElement>(null);
+  const setDirty = useSetDirty();
+
+  // A single delegated listener catches typing/selecting in any native
+  // form control (input/textarea/select) without needing to track every
+  // field's value individually - covers virtually everything in this form
+  // except the theme/seal/moments pickers, which mark dirty themselves
+  // (see useSetDirty's doc comment for why those can't be caught here).
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+    function markDirty() {
+      setDirty(true);
+    }
+    form.addEventListener("input", markDirty);
+    form.addEventListener("change", markDirty);
+    return () => {
+      form.removeEventListener("input", markDirty);
+      form.removeEventListener("change", markDirty);
+    };
+  }, [setDirty]);
+
+  // Edge-detected on the pending->!pending transition (not just whenever
+  // state.success is truthy) for the same reason WeddingChrome's own
+  // toast-trigger effect does this: state.success stays the same `true`
+  // across renders once set, so a plain `state?.success` dependency
+  // wouldn't re-fire on a second consecutive successful save.
+  const wasPendingRef = useRef(false);
+  useEffect(() => {
+    const justFinished = wasPendingRef.current && !pending;
+    wasPendingRef.current = pending;
+    if (justFinished && state?.success) setDirty(false);
+  }, [pending, state?.success, setDirty]);
+
+  // Leaving 內容編輯 entirely (unmount) - nothing left to lose from here.
+  useEffect(() => {
+    return () => setDirty(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const savedSchedule = wedding.schedule as ScheduleItem[] | null;
   const [schedule, setSchedule] = useState<ScheduleItem[]>(
     savedSchedule && savedSchedule.length > 0 ? savedSchedule : emptySchedule()

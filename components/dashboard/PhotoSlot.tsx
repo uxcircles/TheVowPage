@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteWeddingPhoto } from "@/lib/actions/weddings";
 import { uploadPhotoWithProgress } from "@/lib/uploadPhotoWithProgress";
@@ -33,10 +33,39 @@ export function PhotoSlot({
   // props, so this local override is what actually makes the click feel
   // instant.
   const [removed, setRemoved] = useState(false);
+  // Optimistic replace: the compressed file the user just picked, shown
+  // immediately instead of waiting for upload + router.refresh()'s server
+  // round trip - without this, the progress bar clears the instant the
+  // upload finishes but the <img> (driven by the photoUrl prop, not local
+  // state) keeps showing the old photo for a few more seconds until the
+  // refreshed page data arrives, which reads as broken/unresponsive.
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const hasPhoto = Boolean(photoUrl) && !removed;
+  const displayUrl = localPreviewUrl ?? photoUrl;
+  const hasPhoto = Boolean(displayUrl) && !removed;
   const currentPhotoId = removed ? null : photoId;
   const pending = compressing || progress !== null || deleting;
+
+  // Once the server-confirmed photoUrl prop catches up (after
+  // router.refresh() resolves), hand off from the optimistic local preview
+  // to it and release the object URL - seamless since it's the same image.
+  useEffect(() => {
+    if (!localPreviewUrl) return;
+    if (photoUrl && photoUrl !== localPreviewUrl) {
+      URL.revokeObjectURL(localPreviewUrl);
+      setLocalPreviewUrl(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photoUrl]);
+
+  // Revoke on unmount too, in case the user navigates away before the
+  // refresh above ever lands.
+  useEffect(() => {
+    return () => {
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -59,11 +88,19 @@ export function PhotoSlot({
       return;
     }
 
+    // Show the picked photo right away rather than waiting on the upload -
+    // it's the same file being sent, so there's no risk of the preview
+    // looking different from what actually lands.
+    const objectUrl = URL.createObjectURL(compressed);
+    setLocalPreviewUrl(objectUrl);
+
     setProgress(0);
     const result = await uploadPhotoWithProgress(weddingId, kind, compressed, setProgress);
     setProgress(null);
     if (inputRef.current) inputRef.current.value = "";
     if (result.error) {
+      URL.revokeObjectURL(objectUrl);
+      setLocalPreviewUrl(null);
       showToast(result.error, "error");
       return;
     }
@@ -99,7 +136,7 @@ export function PhotoSlot({
     <div className="flex flex-col gap-2">
       <p className="text-sm text-[var(--brand-ink-soft)]">{label}</p>
       <div className="aspect-[4/5] overflow-hidden rounded border border-[var(--brand-line)] bg-[var(--cream-deep,#f1e9da)]">
-        {hasPhoto && <img src={photoUrl!} alt={label} className="h-full w-full object-cover" />}
+        {hasPhoto && <img src={displayUrl!} alt={label} className="h-full w-full object-cover" />}
       </div>
       {progress !== null && (
         <div className="h-1.5 overflow-hidden rounded-full bg-[var(--brand-line)]/40">

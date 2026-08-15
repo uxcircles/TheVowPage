@@ -14,11 +14,17 @@ export function GuestList({
   guests: Tables<"guests">[];
 }) {
   const showToast = useToast();
-  const [pending, startTransition] = useTransition();
+  // Separate transitions (not one shared `pending`) so the add button's
+  // label reflects an add in flight specifically, not a delete elsewhere
+  // in the list - both still gate every button below via `pending` so
+  // nothing else can be clicked mid-mutation.
+  const [addPending, startAddTransition] = useTransition();
+  const [deletePending, startDeleteTransition] = useTransition();
+  const pending = addPending || deletePending;
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleAdd(formData: FormData) {
-    startTransition(async () => {
+    startAddTransition(async () => {
       try {
         await addGuest(weddingId, formData);
         formRef.current?.reset();
@@ -29,7 +35,7 @@ export function GuestList({
   }
 
   function handleDelete(guestId: string) {
-    startTransition(async () => {
+    startDeleteTransition(async () => {
       try {
         await deleteGuest(weddingId, guestId);
       } catch {
@@ -57,7 +63,7 @@ export function GuestList({
           disabled={pending}
           className="rounded bg-[var(--brand-gold)] px-4 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          新增
+          {addPending ? "新增中..." : "新增"}
         </button>
       </form>
 
