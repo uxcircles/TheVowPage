@@ -293,7 +293,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       const atMaxScroll = window.scrollY >= document.documentElement.scrollHeight - getStableVH() - 1;
       items.forEach((li) => {
         const p = atMaxScroll ? 1 : bandProgress(li, 0.85, 0.55);
-        li.style.opacity = String(p);
+        // Opacity races ahead of the translateY settle (reaches 1 by 60%
+        // of the band) so a tall item like the footer photo doesn't sit
+        // faded on screen for most of its scroll band just because its
+        // slide-up hasn't finished yet.
+        const opacityP = atMaxScroll ? 1 : clamp(p / 0.6, 0, 1);
+        li.style.opacity = String(opacityP);
         li.style.transform = `translateY(${lerp(16, 0, p)}px)`;
       });
     }
