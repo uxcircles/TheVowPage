@@ -31,6 +31,7 @@ function PhoneScreen({
   originSide,
   rotateDeg,
   extraLeftInset = 0,
+  override,
   children,
 }: {
   screen: { left: number; top: number; width: number; height: number };
@@ -44,6 +45,11 @@ function PhoneScreen({
    * part of the left portion of the screen area, which isn't actually
    * screen at all, so the safety-only inset wasn't enough there. */
   extraLeftInset?: number;
+  /** Bypasses the screen+SAFETY+extraLeftInset math below entirely and
+   * uses these exact fractions instead - found by hand (via the browser
+   * inspector) to sit tighter against the bezel than the computed values
+   * for this particular phone/image pairing. */
+  override?: { left: number; top: number; width: number; height: number };
   children: React.ReactNode;
 }) {
   // Inward pull beyond the measured hole so this box's sharp corners
@@ -54,10 +60,10 @@ function PhoneScreen({
   // to stay safely inside it.
   const SAFETY = 0.01;
 
-  const left = screen.left + SAFETY + extraLeftInset;
-  const top = screen.top + SAFETY;
-  const width = screen.width - SAFETY * 2 - extraLeftInset;
-  const height = screen.height - SAFETY * 2;
+  const left = override ? override.left : screen.left + SAFETY + extraLeftInset;
+  const top = override ? override.top : screen.top + SAFETY;
+  const width = override ? override.width : screen.width - SAFETY * 2 - extraLeftInset;
+  const height = override ? override.height : screen.height - SAFETY * 2;
 
   return (
     <div
@@ -114,7 +120,12 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_2.left * 100}%`, top: `${PHONE_2.top * 100}%`, width: `${PHONE_2.width * 100}%`, aspectRatio: PHONE_2.aspect }}
       >
-        <PhoneScreen screen={PHONE_2_SCREEN} originSide="right" rotateDeg={14} extraLeftInset={0.015}>
+        <PhoneScreen
+          screen={PHONE_2_SCREEN}
+          originSide="right"
+          rotateDeg={14}
+          override={{ left: 0.085909, top: 0.024582, width: 0.890208, height: 0.950188 }}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/showcase/demo-gold.jpg"
@@ -131,7 +142,12 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_1.left * 100}%`, top: `${PHONE_1.top * 100}%`, width: `${PHONE_1.width * 100}%`, aspectRatio: PHONE_1.aspect }}
       >
-        <PhoneScreen screen={PHONE_1_SCREEN} originSide="left" rotateDeg={14} extraLeftInset={0.015}>
+        <PhoneScreen
+          screen={PHONE_1_SCREEN}
+          originSide="left"
+          rotateDeg={14}
+          override={{ left: 0.0196343, top: 0.024906, width: 0.908757, height: 0.949216 }}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/templates/classic/env.png"
