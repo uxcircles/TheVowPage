@@ -3,15 +3,16 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ui/Toast";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { authCopy } from "@/lib/i18n/dictionaries/auth";
 
 export function GoogleAuthButton({
-  label,
   next = "/dashboard",
 }: {
-  label: string;
   /** Same-site path to land on after the OAuth round trip completes. */
   next?: string;
 }) {
+  const locale = useLocale();
   const showToast = useToast();
   const [pending, setPending] = useState(false);
 
@@ -28,7 +29,7 @@ export function GoogleAuthButton({
     // matter for the (rare) case the call itself fails before that redirect
     // fires - e.g. the Google provider isn't configured on this project.
     if (error) {
-      showToast("無法連接 Google 登入，請稍後再試。", "error");
+      showToast(authCopy.googleConnectFailed[locale], "error");
       setPending(false);
     }
   }
@@ -58,7 +59,7 @@ export function GoogleAuthButton({
           d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .94 4.97l3.01 2.33C4.66 5.17 6.65 3.58 9 3.58Z"
         />
       </svg>
-      {pending ? "跳轉中..." : label}
+      {pending ? authCopy.googleRedirecting[locale] : authCopy.continueWithGoogle[locale]}
     </button>
   );
 }

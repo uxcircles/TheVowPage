@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { translateAuthError } from "@/lib/authErrors";
+import { getLocale } from "@/lib/i18n/locale";
 
 export type AuthActionState = { error?: string } | undefined;
 
@@ -19,7 +20,7 @@ export async function signUp(_prevState: AuthActionState, formData: FormData): P
   });
 
   if (error) {
-    return { error: translateAuthError(error.message) };
+    return { error: translateAuthError(error.message, await getLocale()) };
   }
 
   redirect("/dashboard");
@@ -33,7 +34,7 @@ export async function signIn(_prevState: AuthActionState, formData: FormData): P
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: translateAuthError(error.message) };
+    return { error: translateAuthError(error.message, await getLocale()) };
   }
 
   redirect("/dashboard");

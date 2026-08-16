@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { authCopy } from "@/lib/i18n/dictionaries/auth";
 
 function EyeIcon({ className }: { className?: string }) {
   return (
@@ -42,6 +44,7 @@ export function PasswordInput({
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
+  const locale = useLocale();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -58,7 +61,7 @@ export function PasswordInput({
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "隱藏密碼" : "顯示密碼"}
+        aria-label={visible ? authCopy.hidePassword[locale] : authCopy.showPassword[locale]}
         className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
       >
         {visible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
