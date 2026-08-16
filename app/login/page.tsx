@@ -76,6 +76,17 @@ export default function LoginPage() {
             立即註冊
           </Link>
         </p>
+        <p className="mt-4 text-center text-xs text-[var(--brand-ink-soft)]">
+          繼續即表示您同意我們的{" "}
+          <Link href="/terms" className="underline hover:text-[var(--brand-gold)]">
+            服務條款
+          </Link>{" "}
+          與{" "}
+          <Link href="/privacy" className="underline hover:text-[var(--brand-gold)]">
+            隱私權政策
+          </Link>
+          。
+        </p>
       </div>
     </main>
   );

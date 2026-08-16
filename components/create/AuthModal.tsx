@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { translateAuthError } from "@/lib/authErrors";
@@ -127,6 +128,17 @@ export function AuthModal({
         >
           {mode === "signup" ? "已經有帳號了？改為登入" : "還沒有帳號？改為註冊"}
         </button>
+        <p className="mt-4 text-center text-xs text-[var(--brand-ink-soft)]">
+          繼續即表示您同意我們的{" "}
+          <Link href="/terms" target="_blank" className="underline hover:text-[var(--brand-gold)]">
+            服務條款
+          </Link>{" "}
+          與{" "}
+          <Link href="/privacy" target="_blank" className="underline hover:text-[var(--brand-gold)]">
+            隱私權政策
+          </Link>
+          。
+        </p>
       </div>
     </div>
   );
