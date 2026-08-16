@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EB_Garamond } from "next/font/google";
 import { FaqItem } from "@/components/marketing/FaqItem";
+import { HeroPhones } from "@/components/marketing/HeroPhones";
 import { Reveal } from "@/components/marketing/Reveal";
 import { ShowcaseCarousel } from "@/components/marketing/ShowcaseCarousel";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
@@ -229,12 +230,7 @@ export default function Home() {
           </div>
 
           <Reveal delay={480} className="mx-auto w-full max-w-lg">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/templates/classic/hero-iphone-mockup.webp"
-              alt="喜帖範例畫面"
-              className="w-full"
-            />
+            <HeroPhones />
           </Reveal>
         </section>
 
