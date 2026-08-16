@@ -345,7 +345,7 @@ export function WeddingChrome({
               {!isPaid && !isPublished && (
                 <p className="flex items-center gap-1.5 text-xs text-[var(--brand-ink-soft)]">
                   <ShieldIcon />
-                  14 天安心退款保證：賓客尚未開始回覆、且婚禮尚未舉行前，可全額退款
+                  14 天安心退款保證
                 </p>
               )}
               <div className="flex items-center justify-end gap-3">
