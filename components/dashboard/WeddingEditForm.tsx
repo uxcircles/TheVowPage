@@ -491,8 +491,7 @@ export function WeddingEditForm({
       <EditorCard title="感謝詞">
         <textarea
           name="thanksMessage"
-          defaultValue={wedding.thanks_message}
-          placeholder={THANKS_MESSAGE_FALLBACK}
+          defaultValue={wedding.thanks_message || THANKS_MESSAGE_FALLBACK}
           rows={3}
           className={`${inputClass} w-full`}
         />

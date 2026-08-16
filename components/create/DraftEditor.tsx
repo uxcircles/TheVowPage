@@ -63,7 +63,7 @@ const EMPTY_DRAFT: DraftContent = {
   venueLng: "",
   schedule: emptySchedule(),
   dressCode: "",
-  thanksMessage: "",
+  thanksMessage: THANKS_MESSAGE_FALLBACK,
   showFamily: true,
   showSchedule: true,
   showDressCode: true,
@@ -943,7 +943,6 @@ export function DraftEditor() {
               <textarea
                 value={draft.thanksMessage}
                 onChange={(e) => update("thanksMessage", e.target.value)}
-                placeholder={THANKS_MESSAGE_FALLBACK}
                 rows={3}
                 className={`${inputClass} w-full`}
               />
