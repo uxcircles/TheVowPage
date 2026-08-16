@@ -127,6 +127,21 @@ body {
   animation: hero-screen-pan 26s ease-in-out infinite alternate;
 }
 
+/* Phone 1's screen: a single static screen (the closed-envelope state),
+   not a long scrollable page - so a top-to-bottom pan doesn't apply.
+   A slow, subtle zoom keeps it feeling just as "alive" as phone 2. */
+@keyframes hero-screen-kenburns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.06);
+  }
+}
+.animate-hero-screen-kenburns {
+  animation: hero-screen-kenburns 26s ease-in-out infinite alternate;
+}
+
 /* Chromium/WebKit's native date/datetime-local calendar-picker icon
    renders solid black by default, clashing with every other hand-drawn
    icon in the app (TrashIcon, InfoTooltip's (i), etc., all

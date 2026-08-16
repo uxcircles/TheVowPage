@@ -11,12 +11,82 @@ const CONTAINER_ASPECT = "2783 / 3690";
 const PHONE_1 = { left: 1484 / 2783, top: 0, width: 1299 / 2783, aspect: "1299 / 3086" };
 const PHONE_2 = { left: 0, top: 604 / 3690, width: 1298 / 2783, aspect: "1298 / 3086" };
 
-/** The screen cutout inside hero-phone-2.webp, as a fraction of that
- * phone's own box - i.e. where the frame PNG is transparent, found by
- * scanning each row for a transparent run that doesn't touch either
- * image edge (the actual background transparency around the phone
- * always does touch an edge, so this isolates just the screen hole). */
+/** The screen cutout inside each frame PNG, as a fraction of that phone's
+ * own box - i.e. where the frame is transparent, found by scanning each
+ * row for a transparent run that doesn't touch either image edge (the
+ * background transparency around the phone itself always does touch an
+ * edge, which is what separates it from the screen hole). Both frames
+ * show the phone's near edge flush against the viewer (thin bezel) and
+ * its far edge turned away (visible side/thickness) - 1.png's near edge
+ * is on the left, 2.png's on the right - which is what the "origin" side
+ * in PhoneScreen below is for: a flat screenshot dropped straight into
+ * this rectangular hole looks pasted-on, since it doesn't share the
+ * frame's own perspective, so PhoneScreen re-applies that same tilt to
+ * the content before the frame clips it back down to the hole shape. */
+const PHONE_1_SCREEN = { left: 32 / 1299, top: 46 / 3086, width: (1180 - 32) / 1299, height: (3037 - 46) / 3086 };
 const PHONE_2_SCREEN = { left: 118 / 1298, top: 45 / 3086, width: (1267 - 118) / 1298, height: (3039 - 45) / 3086 };
+
+function PhoneScreen({
+  screen,
+  originSide,
+  rotateDeg,
+  children,
+}: {
+  screen: { left: number; top: number; width: number; height: number };
+  /** Which edge of the screen is closest to the viewer in the frame's own
+   * render - that edge stays put; the opposite edge is the one that tilts
+   * away, so it's the pivot for the rotateY below. */
+  originSide: "left" | "right";
+  rotateDeg: number;
+  children: React.ReactNode;
+}) {
+  // Extra inward pull beyond the measured hole, and extra size beyond
+  // that again, both exist for the same reason: the hole's corners are
+  // rounded but this box is a plain rectangle, so a snug-fitting box
+  // pokes its sharp corners past the frame's opaque bezel right at the
+  // curve. Insetting first guarantees the un-rotated box tucks fully
+  // under the bezel; growing it back out (away from the near edge, and
+  // evenly top/bottom) then compensates for the far edge visually
+  // shrinking once rotateY is applied, so it still fully covers the hole
+  // there too. The frame image painted on top does the actual final
+  // clipping to the hole's true (rounded) shape either way.
+  const SAFETY = 0.006;
+  const OVERSIZE_W = 1.08;
+  const OVERSIZE_H = 1.05;
+
+  const left = screen.left + SAFETY;
+  const top = screen.top + SAFETY;
+  const width = screen.width - SAFETY * 2;
+  const height = screen.height - SAFETY * 2;
+
+  const growW = width * (OVERSIZE_W - 1);
+  const growH = height * (OVERSIZE_H - 1);
+  const boxLeft = originSide === "left" ? left : left - growW;
+  const boxTop = top - growH / 2;
+
+  return (
+    <div
+      className="absolute"
+      style={{
+        left: `${boxLeft * 100}%`,
+        top: `${boxTop * 100}%`,
+        width: `${(width + growW) * 100}%`,
+        height: `${(height + growH) * 100}%`,
+        perspective: "900px",
+      }}
+    >
+      <div
+        className="h-full w-full overflow-hidden rounded-[8%]"
+        style={{
+          transform: `rotateY(${originSide === "left" ? -rotateDeg : rotateDeg}deg)`,
+          transformOrigin: originSide === "left" ? "left center" : "right center",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export function HeroPhones() {
   const phone1Ref = useRef<HTMLDivElement>(null);
@@ -49,22 +119,14 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_2.left * 100}%`, top: `${PHONE_2.top * 100}%`, width: `${PHONE_2.width * 100}%`, aspectRatio: PHONE_2.aspect }}
       >
-        <div
-          className="absolute overflow-hidden"
-          style={{
-            left: `${PHONE_2_SCREEN.left * 100}%`,
-            top: `${PHONE_2_SCREEN.top * 100}%`,
-            width: `${PHONE_2_SCREEN.width * 100}%`,
-            height: `${PHONE_2_SCREEN.height * 100}%`,
-          }}
-        >
+        <PhoneScreen screen={PHONE_2_SCREEN} originSide="right" rotateDeg={14}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/showcase/demo-rose.jpg"
             alt="喜帖範例頁面截圖"
             className="block w-full animate-hero-screen-pan"
           />
-        </div>
+        </PhoneScreen>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/templates/classic/hero-phone-2.webp" alt="" className="absolute inset-0 h-full w-full" />
       </div>
@@ -74,6 +136,14 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_1.left * 100}%`, top: `${PHONE_1.top * 100}%`, width: `${PHONE_1.width * 100}%`, aspectRatio: PHONE_1.aspect }}
       >
+        <PhoneScreen screen={PHONE_1_SCREEN} originSide="left" rotateDeg={14}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/templates/classic/env.png"
+            alt="拆信封畫面"
+            className="block h-full w-full object-cover animate-hero-screen-kenburns"
+          />
+        </PhoneScreen>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/templates/classic/hero-phone-1.webp" alt="" className="absolute inset-0 h-full w-full" />
       </div>
