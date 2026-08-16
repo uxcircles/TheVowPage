@@ -12,6 +12,8 @@ import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@d
 import { CSS } from "@dnd-kit/utilities";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { useHasFinePointer } from "@/lib/useHasFinePointer";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { momentsPhotoGridCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 export type MomentsPhotoItem = { id: string; url: string };
 
@@ -29,6 +31,7 @@ function SortablePhoto({
   item: MomentsPhotoItem;
   onRemove: (id: string) => void;
 }) {
+  const locale = useLocale();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
@@ -50,7 +53,7 @@ function SortablePhoto({
       <button
         type="button"
         onClick={() => onRemove(item.id)}
-        aria-label="移除"
+        aria-label={momentsPhotoGridCopy.remove[locale]}
         className="self-end rounded border border-[var(--brand-line)] p-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
       >
         <TrashIcon className="h-4 w-4" />
@@ -74,6 +77,7 @@ function StaticPhoto({
   onMove: (id: string, direction: "up" | "down") => void;
   onRemove: (id: string) => void;
 }) {
+  const locale = useLocale();
   return (
     <div className="flex flex-col gap-1.5">
       <div className="aspect-[4/5] overflow-hidden rounded border border-[var(--brand-line)]">
@@ -84,7 +88,7 @@ function StaticPhoto({
           type="button"
           disabled={disabled || index === 0}
           onClick={() => onMove(item.id, "up")}
-          aria-label="上移"
+          aria-label={momentsPhotoGridCopy.moveUp[locale]}
           className="flex-1 rounded border border-[var(--brand-line)] py-1.5 text-[var(--brand-ink-soft)] disabled:opacity-30"
         >
           ↑
@@ -93,7 +97,7 @@ function StaticPhoto({
           type="button"
           disabled={disabled || index === count - 1}
           onClick={() => onMove(item.id, "down")}
-          aria-label="下移"
+          aria-label={momentsPhotoGridCopy.moveDown[locale]}
           className="flex-1 rounded border border-[var(--brand-line)] py-1.5 text-[var(--brand-ink-soft)] disabled:opacity-30"
         >
           ↓
@@ -102,7 +106,7 @@ function StaticPhoto({
           type="button"
           disabled={disabled}
           onClick={() => onRemove(item.id)}
-          aria-label="移除"
+          aria-label={momentsPhotoGridCopy.remove[locale]}
           className="flex-1 rounded border border-[var(--brand-line)] py-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500 disabled:opacity-30"
         >
           <TrashIcon className="mx-auto h-4 w-4" />

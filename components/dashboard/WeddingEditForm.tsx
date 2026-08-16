@@ -11,6 +11,8 @@ import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { useEditSaveBar, useEditPreview, useSetDirty } from "@/components/dashboard/WeddingChrome";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { editForm } from "@/lib/i18n/dictionaries/dashboard";
 import type { Tables } from "@/lib/supabase/database.types";
 import {
   SCHEDULE_PLACEHOLDERS,
@@ -52,6 +54,7 @@ export function WeddingEditForm({
   footerPhotoUrl: string | null;
   momentPhotoUrls: string[];
 }) {
+  const locale = useLocale();
   const showToast = useToast();
   const action = updateWeddingContent.bind(null, weddingId);
   const [state, formAction, pending] = useActionState(action, undefined);
@@ -137,7 +140,7 @@ export function WeddingEditForm({
     setLocating(false);
     if (!result) {
       setLocationPreview(null);
-      showToast("找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。", "error");
+      showToast(editForm.locateFailed[locale], "error");
       return;
     }
     setLocationPreview({ lat: result.lat, lng: result.lng });
@@ -220,13 +223,13 @@ export function WeddingEditForm({
   return (
     <form ref={formRef} id={FORM_ID} action={formAction} className="flex flex-col gap-6">
 
-      <EditorCard title="基本資訊">
+      <EditorCard title={editForm.sections.basicInfo[locale]}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Editable role labels (default 新郎/新娘) so the invitation can
               read correctly for same-sex couples too, e.g. "新人一/新人二" -
               they double as the field labels below via live state. */}
           <label className={labelClass}>
-            稱謂（例如：新郎、新人一）
+            {editForm.groomLabelField[locale]}
             <input
               name="groomLabel"
               value={groomLabel}
@@ -235,7 +238,7 @@ export function WeddingEditForm({
             />
           </label>
           <label className={labelClass}>
-            稱謂（例如：新娘、新人二）
+            {editForm.brideLabelField[locale]}
             <input
               name="brideLabel"
               value={brideLabel}
@@ -244,19 +247,19 @@ export function WeddingEditForm({
             />
           </label>
           <label className={labelClass}>
-            {groomLabel || "新郎"}姓名
+            {groomLabel || "新郎"}{editForm.nameSuffix[locale]}
             <input name="groomName" defaultValue={wedding.groom_name} className={inputClass} />
           </label>
           <label className={labelClass}>
-            {brideLabel || "新娘"}姓名
+            {brideLabel || "新娘"}{editForm.nameSuffix[locale]}
             <input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />
           </label>
         </div>
       </EditorCard>
 
       <EditorCard
-        title="雙方家庭資訊"
-        action={<Toggle checked={showFamily} onChange={setShowFamily} label="顯示" />}
+        title={editForm.sections.family[locale]}
+        action={<Toggle checked={showFamily} onChange={setShowFamily} label={editForm.show[locale]} />}
       >
         <input type="hidden" name="showFamily" value={showFamily ? "on" : "off"} />
         {/* Fields stay mounted (just visually hidden) when the toggle is off,
@@ -264,7 +267,7 @@ export function WeddingEditForm({
             hidden form fields still submit their value normally. */}
         <div className={showFamily ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "hidden"}>
           <label className={labelClass}>
-            {groomLabel || "新郎"}雙親
+            {groomLabel || "新郎"}{editForm.parentsSuffix[locale]}
             <div className="flex gap-2">
               <input
                 name="groomParents"
@@ -276,13 +279,13 @@ export function WeddingEditForm({
                 name="groomParentsRelation"
                 defaultValue={groomParentsRelationDefault}
                 placeholder="之子"
-                aria-label={`${groomLabel || "新郎"}與雙親的關係稱謂`}
+                aria-label={`${groomLabel || "新郎"}${editForm.parentsRelationAria[locale]}`}
                 className={`${inputClass} w-20 shrink-0`}
               />
             </div>
           </label>
           <label className={labelClass}>
-            {brideLabel || "新娘"}雙親
+            {brideLabel || "新娘"}{editForm.parentsSuffix[locale]}
             <div className="flex gap-2">
               <input
                 name="brideParents"
@@ -294,7 +297,7 @@ export function WeddingEditForm({
                 name="brideParentsRelation"
                 defaultValue={brideParentsRelationDefault}
                 placeholder="之女"
-                aria-label={`${brideLabel || "新娘"}與雙親的關係稱謂`}
+                aria-label={`${brideLabel || "新娘"}${editForm.parentsRelationAria[locale]}`}
                 className={`${inputClass} w-20 shrink-0`}
               />
             </div>
@@ -303,18 +306,18 @@ export function WeddingEditForm({
         {!showFamily && <HiddenSectionHint />}
       </EditorCard>
 
-      <EditorCard title="場地">
+      <EditorCard title={editForm.sections.venue[locale]}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className={labelClass}>
-            場地名稱
+            {editForm.venueName[locale]}
             <input ref={venueNameRef} name="venueName" defaultValue={wedding.venue_name} className={inputClass} />
           </label>
           <label className={labelClass}>
-            廳別 / 樓層
+            {editForm.venueHall[locale]}
             <input name="venueHall" defaultValue={wedding.venue_hall} className={inputClass} />
           </label>
           <label className={`${labelClass} sm:col-span-2`}>
-            地址
+            {editForm.venueAddress[locale]}
             <input
               ref={venueAddressRef}
               name="venueAddress"
@@ -330,7 +333,7 @@ export function WeddingEditForm({
                 onClick={() => setManualCoords(true)}
                 className="text-[var(--brand-gold)] underline"
               >
-                地圖位置不正確？改成手動輸入座標
+                {editForm.switchToManualCoords[locale]}
               </button>
             ) : (
               <button
@@ -338,14 +341,14 @@ export function WeddingEditForm({
                 onClick={() => setManualCoords(false)}
                 className="text-[var(--brand-gold)] underline"
               >
-                改回自動定位
+                {editForm.switchToAutoLocate[locale]}
               </button>
             )}
           </p>
           {manualCoords && (
             <>
               <label className={labelClass}>
-                緯度
+                {editForm.latitude[locale]}
                 <input
                   ref={venueLatRef}
                   name="venueLat"
@@ -356,7 +359,7 @@ export function WeddingEditForm({
                 />
               </label>
               <label className={labelClass}>
-                經度
+                {editForm.longitude[locale]}
                 <input
                   ref={venueLngRef}
                   name="venueLng"
@@ -375,12 +378,13 @@ export function WeddingEditForm({
               disabled={locating}
               className="rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] disabled:opacity-60"
             >
-              {locating ? "定位中..." : "📍 確認地圖位置"}
+              {locating ? editForm.locating[locale] : editForm.confirmMapLocation[locale]}
             </button>
             {locationPreview && (
               <div className="mt-3 flex flex-col gap-2">
                 <p className="text-sm text-[var(--brand-ink-soft)]">
-                  已定位，判斷時區為：<span className="font-medium text-foreground">{previewTimezone && formatTimezoneLabel(previewTimezone)}</span>
+                  {editForm.locatedTimezonePrefix[locale]}
+                  <span className="font-medium text-foreground">{previewTimezone && formatTimezoneLabel(previewTimezone, locale)}</span>
                 </p>
                 <div className="h-48 overflow-hidden rounded border border-[var(--brand-line)]">
                   <VenueMap
@@ -395,9 +399,9 @@ export function WeddingEditForm({
         </div>
       </EditorCard>
 
-      <EditorCard title="婚禮日期時間">
+      <EditorCard title={editForm.sections.dateTime[locale]}>
         <label className={labelClass}>
-          日期與時間
+          {editForm.dateTimeLabel[locale]}
           <input
             type="datetime-local"
             name="eventDate"
@@ -406,14 +410,14 @@ export function WeddingEditForm({
           />
         </label>
         <p className="mt-2 flex items-center gap-1.5 text-sm text-[var(--brand-ink-soft)]">
-          時區：<span className="font-medium text-foreground">{formatTimezoneLabel(wedding.timezone)}</span>
-          <InfoTooltip text="系統會依場地位置自動判斷時區，儲存後會依最新的場地位置重新確認。" />
+          {editForm.timezonePrefix[locale]}<span className="font-medium text-foreground">{formatTimezoneLabel(wedding.timezone, locale)}</span>
+          <InfoTooltip text={editForm.timezoneTooltip[locale]} />
         </p>
       </EditorCard>
 
       <EditorCard
-        title="婚宴流程"
-        action={<Toggle checked={showSchedule} onChange={setShowSchedule} label="顯示" />}
+        title={editForm.sections.schedule[locale]}
+        action={<Toggle checked={showSchedule} onChange={setShowSchedule} label={editForm.show[locale]} />}
       >
         <input type="hidden" name="showSchedule" value={showSchedule ? "on" : "off"} />
         {/* Same "stay mounted, just hidden" reasoning as the family section
@@ -438,7 +442,7 @@ export function WeddingEditForm({
                 <button
                   type="button"
                   onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
-                  aria-label="刪除"
+                  aria-label={editForm.deleteAria[locale]}
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
                 >
                   <TrashIcon className="h-4 w-4" />
@@ -451,15 +455,15 @@ export function WeddingEditForm({
             onClick={() => setSchedule((s) => [...s, { time: "", event: "" }])}
             className="mt-2 rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]"
           >
-            + 新增流程項目
+            {editForm.addScheduleItem[locale]}
           </button>
         </div>
         {!showSchedule && <HiddenSectionHint />}
       </EditorCard>
 
       <EditorCard
-        title="服裝建議"
-        action={<Toggle checked={showDressCode} onChange={setShowDressCode} label="顯示" />}
+        title={editForm.sections.dressCode[locale]}
+        action={<Toggle checked={showDressCode} onChange={setShowDressCode} label={editForm.show[locale]} />}
       >
         <input type="hidden" name="showDressCode" value={showDressCode ? "on" : "off"} />
         <div className={showDressCode ? "" : "hidden"}>
@@ -475,20 +479,18 @@ export function WeddingEditForm({
       </EditorCard>
 
       <EditorCard
-        title="RSVP 回覆出席"
-        action={<Toggle checked={showRsvp} onChange={setShowRsvp} label="顯示" />}
+        title={editForm.sections.rsvp[locale]}
+        action={<Toggle checked={showRsvp} onChange={setShowRsvp} label={editForm.show[locale]} />}
       >
         <input type="hidden" name="showRsvp" value={showRsvp ? "on" : "off"} />
         {showRsvp ? (
-          <p className="text-sm text-[var(--brand-ink-soft)]">
-            賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在「RSVP 回覆」頁面
-          </p>
+          <p className="text-sm text-[var(--brand-ink-soft)]">{editForm.rsvpEnabledHint[locale]}</p>
         ) : (
           <HiddenSectionHint />
         )}
       </EditorCard>
 
-      <EditorCard title="感謝詞">
+      <EditorCard title={editForm.sections.thanks[locale]}>
         <textarea
           name="thanksMessage"
           defaultValue={wedding.thanks_message || THANKS_MESSAGE_FALLBACK}

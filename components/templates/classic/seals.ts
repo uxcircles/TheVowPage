@@ -4,7 +4,7 @@ export type SealDesignId = "calla" | "rose" | "forget-me-not" | "hydrangea";
 
 export type SealDesign = {
   id: SealDesignId;
-  name: string;
+  name: { zh: string; en: string };
   image: string;
   // Some themes have a dedicated re-shot of the seal (not a CSS recolor -
   // that flattened the emboss detail into a flat blob, see classic.css
@@ -15,7 +15,7 @@ export type SealDesign = {
 export const SEAL_DESIGNS: SealDesign[] = [
   {
     id: "calla",
-    name: "海芋",
+    name: { zh: "海芋", en: "Calla Lily" },
     image: "/templates/classic/wax-seal.webp",
     imageByTheme: {
       rose: "/templates/classic/wax-seal-calla-pink.webp",
@@ -24,7 +24,7 @@ export const SEAL_DESIGNS: SealDesign[] = [
   },
   {
     id: "rose",
-    name: "玫瑰",
+    name: { zh: "玫瑰", en: "Rose" },
     image: "/templates/classic/wax-seal-rose.webp",
     imageByTheme: {
       rose: "/templates/classic/wax-seal-rose-pink.webp",
@@ -33,7 +33,7 @@ export const SEAL_DESIGNS: SealDesign[] = [
   },
   {
     id: "forget-me-not",
-    name: "勿忘我",
+    name: { zh: "勿忘我", en: "Forget-Me-Not" },
     image: "/templates/classic/wax-seal-forget-me-not.webp",
     imageByTheme: {
       rose: "/templates/classic/wax-seal-forget-me-not-pink.webp",
@@ -42,7 +42,7 @@ export const SEAL_DESIGNS: SealDesign[] = [
   },
   {
     id: "hydrangea",
-    name: "繡球花",
+    name: { zh: "繡球花", en: "Hydrangea" },
     image: "/templates/classic/wax-seal-hydrangea.webp",
     imageByTheme: {
       rose: "/templates/classic/wax-seal-hydrangea-pink.webp",

@@ -1,6 +1,7 @@
 "use client";
 
 import { MOMENTS_STYLES, type MomentsStyleId } from "@/components/templates/classic/momentsStyles";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 
 // Small line icons hinting at each layout, drawn to a shared 24x24 grid so
 // they sit consistently at any size - purely decorative (aria-hidden).
@@ -36,6 +37,7 @@ export function MomentsStylePicker({
   value: string;
   onChange: (id: string) => void;
 }) {
+  const locale = useLocale();
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {MOMENTS_STYLES.map((style) => (
@@ -58,8 +60,8 @@ export function MomentsStylePicker({
             {ICONS[style.id]}
           </span>
           <span>
-            <p className="text-sm font-medium text-foreground">{style.name}</p>
-            <p className="mt-0.5 text-xs text-[var(--brand-ink-soft)]">{style.tagline}</p>
+            <p className="text-sm font-medium text-foreground">{style.name[locale]}</p>
+            <p className="mt-0.5 text-xs text-[var(--brand-ink-soft)]">{style.tagline[locale]}</p>
           </span>
         </button>
       ))}

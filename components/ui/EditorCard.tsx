@@ -1,7 +1,13 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { editorCardCopy } from "@/lib/i18n/dictionaries/dashboard";
+
 export function HiddenSectionHint() {
+  const locale = useLocale();
   return (
     <p className="text-sm text-[var(--brand-ink-soft)]">
-      這個區塊目前不會顯示在喜帖上。開啟「顯示」即可編輯內容。
+      {editorCardCopy.hiddenSectionHint[locale]}
     </p>
   );
 }

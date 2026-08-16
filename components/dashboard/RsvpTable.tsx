@@ -5,6 +5,8 @@ import { deleteRsvp } from "@/lib/actions/rsvps";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { rsvpTableCopy, editForm } from "@/lib/i18n/dictionaries/dashboard";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export function RsvpTable({
@@ -14,6 +16,7 @@ export function RsvpTable({
   weddingId: string;
   rsvps: Tables<"rsvps">[];
 }) {
+  const locale = useLocale();
   const showToast = useToast();
   const [pending, startTransition] = useTransition();
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
@@ -24,13 +27,13 @@ export function RsvpTable({
       try {
         await deleteRsvp(weddingId, rsvpId);
       } catch {
-        showToast("刪除失敗，請稍後再試。", "error");
+        showToast(rsvpTableCopy.deleteFailed[locale], "error");
       }
     });
   }
 
   if (rsvps.length === 0) {
-    return <p className="text-sm text-[var(--brand-ink-soft)]">還沒有收到回覆。</p>;
+    return <p className="text-sm text-[var(--brand-ink-soft)]">{rsvpTableCopy.empty[locale]}</p>;
   }
 
   return (
@@ -39,13 +42,13 @@ export function RsvpTable({
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead>
             <tr className="border-b border-[var(--brand-line)] text-[var(--brand-ink-soft)]">
-              <th className="px-4 py-3 font-medium">姓名</th>
-              <th className="px-4 py-3 font-medium">出席</th>
-              <th className="px-4 py-3 font-medium">大人</th>
-              <th className="px-4 py-3 font-medium">小孩</th>
-              <th className="px-4 py-3 font-medium">飲食需求</th>
-              <th className="px-4 py-3 font-medium">留言</th>
-              <th className="px-4 py-3 font-medium">時間</th>
+              <th className="px-4 py-3 font-medium">{rsvpTableCopy.headers.name[locale]}</th>
+              <th className="px-4 py-3 font-medium">{rsvpTableCopy.headers.attending[locale]}</th>
+              <th className="px-4 py-3 font-medium">{rsvpTableCopy.headers.adults[locale]}</th>
+              <th className="px-4 py-3 font-medium">{rsvpTableCopy.headers.children[locale]}</th>
+              <th className="px-4 py-3 font-medium">{rsvpTableCopy.headers.diet[locale]}</th>
+              <th className="px-4 py-3 font-medium">{rsvpTableCopy.headers.message[locale]}</th>
+              <th className="px-4 py-3 font-medium">{rsvpTableCopy.headers.time[locale]}</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -53,7 +56,7 @@ export function RsvpTable({
             {rsvps.map((r) => (
               <tr key={r.id} className="border-b border-[var(--brand-line)] last:border-0">
                 <td className="px-4 py-3">{r.name}</td>
-                <td className="px-4 py-3">{r.attending ? "出席" : "不出席"}</td>
+                <td className="px-4 py-3">{r.attending ? rsvpTableCopy.attendingYes[locale] : rsvpTableCopy.attendingNo[locale]}</td>
                 <td className="px-4 py-3">{r.attending ? r.adults : "-"}</td>
                 <td className="px-4 py-3">{r.attending ? r.children : "-"}</td>
                 <td className="px-4 py-3 max-w-[200px]">
@@ -67,14 +70,14 @@ export function RsvpTable({
                 </td>
                 <td className="px-4 py-3 max-w-[240px] truncate">{r.message}</td>
                 <td className="px-4 py-3 text-[var(--brand-ink-soft)]">
-                  {new Date(r.created_at).toLocaleString("zh-TW")}
+                  {new Date(r.created_at).toLocaleString(locale === "en" ? "en-GB" : "zh-TW")}
                 </td>
                 <td className="px-4 py-3">
                   <button
                     type="button"
                     disabled={pending}
                     onClick={() => setConfirmingId(r.id)}
-                    aria-label="刪除"
+                    aria-label={editForm.deleteAria[locale]}
                     className="text-[var(--brand-ink-soft)] hover:text-red-500"
                   >
                     <TrashIcon className="h-4 w-4" />
@@ -87,9 +90,9 @@ export function RsvpTable({
       </div>
       {confirmingId && (
         <ConfirmDialog
-          title="刪除回覆"
-          message="確定要刪除這筆 RSVP 回覆嗎？刪除後無法復原。"
-          confirmLabel="刪除"
+          title={rsvpTableCopy.confirmTitle[locale]}
+          message={rsvpTableCopy.confirmMessage[locale]}
+          confirmLabel={editForm.deleteAria[locale]}
           danger
           onConfirm={() => handleDelete(confirmingId)}
           onCancel={() => setConfirmingId(null)}

@@ -8,6 +8,8 @@ import { validatePhotoType, validatePhotoSize, MAX_MOMENT_PHOTOS } from "@/lib/p
 import { compressImage } from "@/lib/compressImage";
 import { useToast } from "@/components/ui/Toast";
 import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { momentsCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 type BatchPhase = "compressing" | "uploading" | "processing";
 
@@ -19,6 +21,7 @@ export function MomentsGallery({
   photos: { id: string; url: string }[];
 }) {
   const router = useRouter();
+  const locale = useLocale();
   const showToast = useToast();
   const [uploading, startUploadTransition] = useTransition();
   const [otherPending, startOtherTransition] = useTransition();
@@ -83,7 +86,7 @@ export function MomentsGallery({
           next.delete(id);
           return next;
         });
-        showToast("移除失敗，請稍後再試。", "error");
+        showToast(momentsCopy.removeFailed[locale], "error");
       }
     });
   }
@@ -104,10 +107,10 @@ export function MomentsGallery({
     }
 
     if (overLimitCount > 0) {
-      showToast(`婚紗相簿最多只能上傳 ${MAX_MOMENT_PHOTOS} 張，已略過 ${overLimitCount} 張。`, "error");
+      showToast(momentsCopy.overLimit[locale](MAX_MOMENT_PHOTOS, overLimitCount), "error");
     }
     if (typeInvalidCount > 0) {
-      showToast(`${typeInvalidCount} 張照片格式不符，已略過。`, "error");
+      showToast(momentsCopy.typeInvalid[locale](typeInvalidCount), "error");
     }
     if (typeValidFiles.length === 0) {
       if (inputRef.current) inputRef.current.value = "";
@@ -152,7 +155,7 @@ export function MomentsGallery({
       }
       setBatch(null);
       if (inputRef.current) inputRef.current.value = "";
-      if (failures > 0) showToast(`${failures} 張照片上傳失敗，請稍後再試。`, "error");
+      if (failures > 0) showToast(momentsCopy.uploadFailedBatch[locale](failures), "error");
       router.refresh();
     });
   }
@@ -169,7 +172,11 @@ export function MomentsGallery({
       {batch && (
         <div className="mt-3 mb-4 flex flex-col gap-1">
           <p className="text-xs text-[var(--brand-ink-soft)]">
-            {batch.phase === "compressing" ? "壓縮中" : batch.phase === "processing" ? "處理中" : "上傳中"}{" "}
+            {batch.phase === "compressing"
+              ? momentsCopy.phaseCompressing[locale]
+              : batch.phase === "processing"
+                ? momentsCopy.phaseProcessing[locale]
+                : momentsCopy.phaseUploading[locale]}{" "}
             {batch.done}/{batch.total}
           </p>
           <div className="h-1.5 overflow-hidden rounded-full bg-[var(--brand-line)]/40">
@@ -189,7 +196,7 @@ export function MomentsGallery({
           visiblePhotos.length > 0 && !batch ? "mt-4" : ""
         }`}
       >
-        {uploading ? "上傳中..." : "+ 新增照片（可多選）"}
+        {uploading ? momentsCopy.uploading[locale] : momentsCopy.addPhotos[locale]}
         <input
           ref={inputRef}
           type="file"

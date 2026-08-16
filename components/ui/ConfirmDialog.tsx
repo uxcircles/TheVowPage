@@ -1,10 +1,13 @@
 "use client";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { confirmDialogCopy } from "@/lib/i18n/dictionaries/dashboard";
+
 export function ConfirmDialog({
   title,
   message,
-  confirmLabel = "確定",
-  cancelLabel = "取消",
+  confirmLabel,
+  cancelLabel,
   danger,
   onConfirm,
   onCancel,
@@ -17,6 +20,9 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const locale = useLocale();
+  const resolvedConfirmLabel = confirmLabel ?? confirmDialogCopy.confirm[locale];
+  const resolvedCancelLabel = cancelLabel ?? confirmDialogCopy.cancel[locale];
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-sm rounded bg-white p-6 shadow-xl">
@@ -28,7 +34,7 @@ export function ConfirmDialog({
             onClick={onCancel}
             className="rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]"
           >
-            {cancelLabel}
+            {resolvedCancelLabel}
           </button>
           <button
             type="button"
@@ -37,7 +43,7 @@ export function ConfirmDialog({
               danger ? "bg-red-500" : "bg-[var(--brand-gold)]"
             }`}
           >
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </button>
         </div>
       </div>

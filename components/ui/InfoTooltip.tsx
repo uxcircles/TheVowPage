@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useHasFinePointer } from "@/lib/useHasFinePointer";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { infoTooltipCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 // Click-to-toggle on touch devices, since hover alone doesn't fire on tap -
 // but on devices with a real mouse, showing only on click feels sluggish
 // for a quick glance, so those also get a hover reveal (plus focus, for
 // keyboard navigation).
 export function InfoTooltip({ text }: { text: string }) {
+  const locale = useLocale();
   const hasFinePointer = useHasFinePointer();
   const [open, setOpen] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -41,7 +44,7 @@ export function InfoTooltip({ text }: { text: string }) {
         }}
         onFocus={() => setHovering(true)}
         onBlur={() => setHovering(false)}
-        aria-label="更多說明"
+        aria-label={infoTooltipCopy.moreInfo[locale]}
         className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[var(--brand-line)] text-[10px] leading-none text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)]"
       >
         i

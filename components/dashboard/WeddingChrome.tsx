@@ -19,6 +19,8 @@ import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import type { ClassicTemplateData } from "@/components/templates/classic/types";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
@@ -139,6 +141,7 @@ export function WeddingChrome({
   tabs: { href: string; label: string }[];
   children: React.ReactNode;
 }) {
+  const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const showToast = useToast();
@@ -207,7 +210,7 @@ export function WeddingChrome({
     const justFinished = wasPendingRef.current && !isPending;
     wasPendingRef.current = isPending;
     if (!justFinished) return;
-    if (saveBar?.success) showToast("已儲存", "success");
+    if (saveBar?.success) showToast(chromeCopy.saved[locale], "success");
     else if (saveBar?.error) showToast(saveBar.error, "error");
   }, [saveBar?.pending, saveBar?.success, saveBar?.error, showToast]);
 
@@ -233,7 +236,7 @@ export function WeddingChrome({
         await setWeddingStatus(weddingId, next);
         setIsPublished(next === "published");
       } catch {
-        showToast("操作失敗，請稍後再試。", "error");
+        showToast(chromeCopy.publishToggleFailed[locale], "error");
       }
     });
   }
@@ -268,7 +271,7 @@ export function WeddingChrome({
               onClick={() => setPreviewData(null)}
               className="fixed right-4 top-4 z-[1001] rounded-full bg-white px-4 py-2 text-sm shadow-lg hover:opacity-90"
             >
-              ✕ 返回編輯
+              {chromeCopy.backToEditing[locale]}
             </button>
             <ClassicTemplate data={previewData} />
           </div>,
@@ -290,7 +293,7 @@ export function WeddingChrome({
                 onClick={(e) => guardNavigation(e, "/dashboard")}
                 className="text-sm text-[var(--brand-gold)] hover:underline"
               >
-                ← 返回
+                {chromeCopy.back[locale]}
               </Link>
               <LanguageSwitcher />
             </div>
@@ -305,14 +308,14 @@ export function WeddingChrome({
                   }`}
                 />
                 <span className={isPublished ? "text-green-700" : "text-[var(--brand-ink-soft)]"}>
-                  {isPublished ? "已發布" : "草稿"}
+                  {isPublished ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
                 </span>
               </span>
               {expiryLabel && (
                 <>
                   <span className="text-[var(--brand-line)]">·</span>
                   <span className={isExpired ? "text-[var(--brand-error)]" : "text-[var(--brand-ink-soft)]"}>
-                    {isExpired ? "已到期" : `有效期限至 ${expiryLabel}`}
+                    {isExpired ? chromeCopy.expired[locale] : `${chromeCopy.validUntilPrefix[locale]}${expiryLabel}`}
                   </span>
                 </>
               )}
@@ -349,7 +352,7 @@ export function WeddingChrome({
               {!isPaid && !isPublished && (
                 <p className="flex items-center gap-1.5 text-xs text-[var(--brand-ink-soft)]">
                   <ShieldIcon />
-                  14 天安心退款保證
+                  {chromeCopy.refundGuarantee[locale]}
                 </p>
               )}
               <div className="flex items-center justify-end gap-3">
@@ -364,7 +367,7 @@ export function WeddingChrome({
                         : "rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
                     }
                   >
-                    {saveBar.pending ? "儲存中..." : "儲存"}
+                    {saveBar.pending ? chromeCopy.saving[locale] : chromeCopy.save[locale]}
                   </button>
                 )}
                 {previewSnapshot && (
@@ -373,7 +376,7 @@ export function WeddingChrome({
                     onClick={handlePreviewClick}
                     className="rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)]"
                   >
-                    預覽
+                    {chromeCopy.preview[locale]}
                   </button>
                 )}
                 <button
@@ -387,12 +390,12 @@ export function WeddingChrome({
                   }
                 >
                   {publishPending
-                    ? "處理中..."
+                    ? chromeCopy.processing[locale]
                     : isPublished
-                      ? "取消發布"
+                      ? chromeCopy.unpublish[locale]
                       : isPaid
-                        ? "發布喜帖"
-                        : "付費解鎖發布"}
+                        ? chromeCopy.publish[locale]
+                        : chromeCopy.payToPublish[locale]}
                 </button>
               </div>
             </div>
@@ -401,9 +404,9 @@ export function WeddingChrome({
       </div>
       {pendingHref && (
         <ConfirmDialog
-          title="尚未儲存"
-          message="您有尚未儲存的變更，確定要離開嗎？"
-          confirmLabel="離開"
+          title={chromeCopy.unsavedTitle[locale]}
+          message={chromeCopy.unsavedMessage[locale]}
+          confirmLabel={chromeCopy.leave[locale]}
           danger
           onConfirm={() => {
             const href = pendingHref;

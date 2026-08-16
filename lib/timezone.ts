@@ -60,9 +60,9 @@ export function toDatetimeLocalValue(iso: string | null, timeZone: string): stri
  * so this leans on ICU's built-in zh-Hant data instead of a hand-maintained
  * translation table. Falls back to the raw identifier if the runtime's ICU
  * data doesn't cover it. */
-export function formatTimezoneLabel(timeZone: string): string {
+export function formatTimezoneLabel(timeZone: string, locale: "zh" | "en" = "zh"): string {
   try {
-    const parts = new Intl.DateTimeFormat("zh-Hant", {
+    const parts = new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "zh-Hant", {
       timeZone,
       timeZoneName: "long",
     }).formatToParts(new Date());

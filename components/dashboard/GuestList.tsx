@@ -4,6 +4,8 @@ import { useRef, useTransition } from "react";
 import { addGuest, deleteGuest } from "@/lib/actions/guests";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { useToast } from "@/components/ui/Toast";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { guestListCopy, editForm } from "@/lib/i18n/dictionaries/dashboard";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export function GuestList({
@@ -13,6 +15,7 @@ export function GuestList({
   weddingId: string;
   guests: Tables<"guests">[];
 }) {
+  const locale = useLocale();
   const showToast = useToast();
   // Separate transitions (not one shared `pending`) so the add button's
   // label reflects an add in flight specifically, not a delete elsewhere
@@ -29,7 +32,7 @@ export function GuestList({
         await addGuest(weddingId, formData);
         formRef.current?.reset();
       } catch {
-        showToast("新增賓客失敗，請稍後再試。", "error");
+        showToast(guestListCopy.addFailed[locale], "error");
       }
     });
   }
@@ -39,7 +42,7 @@ export function GuestList({
       try {
         await deleteGuest(weddingId, guestId);
       } catch {
-        showToast("刪除賓客失敗，請稍後再試。", "error");
+        showToast(guestListCopy.deleteFailed[locale], "error");
       }
     });
   }
@@ -49,13 +52,13 @@ export function GuestList({
       <form ref={formRef} action={handleAdd} className="mb-6 flex flex-wrap gap-2">
         <input
           name="name"
-          placeholder="姓名"
+          placeholder={guestListCopy.namePlaceholder[locale]}
           required
           className="rounded border border-[var(--brand-line)] bg-white px-3 py-2"
         />
         <input
           name="note"
-          placeholder="備註（選填）"
+          placeholder={guestListCopy.notePlaceholder[locale]}
           className="flex-1 rounded border border-[var(--brand-line)] bg-white px-3 py-2"
         />
         <button
@@ -63,12 +66,12 @@ export function GuestList({
           disabled={pending}
           className="rounded bg-[var(--brand-gold)] px-4 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {addPending ? "新增中..." : "新增"}
+          {addPending ? guestListCopy.addPending[locale] : guestListCopy.add[locale]}
         </button>
       </form>
 
       {guests.length === 0 ? (
-        <p className="text-sm text-[var(--brand-ink-soft)]">還沒有賓客，新增第一位吧。</p>
+        <p className="text-sm text-[var(--brand-ink-soft)]">{guestListCopy.empty[locale]}</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {guests.map((guest) => (
@@ -84,7 +87,7 @@ export function GuestList({
                 type="button"
                 disabled={pending}
                 onClick={() => handleDelete(guest.id)}
-                aria-label="刪除"
+                aria-label={editForm.deleteAria[locale]}
                 className="text-[var(--brand-ink-soft)] hover:text-red-500"
               >
                 <TrashIcon className="h-4 w-4" />

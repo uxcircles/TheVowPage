@@ -1,6 +1,7 @@
 "use client";
 
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 
 export function ThemePicker({
   value,
@@ -9,6 +10,7 @@ export function ThemePicker({
   value: string;
   onChange: (id: string) => void;
 }) {
+  const locale = useLocale();
   return (
     <div className="flex flex-wrap gap-3">
       {CLASSIC_THEMES.map((theme) => (
@@ -30,8 +32,7 @@ export function ThemePicker({
               }}
             />
           </span>
-          {/* Dashboard UI translation is a separate pass (see i18n plan) - zh for now, matching the rest of this editor. */}
-          <span className="text-sm font-medium text-foreground">{theme.name.zh}</span>
+          <span className="text-sm font-medium text-foreground">{theme.name[locale]}</span>
         </button>
       ))}
     </div>

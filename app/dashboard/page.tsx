@@ -5,10 +5,13 @@ import { createWedding } from "@/lib/actions/weddings";
 import { WeddingRowMenu } from "@/components/dashboard/WeddingRowMenu";
 import { CreateWeddingButton } from "@/components/dashboard/CreateWeddingButton";
 import { DeletedNotice } from "@/components/dashboard/DeletedNotice";
+import { getLocale } from "@/lib/i18n/locale";
+import { dashboardPageCopy, chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   const supabase = await createClient();
+  const locale = await getLocale();
 
   const { data: weddings } = await supabase
     .from("weddings")
@@ -22,7 +25,7 @@ export default async function DashboardPage() {
         <DeletedNotice />
       </Suspense>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium">我的喜帖</h1>
+        <h1 className="text-2xl font-medium">{dashboardPageCopy.heading[locale]}</h1>
         <form action={createWedding}>
           <CreateWeddingButton />
         </form>
@@ -41,7 +44,7 @@ export default async function DashboardPage() {
               strokeLinejoin="round"
             />
           </svg>
-          <p className="text-[var(--brand-ink-soft)]">還沒有喜帖，點擊上方按鈕建立第一個吧。</p>
+          <p className="text-[var(--brand-ink-soft)]">{dashboardPageCopy.empty[locale]}</p>
         </div>
       )}
 
@@ -68,7 +71,7 @@ export default async function DashboardPage() {
                   w.status === "published" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
                 }`}
               >
-                {w.status === "published" ? "已發布" : "草稿"}
+                {w.status === "published" ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
               </span>
             </div>
             {w.status !== "published" && (

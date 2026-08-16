@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { deleteWedding } from "@/lib/actions/weddings";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { rowMenuCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 // deleteWedding() redirects to /dashboard on success, which Next.js
 // implements by throwing a special error carrying this digest - our own
@@ -20,6 +22,7 @@ function isRedirectError(error: unknown): boolean {
 }
 
 export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
+  const locale = useLocale();
   const showToast = useToast();
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -43,7 +46,7 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
         await deleteWedding(weddingId);
       } catch (err) {
         if (isRedirectError(err)) throw err;
-        showToast("刪除失敗，請稍後再試。", "error");
+        showToast(rowMenuCopy.deleteFailed[locale], "error");
       }
     });
   }
@@ -57,7 +60,7 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
           e.stopPropagation();
           setOpen((o) => !o);
         }}
-        aria-label="更多操作"
+        aria-label={rowMenuCopy.moreActions[locale]}
         aria-haspopup="menu"
         aria-expanded={open}
         className="flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-[var(--brand-ink-soft)] hover:bg-black/5"
@@ -81,15 +84,15 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
             }}
             className="block w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
           >
-            {pending ? "刪除中..." : "刪除"}
+            {pending ? rowMenuCopy.deleting[locale] : rowMenuCopy.delete[locale]}
           </button>
         </div>
       )}
       {confirming && (
         <ConfirmDialog
-          title="刪除草稿"
-          message="確定要刪除這份草稿嗎？刪除後無法復原。"
-          confirmLabel="刪除"
+          title={rowMenuCopy.confirmTitle[locale]}
+          message={rowMenuCopy.confirmMessage[locale]}
+          confirmLabel={rowMenuCopy.delete[locale]}
           danger
           onConfirm={handleConfirmDelete}
           onCancel={() => setConfirming(false)}

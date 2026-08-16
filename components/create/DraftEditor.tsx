@@ -26,6 +26,8 @@ import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { editForm, chromeCopy, momentsCopy, photoSlotCopy, draftEditorCopy } from "@/lib/i18n/dictionaries/dashboard";
 import { headingFont } from "@/lib/fonts";
 import { validatePhotoType, validatePhotoSize, MAX_MOMENT_PHOTOS } from "@/lib/photoLimits";
 import { compressImage } from "@/lib/compressImage";
@@ -105,6 +107,7 @@ function PhotoPicker({
   file: File | null;
   onChange: (file: File | null) => void;
 }) {
+  const locale = useLocale();
   const url = useObjectUrl(file);
   const showToast = useToast();
   const [compressing, setCompressing] = useState(false);
@@ -119,7 +122,7 @@ function PhotoPicker({
       </div>
       <div className="flex gap-2">
         <label className="flex-1 cursor-pointer rounded border border-[var(--brand-line)] px-3 py-1.5 text-center text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
-          {compressing ? "壓縮中..." : file ? "更換" : "上傳"}
+          {compressing ? photoSlotCopy.compressing[locale] : file ? photoSlotCopy.change[locale] : photoSlotCopy.upload[locale]}
           <input
             type="file"
             accept="image/*"
@@ -154,7 +157,7 @@ function PhotoPicker({
           <button
             type="button"
             onClick={() => onChange(null)}
-            aria-label="移除"
+            aria-label={photoSlotCopy.removeAria[locale]}
             className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
           >
             <TrashIcon className="h-4 w-4" />
@@ -185,6 +188,7 @@ function useObjectUrls(files: File[]): string[] {
 
 export function DraftEditor() {
   const router = useRouter();
+  const locale = useLocale();
   const showToast = useToast();
   const [draft, setDraft] = useState<DraftContent>(EMPTY_DRAFT);
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
@@ -340,7 +344,7 @@ export function DraftEditor() {
     setLocating(false);
     if (!result) {
       setLocationPreview(null);
-      showToast("找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。", "error");
+      showToast(editForm.locateFailed[locale], "error");
       return;
     }
     setLocationPreview({ lat: result.lat, lng: result.lng });
@@ -437,7 +441,7 @@ export function DraftEditor() {
           onClick={() => setShowPreview(false)}
           className="fixed right-4 top-4 z-[1001] rounded-full bg-white px-4 py-2 text-sm shadow-lg hover:opacity-90"
         >
-          ✕ 返回編輯
+          {chromeCopy.backToEditing[locale]}
         </button>
         <ClassicTemplate data={previewData} />
       </>
@@ -451,7 +455,7 @@ export function DraftEditor() {
       sessionStorage.removeItem(STORAGE_KEY);
       router.push(`/dashboard/${weddingId}/edit`);
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "儲存失敗，請稍後再試", "error");
+      showToast(err instanceof Error ? err.message : draftEditorCopy.saveFailed[locale], "error");
       setSaving(false);
     }
   }
@@ -466,21 +470,21 @@ export function DraftEditor() {
           href="/login"
           className="text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
         >
-          已經有帳號？登入
+          {draftEditorCopy.alreadyHaveAccount[locale]}
         </Link>
       </header>
       <div className="mx-auto w-full max-w-4xl px-6 pt-10 pb-28">
-        <h1 className="text-2xl font-medium">試做你的喜帖</h1>
+        <h1 className="text-2xl font-medium">{draftEditorCopy.tryTitle[locale]}</h1>
         <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
-          不用先註冊，直接填內容、選照片。準備好要儲存時再建立帳號，內容不會遺失。
+          {draftEditorCopy.tryHint[locale]}
         </p>
 
         <section className="mt-8">
-          <h2 className="mb-4 text-lg font-medium">喜帖樣板</h2>
+          <h2 className="mb-4 text-lg font-medium">{draftEditorCopy.templateSection[locale]}</h2>
           <EditorCard>
-            <p className="mb-2 text-sm font-medium text-foreground">顏色</p>
+            <p className="mb-2 text-sm font-medium text-foreground">{draftEditorCopy.colorLabel[locale]}</p>
             <ThemePicker value={draft.theme} onChange={(id) => update("theme", id)} />
-            <p className="mb-2 mt-6 text-sm font-medium text-foreground">封蠟花樣</p>
+            <p className="mb-2 mt-6 text-sm font-medium text-foreground">{draftEditorCopy.sealLabel[locale]}</p>
             <SealPicker
               value={draft.sealDesign}
               onChange={(id) => update("sealDesign", id)}
@@ -489,28 +493,28 @@ export function DraftEditor() {
         </section>
 
         <section className="mt-10">
-          <h2 className="mb-4 text-lg font-medium">照片</h2>
+          <h2 className="mb-4 text-lg font-medium">{draftEditorCopy.photosSection[locale]}</h2>
           <div className="flex flex-col gap-6">
-            <EditorCard title="主視覺 / 合影 / 頁尾照片">
+            <EditorCard title={draftEditorCopy.heroFamilyFooterTitle[locale]}>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                 <PhotoPicker
-                  label="主視覺照（封面）"
+                  label={draftEditorCopy.heroPhotoLabel[locale]}
                   file={photos.hero}
                   onChange={(f) => setPhotos((p) => ({ ...p, hero: f }))}
                 />
                 <PhotoPicker
-                  label="雙方合影"
+                  label={draftEditorCopy.familyPhotoLabel[locale]}
                   file={photos.family}
                   onChange={(f) => setPhotos((p) => ({ ...p, family: f }))}
                 />
                 <PhotoPicker
-                  label="頁尾照片"
+                  label={draftEditorCopy.footerPhotoLabel[locale]}
                   file={photos.footer}
                   onChange={(f) => setPhotos((p) => ({ ...p, footer: f }))}
                 />
               </div>
             </EditorCard>
-            <EditorCard title="婚紗相簿（Moments）">
+            <EditorCard title={draftEditorCopy.momentsTitle[locale]}>
               <MomentsPhotoGrid
                 items={momentItems}
                 onReorder={(orderedIds) =>
@@ -543,7 +547,7 @@ export function DraftEditor() {
                   photos.moments.length > 0 ? "mt-4" : ""
                 }`}
               >
-                {momentsCompressing ? "壓縮中..." : "+ 新增照片（可多選）"}
+                {momentsCompressing ? photoSlotCopy.compressing[locale] : momentsCopy.addPhotos[locale]}
                 <input
                   ref={momentsInputRef}
                   type="file"
@@ -568,11 +572,11 @@ export function DraftEditor() {
                     }
 
                     if (overLimitCount > 0) {
-                      showToast(`婚紗相簿最多只能上傳 ${MAX_MOMENT_PHOTOS} 張，已略過 ${overLimitCount} 張。`, "error");
+                      showToast(momentsCopy.overLimit[locale](MAX_MOMENT_PHOTOS, overLimitCount), "error");
                     }
                     if (typeValidFiles.length === 0) {
                       if (invalidCount > 0) {
-                        showToast(`${invalidCount} 張照片格式不符，已略過。`, "error");
+                        showToast(momentsCopy.typeInvalid[locale](invalidCount), "error");
                       }
                       return;
                     }
@@ -587,7 +591,7 @@ export function DraftEditor() {
                     setMomentsCompressing(false);
 
                     if (invalidCount > 0) {
-                      showToast(`${invalidCount} 張照片格式或大小不符，已略過。`, "error");
+                      showToast(draftEditorCopy.sizeOrTypeInvalid[locale](invalidCount), "error");
                     }
                     if (validFiles.length === 0) return;
 
@@ -601,7 +605,7 @@ export function DraftEditor() {
                   }}
                 />
               </label>
-              <p className="mb-2 mt-6 text-sm font-medium text-foreground">婚紗相簿呈現方式</p>
+              <p className="mb-2 mt-6 text-sm font-medium text-foreground">{draftEditorCopy.momentsStyleLabel[locale]}</p>
               <MomentsStylePicker
                 value={draft.momentsStyle}
                 onChange={(id) => update("momentsStyle", id)}
@@ -611,16 +615,16 @@ export function DraftEditor() {
         </section>
 
         <section className="mt-10">
-          <h2 className="mb-4 text-lg font-medium">喜帖內容</h2>
+          <h2 className="mb-4 text-lg font-medium">{draftEditorCopy.contentSection[locale]}</h2>
           <div className="flex flex-col gap-6">
-            <EditorCard title="基本資訊">
+            <EditorCard title={editForm.sections.basicInfo[locale]}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {/* Editable role labels (default 新郎/新娘) so the
                     invitation can read correctly for same-sex couples too,
                     e.g. "新人一/新人二" - they double as the field labels
                     below via live state. */}
                 <label className={labelClass}>
-                  稱謂（例如：新郎、新人一）
+                  {editForm.groomLabelField[locale]}
                   <input
                     value={draft.groomLabel}
                     onChange={(e) => update("groomLabel", e.target.value)}
@@ -628,7 +632,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  稱謂（例如：新娘、新人二）
+                  {editForm.brideLabelField[locale]}
                   <input
                     value={draft.brideLabel}
                     onChange={(e) => update("brideLabel", e.target.value)}
@@ -636,7 +640,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  {draft.groomLabel || "新郎"}姓名
+                  {draft.groomLabel || "新郎"}{editForm.nameSuffix[locale]}
                   <input
                     value={draft.groomName}
                     onChange={(e) => update("groomName", e.target.value)}
@@ -644,7 +648,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  {draft.brideLabel || "新娘"}姓名
+                  {draft.brideLabel || "新娘"}{editForm.nameSuffix[locale]}
                   <input
                     value={draft.brideName}
                     onChange={(e) => update("brideName", e.target.value)}
@@ -655,19 +659,19 @@ export function DraftEditor() {
             </EditorCard>
 
             <EditorCard
-              title="雙方家庭資訊"
+              title={editForm.sections.family[locale]}
               action={
                 <Toggle
                   checked={draft.showFamily}
                   onChange={(v) => update("showFamily", v)}
-                  label="顯示"
+                  label={editForm.show[locale]}
                 />
               }
             >
               {draft.showFamily ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className={labelClass}>
-                    {draft.groomLabel || "新郎"}雙親
+                    {draft.groomLabel || "新郎"}{editForm.parentsSuffix[locale]}
                     <div className="flex gap-2">
                       <input
                         value={draft.groomParents}
@@ -679,13 +683,13 @@ export function DraftEditor() {
                         value={draft.groomParentsRelation}
                         onChange={(e) => update("groomParentsRelation", e.target.value)}
                         placeholder="之子"
-                        aria-label={`${draft.groomLabel || "新郎"}與雙親的關係稱謂`}
+                        aria-label={`${draft.groomLabel || "新郎"}${editForm.parentsRelationAria[locale]}`}
                         className={`${inputClass} w-20 shrink-0`}
                       />
                     </div>
                   </label>
                   <label className={labelClass}>
-                    {draft.brideLabel || "新娘"}雙親
+                    {draft.brideLabel || "新娘"}{editForm.parentsSuffix[locale]}
                     <div className="flex gap-2">
                       <input
                         value={draft.brideParents}
@@ -697,7 +701,7 @@ export function DraftEditor() {
                         value={draft.brideParentsRelation}
                         onChange={(e) => update("brideParentsRelation", e.target.value)}
                         placeholder="之女"
-                        aria-label={`${draft.brideLabel || "新娘"}與雙親的關係稱謂`}
+                        aria-label={`${draft.brideLabel || "新娘"}${editForm.parentsRelationAria[locale]}`}
                         className={`${inputClass} w-20 shrink-0`}
                       />
                     </div>
@@ -708,10 +712,10 @@ export function DraftEditor() {
               )}
             </EditorCard>
 
-            <EditorCard title="場地">
+            <EditorCard title={editForm.sections.venue[locale]}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className={labelClass}>
-                  場地名稱
+                  {editForm.venueName[locale]}
                   <input
                     value={draft.venueName}
                     onChange={(e) => update("venueName", e.target.value)}
@@ -719,7 +723,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  廳別 / 樓層
+                  {editForm.venueHall[locale]}
                   <input
                     value={draft.venueHall}
                     onChange={(e) => update("venueHall", e.target.value)}
@@ -727,7 +731,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={`${labelClass} sm:col-span-2`}>
-                  地址
+                  {editForm.venueAddress[locale]}
                   <input
                     value={draft.venueAddress}
                     onChange={(e) => update("venueAddress", e.target.value)}
@@ -741,7 +745,7 @@ export function DraftEditor() {
                       onClick={() => update("manualCoords", true)}
                       className="text-[var(--brand-gold)] underline"
                     >
-                      地圖位置不正確？改成手動輸入座標
+                      {editForm.switchToManualCoords[locale]}
                     </button>
                   ) : (
                     <button
@@ -749,14 +753,14 @@ export function DraftEditor() {
                       onClick={() => update("manualCoords", false)}
                       className="text-[var(--brand-gold)] underline"
                     >
-                      改回自動定位
+                      {editForm.switchToAutoLocate[locale]}
                     </button>
                   )}
                 </p>
                 {draft.manualCoords && (
                   <>
                     <label className={labelClass}>
-                      緯度
+                      {editForm.latitude[locale]}
                       <input
                         type="number"
                         step="any"
@@ -766,7 +770,7 @@ export function DraftEditor() {
                       />
                     </label>
                     <label className={labelClass}>
-                      經度
+                      {editForm.longitude[locale]}
                       <input
                         type="number"
                         step="any"
@@ -784,14 +788,14 @@ export function DraftEditor() {
                     disabled={locating}
                     className="rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] disabled:opacity-60"
                   >
-                    {locating ? "定位中..." : "📍 確認地圖位置"}
+                    {locating ? editForm.locating[locale] : editForm.confirmMapLocation[locale]}
                   </button>
                   {locationPreview && (
                     <div className="mt-3 flex flex-col gap-2">
                       <p className="text-sm text-[var(--brand-ink-soft)]">
-                        已定位，判斷時區為：
+                        {editForm.locatedTimezonePrefix[locale]}
                         <span className="font-medium text-foreground">
-                          {formatTimezoneLabel(timezone)}
+                          {formatTimezoneLabel(timezone, locale)}
                         </span>
                       </p>
                       <div className="h-48 overflow-hidden rounded border border-[var(--brand-line)]">
@@ -807,9 +811,9 @@ export function DraftEditor() {
               </div>
             </EditorCard>
 
-            <EditorCard title="婚禮日期時間">
+            <EditorCard title={editForm.sections.dateTime[locale]}>
               <label className={labelClass}>
-                日期與時間
+                {editForm.dateTimeLabel[locale]}
                 <input
                   type="datetime-local"
                   value={draft.eventDate}
@@ -818,24 +822,24 @@ export function DraftEditor() {
                 />
               </label>
               <p className="mt-2 flex items-center gap-1.5 text-sm text-[var(--brand-ink-soft)]">
-                時區：<span className="font-medium text-foreground">{formatTimezoneLabel(timezone)}</span>
+                {editForm.timezonePrefix[locale]}<span className="font-medium text-foreground">{formatTimezoneLabel(timezone, locale)}</span>
                 <InfoTooltip
                   text={
                     timezone === DEFAULT_TIMEZONE
-                      ? "系統會依場地位置自動判斷時區，尚未確認地點前先以台灣時間計算。"
-                      : "系統會依場地位置自動判斷時區，確認地點後會依當地時區重新計算。"
+                      ? draftEditorCopy.tooltipDefault[locale]
+                      : draftEditorCopy.tooltipLocated[locale]
                   }
                 />
               </p>
             </EditorCard>
 
             <EditorCard
-              title="婚宴流程"
+              title={editForm.sections.schedule[locale]}
               action={
                 <Toggle
                   checked={draft.showSchedule}
                   onChange={(v) => update("showSchedule", v)}
-                  label="顯示"
+                  label={editForm.show[locale]}
                 />
               }
             >
@@ -870,7 +874,7 @@ export function DraftEditor() {
                               ),
                             }))
                           }
-                          aria-label="刪除"
+                          aria-label={editForm.deleteAria[locale]}
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -888,7 +892,7 @@ export function DraftEditor() {
                     }
                     className="mt-2 rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]"
                   >
-                    + 新增流程項目
+                    {editForm.addScheduleItem[locale]}
                   </button>
                 </>
               ) : (
@@ -897,12 +901,12 @@ export function DraftEditor() {
             </EditorCard>
 
             <EditorCard
-              title="服裝建議"
+              title={editForm.sections.dressCode[locale]}
               action={
                 <Toggle
                   checked={draft.showDressCode}
                   onChange={(v) => update("showDressCode", v)}
-                  label="顯示"
+                  label={editForm.show[locale]}
                 />
               }
             >
@@ -920,26 +924,25 @@ export function DraftEditor() {
             </EditorCard>
 
             <EditorCard
-              title="RSVP 回覆出席"
+              title={editForm.sections.rsvp[locale]}
               action={
                 <Toggle
                   checked={draft.showRsvp}
                   onChange={(v) => update("showRsvp", v)}
-                  label="顯示"
+                  label={editForm.show[locale]}
                 />
               }
             >
               {draft.showRsvp ? (
                 <p className="text-sm text-[var(--brand-ink-soft)]">
-                  賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在後台的「RSVP
-                  回覆」頁面
+                  {draftEditorCopy.rsvpHint[locale]}
                 </p>
               ) : (
                 <HiddenSectionHint />
               )}
             </EditorCard>
 
-            <EditorCard title="感謝詞">
+            <EditorCard title={editForm.sections.thanks[locale]}>
               <textarea
                 value={draft.thanksMessage}
                 onChange={(e) => update("thanksMessage", e.target.value)}
@@ -959,7 +962,7 @@ export function DraftEditor() {
                 onClick={() => setShowAuth(true)}
                 className="rounded border border-[var(--brand-gold)] px-6 py-2.5 text-[var(--brand-gold)] transition-colors hover:bg-[var(--brand-gold)] hover:text-white disabled:opacity-60"
               >
-                {saving ? "儲存中..." : "儲存喜帖"}
+                {saving ? chromeCopy.saving[locale] : draftEditorCopy.saveInvitation[locale]}
               </button>
               <button
                 type="button"
@@ -973,7 +976,7 @@ export function DraftEditor() {
                 }}
                 className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90"
               >
-                預覽喜帖
+                {draftEditorCopy.previewInvitation[locale]}
               </button>
             </div>
           </div>

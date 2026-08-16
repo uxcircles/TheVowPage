@@ -8,6 +8,8 @@ import { MomentsStyleField } from "@/components/dashboard/MomentsStyleField";
 import { PhotoSlot } from "@/components/dashboard/PhotoSlot";
 import { MomentsGallery } from "@/components/dashboard/MomentsGallery";
 import { EditorCard } from "@/components/ui/EditorCard";
+import { getLocale } from "@/lib/i18n/locale";
+import { editPageCopy, draftEditorCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 export default async function EditWeddingPage({
   params,
@@ -17,6 +19,7 @@ export default async function EditWeddingPage({
   const { weddingId } = await params;
   const wedding = await getOwnedWedding(weddingId);
   if (!wedding) notFound();
+  const locale = await getLocale();
 
   const supabase = await createClient();
   const { data: photos } = await supabase
@@ -36,7 +39,7 @@ export default async function EditWeddingPage({
   return (
     <div className="flex flex-col gap-10">
       <section>
-        <h2 className="mb-4 text-lg font-medium">網址代稱</h2>
+        <h2 className="mb-4 text-lg font-medium">{editPageCopy.slugSection[locale]}</h2>
         {/* Rendered outside <WeddingEditForm>'s own <form> so it can sit in
             its own card at the top of the page (separate from the rest of
             the content fields further down) while still submitting through
@@ -47,41 +50,41 @@ export default async function EditWeddingPage({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-medium">喜帖樣板</h2>
+        <h2 className="mb-4 text-lg font-medium">{draftEditorCopy.templateSection[locale]}</h2>
         <EditorCard>
           <WeddingStylePicker defaultTheme={wedding.theme} defaultSeal={wedding.seal} />
         </EditorCard>
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-medium">照片</h2>
+        <h2 className="mb-4 text-lg font-medium">{draftEditorCopy.photosSection[locale]}</h2>
         <div className="flex flex-col gap-6">
-          <EditorCard title="主視覺 / 合影 / 頁尾照片">
+          <EditorCard title={draftEditorCopy.heroFamilyFooterTitle[locale]}>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
               <PhotoSlot
                 weddingId={weddingId}
                 kind="hero"
-                label="主視覺照（封面）"
+                label={draftEditorCopy.heroPhotoLabel[locale]}
                 photoId={heroPhoto?.id ?? null}
                 photoUrl={heroPhoto ? publicUrl(heroPhoto.storage_path) : null}
               />
               <PhotoSlot
                 weddingId={weddingId}
                 kind="family"
-                label="雙方合影"
+                label={draftEditorCopy.familyPhotoLabel[locale]}
                 photoId={familyPhoto?.id ?? null}
                 photoUrl={familyPhoto ? publicUrl(familyPhoto.storage_path) : null}
               />
               <PhotoSlot
                 weddingId={weddingId}
                 kind="footer"
-                label="頁尾照片"
+                label={draftEditorCopy.footerPhotoLabel[locale]}
                 photoId={footerPhoto?.id ?? null}
                 photoUrl={footerPhoto ? publicUrl(footerPhoto.storage_path) : null}
               />
             </div>
           </EditorCard>
-          <EditorCard title="婚紗相簿（Moments）">
+          <EditorCard title={draftEditorCopy.momentsTitle[locale]}>
             <MomentsGallery
               weddingId={weddingId}
               photos={moments.map((p) => ({ id: p.id, url: publicUrl(p.storage_path) }))}
@@ -94,7 +97,7 @@ export default async function EditWeddingPage({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-medium">喜帖內容</h2>
+        <h2 className="mb-4 text-lg font-medium">{draftEditorCopy.contentSection[locale]}</h2>
         <WeddingEditForm
           weddingId={weddingId}
           wedding={wedding}

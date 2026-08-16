@@ -1,6 +1,7 @@
 "use client";
 
 import { SEAL_DESIGNS } from "@/components/templates/classic/seals";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 
 export function SealPicker({
   value,
@@ -9,6 +10,7 @@ export function SealPicker({
   value: string;
   onChange: (id: string) => void;
 }) {
+  const locale = useLocale();
   return (
     <div className="flex flex-wrap gap-3">
       {SEAL_DESIGNS.map((seal) => (
@@ -26,7 +28,7 @@ export function SealPicker({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={seal.image} alt="" className="h-full w-full object-contain" />
           </span>
-          <span className="text-sm font-medium text-foreground">{seal.name}</span>
+          <span className="text-sm font-medium text-foreground">{seal.name[locale]}</span>
         </button>
       ))}
     </div>

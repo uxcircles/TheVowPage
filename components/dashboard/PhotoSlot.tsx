@@ -8,6 +8,8 @@ import { validatePhotoType, validatePhotoSize } from "@/lib/photoLimits";
 import { compressImage } from "@/lib/compressImage";
 import { useToast } from "@/components/ui/Toast";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { photoSlotCopy, chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 export function PhotoSlot({
   weddingId,
@@ -23,6 +25,7 @@ export function PhotoSlot({
   photoUrl: string | null;
 }) {
   const router = useRouter();
+  const locale = useLocale();
   const showToast = useToast();
   const [compressing, setCompressing] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
@@ -117,20 +120,20 @@ export function PhotoSlot({
         await deleteWeddingPhoto(weddingId, idToDelete);
       } catch {
         setRemoved(false);
-        showToast("移除失敗，請稍後再試。", "error");
+        showToast(photoSlotCopy.removeFailed[locale], "error");
       }
     });
   }
 
   const buttonLabel = compressing
-    ? "壓縮中..."
+    ? photoSlotCopy.compressing[locale]
     : progress === null
       ? hasPhoto
-        ? "更換"
-        : "上傳"
+        ? photoSlotCopy.change[locale]
+        : photoSlotCopy.upload[locale]
       : progress < 100
-        ? `上傳中... ${progress}%`
-        : "處理中...";
+        ? photoSlotCopy.uploadingPercent[locale](progress)
+        : chromeCopy.processing[locale];
 
   return (
     <div className="flex flex-col gap-2">
@@ -160,7 +163,7 @@ export function PhotoSlot({
             type="button"
             disabled={pending}
             onClick={handleDelete}
-            aria-label="移除"
+            aria-label={photoSlotCopy.removeAria[locale]}
             className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
           >
             <TrashIcon className="h-4 w-4" />

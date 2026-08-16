@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { FORM_ID } from "@/components/dashboard/WeddingEditForm";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { slugFieldCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 const DOMAIN_PREFIX = "thevowpage.com/w/";
 
@@ -37,6 +39,7 @@ function ExternalLinkIcon({ className }: { className?: string }) {
  * buttons for the *currently saved* slug - not the input's live-edited
  * value, since an unsaved edit isn't the real public URL yet. */
 export function SlugField({ slug }: { slug: string }) {
+  const locale = useLocale();
   const [copied, setCopied] = useState(false);
   const publicUrl = `https://${DOMAIN_PREFIX}${slug}`;
 
@@ -73,7 +76,7 @@ export function SlugField({ slug }: { slug: string }) {
             className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded border border-[var(--brand-line)] px-3 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] sm:flex-none"
           >
             {copied ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
-            {copied ? "已複製" : "複製"}
+            {copied ? slugFieldCopy.copied[locale] : slugFieldCopy.copy[locale]}
           </button>
           <a
             href={publicUrl}
@@ -82,12 +85,12 @@ export function SlugField({ slug }: { slug: string }) {
             className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded border border-[var(--brand-line)] px-3 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] sm:flex-none"
           >
             <ExternalLinkIcon className="h-4 w-4" />
-            前往
+            {slugFieldCopy.visit[locale]}
           </a>
         </div>
       </div>
       <p className="text-sm text-[var(--brand-ink-soft)]">
-        這將是賓客訪問您喜帖的專屬連結，您可以隨時自訂後方的網址名稱
+        {slugFieldCopy.hint[locale]}
       </p>
     </div>
   );
