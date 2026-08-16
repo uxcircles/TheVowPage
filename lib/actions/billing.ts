@@ -48,7 +48,8 @@ export async function createCheckoutSession(
     allow_promotion_codes: true,
     custom_text: {
       submit: {
-        message: "🛡️ 14 天安心退款保證：付款後 14 天內，只要賓客尚未開始回覆、且婚禮尚未舉行，即可全額退款。",
+        message:
+          "❤️ 14 天安心退款保證：付款後 14 天內，只要賓客尚未開始回覆、且婚禮尚未舉行，即可全額退款。\n❤️ 14-Day Peace of Mind Guarantee: full refund within 14 days of payment, as long as no guests have RSVP'd yet and the wedding hasn't taken place.",
       },
     },
     client_reference_id: weddingId,
