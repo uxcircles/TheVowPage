@@ -122,6 +122,19 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_2.left * 100}%`, top: `${PHONE_2.top * 100}%`, width: `${PHONE_2.width * 100}%`, aspectRatio: PHONE_2.aspect }}
       >
+        {/* Soft glow behind this phone specifically, so it doesn't look
+         * like it's floating flat against the page background - sized
+         * off the phone's own width (not its height) so it reads as a
+         * centered halo rather than a tall oval, and sits behind via DOM
+         * order, no z-index needed since nothing here sets one. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[150%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-35 blur-3xl"
+          style={{
+            background:
+              "radial-gradient(closest-side, var(--brand-gold) 0%, transparent 70%)",
+          }}
+        />
         <PhoneScreen
           screen={PHONE_2_SCREEN}
           originSide="right"
@@ -144,6 +157,14 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_1.left * 100}%`, top: `${PHONE_1.top * 100}%`, width: `${PHONE_1.width * 100}%`, aspectRatio: PHONE_1.aspect }}
       >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[150%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-35 blur-3xl"
+          style={{
+            background:
+              "radial-gradient(closest-side, var(--brand-gold) 0%, transparent 70%)",
+          }}
+        />
         <PhoneScreen
           screen={PHONE_1_SCREEN}
           originSide="left"
