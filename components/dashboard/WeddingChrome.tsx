@@ -21,6 +21,22 @@ import type { ClassicTemplateData } from "@/components/templates/classic/types";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
+function ShieldIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="h-3.5 w-3.5 shrink-0"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.5l7 2.5v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6l7-2.5Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4.5" />
+    </svg>
+  );
+}
+
 type SaveBarState = {
   formId: string;
   pending: boolean;
@@ -327,8 +343,9 @@ export function WeddingChrome({
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
             <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
               {!isPaid && !isPublished && (
-                <p className="text-xs text-[var(--brand-ink-soft)]">
-                  🛡️ 14 天安心退款保證：賓客尚未開始回覆前，可全額退款
+                <p className="flex items-center gap-1.5 text-xs text-[var(--brand-ink-soft)]">
+                  <ShieldIcon />
+                  14 天安心退款保證：賓客尚未開始回覆、且婚禮尚未舉行前，可全額退款
                 </p>
               )}
               <div className="flex items-center justify-end gap-3">
