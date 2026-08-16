@@ -59,5 +59,48 @@ export async function POST(request: Request) {
     }
   }
 
+  if (event.type === "charge.refunded") {
+    const charge = event.data.object as Stripe.Charge;
+
+    // `charge.refunded` also fires on a partial refund - `charge.refunded`
+    // (the boolean field, not the event type) is only true once the full
+    // amount has come back, which is the only case that should unpublish.
+    if (charge.refunded) {
+      const paymentIntentId =
+        typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
+
+      if (paymentIntentId) {
+        const stripe = getStripe();
+        // The charge only carries the PaymentIntent, not the Checkout
+        // Session we actually stored on the wedding row - look the session
+        // back up by its payment_intent to bridge the two.
+        const sessions = await stripe.checkout.sessions.list({ payment_intent: paymentIntentId, limit: 1 });
+        const session = sessions.data[0];
+
+        if (session) {
+          const admin = createAdminClient();
+          const { error } = await admin
+            .from("weddings")
+            .update({
+              status: "draft",
+              // Reset back to pre-payment state, not just unpublished - a
+              // refund means the couple no longer holds a paid plan, so
+              // re-publishing later must go through checkout again rather
+              // than freely toggling `status` back on (see WeddingChrome's
+              // `togglePublish`, which only gates on `plan`, not `status`).
+              plan: "draft",
+              paid_at: null,
+              expires_at: null,
+            })
+            .eq("stripe_checkout_session_id", session.id);
+
+          if (error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+          }
+        }
+      }
+    }
+  }
+
   return NextResponse.json({ received: true });
 }
