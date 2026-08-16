@@ -129,7 +129,7 @@ export function HeroPhones() {
          * order, no z-index needed since nothing here sets one. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[150%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-35 blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[150%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-2xl"
           style={{
             background:
               "radial-gradient(closest-side, var(--brand-gold) 0%, transparent 70%)",
@@ -159,7 +159,7 @@ export function HeroPhones() {
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[150%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-35 blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[150%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-2xl"
           style={{
             background:
               "radial-gradient(closest-side, var(--brand-gold) 0%, transparent 70%)",

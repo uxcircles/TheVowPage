@@ -313,15 +313,8 @@ export default function Home() {
         </section>
 
         {/* Founder story */}
-        <section className="relative overflow-hidden px-6 py-20 sm:px-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/templates/classic/illus-doves-heart.png"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-0 hidden w-56 -translate-x-1/2 -translate-y-1/2 opacity-15 sm:block"
-          />
-          <Reveal className="relative mx-auto max-w-2xl text-center">
+        <section className="px-6 py-20 sm:px-10">
+          <Reveal className="mx-auto max-w-2xl text-center">
             <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">our story</p>
             <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>
               為什麼我們做這個
