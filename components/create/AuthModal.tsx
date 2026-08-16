@@ -95,6 +95,7 @@ export function AuthModal({
               <input
                 type="text"
                 required
+                autoComplete="name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className="rounded border border-[var(--brand-line)] px-3 py-2 text-foreground"
@@ -106,6 +107,7 @@ export function AuthModal({
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="rounded border border-[var(--brand-line)] px-3 py-2 text-foreground"
@@ -113,7 +115,13 @@ export function AuthModal({
           </label>
           <label className="flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]">
             {authCopy.password[locale]}
-            <PasswordInput required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <PasswordInput
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            />
           </label>
 
           <button

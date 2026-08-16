@@ -28,6 +28,18 @@ export const signupCopy = {
   hasAccount: { zh: "已經有帳號了？", en: "Already have an account?" },
   loginLink: { zh: "登入", en: "Log in" },
   agreePrefix: { zh: "註冊即表示您同意我們的", en: "By signing up, you agree to our" },
+  // Shown instead of the form once signup succeeds but email confirmation
+  // is still required (no session yet) - replaces a silent redirect to
+  // /dashboard that just bounced back to /login with no explanation.
+  confirmEmailTitle: { zh: "請確認你的信箱", en: "Confirm your email" },
+  confirmEmailBody: {
+    zh: (email: string) => `我們已經寄出一封驗證信到 ${email}，請點擊信中連結完成註冊。`,
+    en: (email: string) => `We've sent a confirmation link to ${email}. Click it to finish creating your account.`,
+  },
+  confirmEmailHint: {
+    zh: "沒收到信？請檢查垃圾郵件匣，或稍後再試一次。",
+    en: "Didn't get it? Check your spam folder, or try again in a moment.",
+  },
 };
 
 export const authModalCopy = {

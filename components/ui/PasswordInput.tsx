@@ -37,12 +37,17 @@ export function PasswordInput({
   minLength,
   value,
   onChange,
+  autoComplete,
 }: {
   name?: string;
   required?: boolean;
   minLength?: number;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** "current-password" for login, "new-password" for signup - without
+   * this, iOS Safari's QuickType bar can show a suggestion that doesn't
+   * actually fill in when tapped. */
+  autoComplete?: string;
 }) {
   const locale = useLocale();
   const [visible, setVisible] = useState(false);
@@ -56,6 +61,7 @@ export function PasswordInput({
         minLength={minLength}
         value={value}
         onChange={onChange}
+        autoComplete={autoComplete}
         className="w-full rounded border border-[var(--brand-line)] bg-white py-2 pl-3 pr-10 text-foreground"
       />
       <button

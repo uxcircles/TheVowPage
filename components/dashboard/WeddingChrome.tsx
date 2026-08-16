@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  Suspense,
   useContext,
   useEffect,
   useMemo,
@@ -13,7 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { setWeddingStatus } from "@/lib/actions/weddings";
 import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
@@ -116,6 +117,22 @@ export function useEditPreview(getSnapshot: () => ClassicTemplateData) {
  * changes - each caller flips this on directly instead. */
 export function useSetDirty() {
   return useContext(EditChromeContext)?.setDirty ?? (() => {});
+}
+
+// Reads the `?checkout=success` param Stripe Checkout's success_url redirects
+// here with (see lib/actions/billing.ts). Isolated in its own component so
+// useSearchParams's Suspense requirement doesn't force the rest of the chrome
+// to bail out of static rendering, matching OAuthErrorNotice/DeletedNotice.
+function CheckoutSuccessNotice() {
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const showToast = useToast();
+  useEffect(() => {
+    if (searchParams.get("checkout") !== "success") return;
+    showToast(chromeCopy.checkoutSuccess[locale], "success");
+    window.history.replaceState(null, "", window.location.pathname);
+  }, [searchParams, showToast, locale]);
+  return null;
 }
 
 export function WeddingChrome({
@@ -256,6 +273,9 @@ export function WeddingChrome({
 
   return (
     <EditChromeContext.Provider value={contextValue}>
+      <Suspense fallback={null}>
+        <CheckoutSuccessNotice />
+      </Suspense>
       {previewData &&
         createPortal(
           // Portaled straight to <body>, escaping the dashboard layout's own

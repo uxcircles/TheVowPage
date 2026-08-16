@@ -82,6 +82,7 @@ export const chromeCopy = {
   expired: { zh: "已到期", en: "Expired" },
   validUntilPrefix: { zh: "有效期限至 ", en: "Valid until " },
   saved: { zh: "已儲存", en: "Saved" },
+  checkoutSuccess: { zh: "付款成功！可以發布喜帖了。", en: "Payment successful! You can now publish your invitation." },
   publishToggleFailed: { zh: "操作失敗，請稍後再試。", en: "Something went wrong. Please try again." },
   refundGuarantee: { zh: "14 天安心退款保證", en: "14-Day Peace of Mind Guarantee" },
   save: { zh: "儲存", en: "Save" },
