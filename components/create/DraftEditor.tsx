@@ -80,6 +80,35 @@ const inputClass =
   "rounded border border-[var(--brand-line)] bg-white px-3 py-2 text-foreground";
 const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
 
+// Fields whose *starting* value is a system default rather than the
+// couple's own content, and whose correct-looking value depends on which
+// language they're viewing the editor in (新郎/新娘 vs Groom/Bride, 之子/
+// 之女 vs Son of/Daughter of, the thanks-message fallback). Listing both
+// locales' text per field lets applyLocaleDefaults recognise "still at a
+// default" from *either* language - not just the one EMPTY_DRAFT happened
+// to start in - so switching site language mid-session (no reload) can
+// still correct a value that was set by an earlier locale, while never
+// touching anything the couple actually typed themselves.
+const LOCALE_DEFAULT_FIELDS = [
+  { key: "groomLabel", zh: "新郎", en: "Groom" },
+  { key: "brideLabel", zh: "新娘", en: "Bride" },
+  { key: "groomParentsRelation", zh: "之子", en: "Son of" },
+  { key: "brideParentsRelation", zh: "之女", en: "Daughter of" },
+  { key: "thanksMessage", zh: THANKS_MESSAGE_FALLBACK.zh, en: THANKS_MESSAGE_FALLBACK.en },
+] as const satisfies readonly { key: keyof DraftContent; zh: string; en: string }[];
+
+function applyLocaleDefaults(content: DraftContent, locale: "zh" | "en"): DraftContent {
+  let next = content;
+  for (const field of LOCALE_DEFAULT_FIELDS) {
+    const current = next[field.key];
+    const target = field[locale];
+    if (current !== target && (current === field.zh || current === field.en)) {
+      next = { ...next, [field.key]: target };
+    }
+  }
+  return next;
+}
+
 /** Creating the object URL in useMemo and revoking it in a separate
  * useEffect looks reasonable, but breaks under React Strict Mode's
  * dev-only double-invoke: the effect's cleanup fires once for the "throw
@@ -267,29 +296,26 @@ export function DraftEditor() {
       hydrated = { ...hydrated, momentsStyle: momentsParam };
     }
 
-    // EMPTY_DRAFT's content defaults are the Chinese baseline (locale isn't
-    // known at module load time) - swap in the English equivalents here,
-    // but only for fields still sitting at that baseline, so a resumed
-    // draft's actual typed content is never overwritten.
-    if (locale === "en") {
-      if (hydrated.groomLabel === EMPTY_DRAFT.groomLabel) hydrated = { ...hydrated, groomLabel: "Groom" };
-      if (hydrated.brideLabel === EMPTY_DRAFT.brideLabel) hydrated = { ...hydrated, brideLabel: "Bride" };
-      if (hydrated.groomParentsRelation === EMPTY_DRAFT.groomParentsRelation) {
-        hydrated = { ...hydrated, groomParentsRelation: editForm.sonOfDefault.en };
-      }
-      if (hydrated.brideParentsRelation === EMPTY_DRAFT.brideParentsRelation) {
-        hydrated = { ...hydrated, brideParentsRelation: editForm.daughterOfDefault.en };
-      }
-      if (hydrated.thanksMessage === EMPTY_DRAFT.thanksMessage) {
-        hydrated = { ...hydrated, thanksMessage: THANKS_MESSAGE_FALLBACK.en };
-      }
-    }
+    hydrated = applyLocaleDefaults(hydrated, locale);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(hydrated);
     setDraftHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // If the visitor switches site language mid-session (footer switcher,
+  // no full reload) after the mount effect above already ran once, that
+  // one-time hydration never re-fires - without this, any of the
+  // LOCALE_DEFAULT_FIELDS still sitting at their *previous* locale's
+  // default would stay stuck in that language even though the rest of the
+  // editor chrome has switched, and could get saved that way. Only fires
+  // after the initial hydration (guarded on draftHydrated) so it can't
+  // race the mount effect's own setDraft above.
+  useEffect(() => {
+    if (!draftHydrated) return;
+    setDraft((d) => applyLocaleDefaults(d, locale));
+  }, [locale, draftHydrated]);
 
   // Google sign-in from the AuthModal is a full-page redirect (unlike the
   // email/password form in that same modal, which authenticates in place
