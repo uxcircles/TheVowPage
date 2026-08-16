@@ -13,6 +13,7 @@ import { VenueMap } from "@/components/templates/classic/VenueMap";
 import { useEditSaveBar, useEditPreview, useSetDirty } from "@/components/dashboard/WeddingChrome";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { editForm } from "@/lib/i18n/dictionaries/dashboard";
+import type { Locale } from "@/lib/i18n/shared";
 import type { Tables } from "@/lib/supabase/database.types";
 import {
   SCHEDULE_PLACEHOLDERS,
@@ -28,7 +29,7 @@ const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
 
 // Smart default for the "關係稱謂" field, applied once when the field is
 // first rendered (not kept in sync with later 稱謂 edits): only fills in
-// "之子"/"之女" when the couple is still using the standard 新郎/新娘
+// a relation word when the couple is still using the standard 新郎/新娘
 // labels, since a custom label (e.g. "新人一") has no obvious relation word.
 function defaultParentsRelation(label: string, standardLabel: string, relationWord: string) {
   return label === standardLabel ? relationWord : "";
@@ -55,6 +56,14 @@ export function WeddingEditForm({
   momentPhotoUrls: string[];
 }) {
   const locale = useLocale();
+  // Standard-label defaults follow site locale so a wedding started from
+  // the English UI doesn't end up with Chinese-only labels/content - see
+  // the matching defaultGroomLabel/defaultBrideLabel in lib/actions/weddings.ts,
+  // which is what actually determined `wedding.groom_label`/`bride_label`
+  // at creation time. These are just the same defaults for display/fallback
+  // purposes here in the client.
+  const defaultGroomLabelText = locale === "en" ? "Groom" : "新郎";
+  const defaultBrideLabelText = locale === "en" ? "Bride" : "新娘";
   const showToast = useToast();
   const action = updateWeddingContent.bind(null, weddingId);
   const [state, formAction, pending] = useActionState(action, undefined);
@@ -106,9 +115,11 @@ export function WeddingEditForm({
   const [groomLabel, setGroomLabel] = useState(wedding.groom_label);
   const [brideLabel, setBrideLabel] = useState(wedding.bride_label);
   const groomParentsRelationDefault =
-    wedding.groom_parents_relation || defaultParentsRelation(wedding.groom_label, "新郎", "之子");
+    wedding.groom_parents_relation ||
+    defaultParentsRelation(wedding.groom_label, defaultGroomLabelText, editForm.sonOfDefault[locale]);
   const brideParentsRelationDefault =
-    wedding.bride_parents_relation || defaultParentsRelation(wedding.bride_label, "新娘", "之女");
+    wedding.bride_parents_relation ||
+    defaultParentsRelation(wedding.bride_label, defaultBrideLabelText, editForm.daughterOfDefault[locale]);
   const [showFamily, setShowFamily] = useState(wedding.show_family);
   const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
   const [showDressCode, setShowDressCode] = useState(wedding.show_dress_code);
@@ -176,8 +187,8 @@ export function WeddingEditForm({
       momentsStyle: String(fd.get("momentsStyle") ?? wedding.moments_style),
       groomName: String(fd.get("groomName") ?? ""),
       brideName: String(fd.get("brideName") ?? ""),
-      groomLabel: groomLabel || "新郎",
-      brideLabel: brideLabel || "新娘",
+      groomLabel: groomLabel || defaultGroomLabelText,
+      brideLabel: brideLabel || defaultBrideLabelText,
       groomParents: String(fd.get("groomParents") ?? ""),
       groomParentsRelation: String(fd.get("groomParentsRelation") ?? ""),
       brideParents: String(fd.get("brideParents") ?? ""),
@@ -247,11 +258,11 @@ export function WeddingEditForm({
             />
           </label>
           <label className={labelClass}>
-            {`${groomLabel || "新郎"}${editForm.nameSuffix[locale]}`}
+            {`${groomLabel || defaultGroomLabelText}${editForm.nameSuffix[locale]}`}
             <input name="groomName" defaultValue={wedding.groom_name} className={inputClass} />
           </label>
           <label className={labelClass}>
-            {`${brideLabel || "新娘"}${editForm.nameSuffix[locale]}`}
+            {`${brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
             <input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />
           </label>
         </div>
@@ -267,39 +278,61 @@ export function WeddingEditForm({
             hidden form fields still submit their value normally. */}
         <div className={showFamily ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "hidden"}>
           <label className={labelClass}>
-            {`${groomLabel || "新郎"}${editForm.parentsSuffix[locale]}`}
+            {`${groomLabel || defaultGroomLabelText}${editForm.parentsSuffix[locale]}`}
             <div className="flex gap-2">
+              {locale === "en" && (
+                <input
+                  name="groomParentsRelation"
+                  defaultValue={groomParentsRelationDefault}
+                  placeholder={editForm.sonOfDefault[locale]}
+                  aria-label={`${groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                  className={`${inputClass} w-28 shrink-0`}
+                />
+              )}
               <input
                 name="groomParents"
                 defaultValue={wedding.groom_parents}
-                placeholder="林建平・王淑芬"
+                placeholder={editForm.groomParentsPlaceholder[locale]}
                 className={`${inputClass} min-w-0 flex-1`}
               />
-              <input
-                name="groomParentsRelation"
-                defaultValue={groomParentsRelationDefault}
-                placeholder="之子"
-                aria-label={`${groomLabel || "新郎"}${editForm.parentsRelationAria[locale]}`}
-                className={`${inputClass} w-20 shrink-0`}
-              />
+              {locale === "zh" && (
+                <input
+                  name="groomParentsRelation"
+                  defaultValue={groomParentsRelationDefault}
+                  placeholder={editForm.sonOfDefault[locale]}
+                  aria-label={`${groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                  className={`${inputClass} w-20 shrink-0`}
+                />
+              )}
             </div>
           </label>
           <label className={labelClass}>
-            {`${brideLabel || "新娘"}${editForm.parentsSuffix[locale]}`}
+            {`${brideLabel || defaultBrideLabelText}${editForm.parentsSuffix[locale]}`}
             <div className="flex gap-2">
+              {locale === "en" && (
+                <input
+                  name="brideParentsRelation"
+                  defaultValue={brideParentsRelationDefault}
+                  placeholder={editForm.daughterOfDefault[locale]}
+                  aria-label={`${brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                  className={`${inputClass} w-32 shrink-0`}
+                />
+              )}
               <input
                 name="brideParents"
                 defaultValue={wedding.bride_parents}
-                placeholder="黃文昌・李美玲"
+                placeholder={editForm.brideParentsPlaceholder[locale]}
                 className={`${inputClass} min-w-0 flex-1`}
               />
-              <input
-                name="brideParentsRelation"
-                defaultValue={brideParentsRelationDefault}
-                placeholder="之女"
-                aria-label={`${brideLabel || "新娘"}${editForm.parentsRelationAria[locale]}`}
-                className={`${inputClass} w-20 shrink-0`}
-              />
+              {locale === "zh" && (
+                <input
+                  name="brideParentsRelation"
+                  defaultValue={brideParentsRelationDefault}
+                  placeholder={editForm.daughterOfDefault[locale]}
+                  aria-label={`${brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                  className={`${inputClass} w-20 shrink-0`}
+                />
+              )}
             </div>
           </label>
         </div>
@@ -386,7 +419,7 @@ export function WeddingEditForm({
                   {editForm.locatedTimezonePrefix[locale]}
                   <span className="font-medium text-foreground">{previewTimezone && formatTimezoneLabel(previewTimezone, locale)}</span>
                 </p>
-                <div className="h-48 overflow-hidden rounded border border-[var(--brand-line)]">
+                <div className="relative z-0 h-48 overflow-hidden rounded border border-[var(--brand-line)]">
                   <VenueMap
                     lat={locationPreview.lat}
                     lng={locationPreview.lng}
@@ -430,13 +463,13 @@ export function WeddingEditForm({
                 <input
                   name="scheduleTime"
                   defaultValue={item.time}
-                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time}
+                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time[locale]}
                   className={`${inputClass} w-20 shrink-0 sm:w-28`}
                 />
                 <input
                   name="scheduleEvent"
                   defaultValue={item.event}
-                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event}
+                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event[locale]}
                   className={`${inputClass} min-w-0 flex-1`}
                 />
                 <button
@@ -470,7 +503,7 @@ export function WeddingEditForm({
           <textarea
             name="dressCode"
             defaultValue={wedding.dress_code}
-            placeholder="建議服裝：香檳金、酒紅色系，避免純白色系"
+            placeholder={editForm.dressCodePlaceholder[locale]}
             rows={2}
             className={`${inputClass} w-full`}
           />
@@ -493,7 +526,7 @@ export function WeddingEditForm({
       <EditorCard title={editForm.sections.thanks[locale]}>
         <textarea
           name="thanksMessage"
-          defaultValue={wedding.thanks_message || THANKS_MESSAGE_FALLBACK}
+          defaultValue={wedding.thanks_message || THANKS_MESSAGE_FALLBACK[locale]}
           rows={3}
           className={`${inputClass} w-full`}
         />

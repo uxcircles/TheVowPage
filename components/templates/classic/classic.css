@@ -781,7 +781,13 @@
 .classic .map-wrap {
   border: 10px solid #fff;
   box-shadow: 0 30px 60px -25px rgba(60, 53, 44, 0.3);
+  /* Leaflet's own panes/controls default to z-index 400-1000 - without an
+     explicit z-index here too, `position: relative` alone doesn't contain
+     them in a local stacking context, so they can paint above unrelated
+     fixed page chrome (e.g. the "Try this design" CTA) that sits at a
+     lower z-index in the page's own stacking order. */
   position: relative;
+  z-index: 0;
 }
 .classic .venue-map {
   width: 100%;

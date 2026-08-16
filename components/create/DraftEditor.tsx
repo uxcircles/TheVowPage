@@ -50,6 +50,10 @@ const EMPTY_DRAFT: DraftContent = {
   momentsStyle: "stack",
   groomName: "",
   brideName: "",
+  // Chinese baseline - a fresh visitor's actual locale isn't known at
+  // module load time (this runs on the server too), so these are
+  // overridden to English right after mount, in the hydration effect
+  // below, when the site locale is en.
   groomLabel: "新郎",
   brideLabel: "新娘",
   groomParents: "",
@@ -65,7 +69,7 @@ const EMPTY_DRAFT: DraftContent = {
   venueLng: "",
   schedule: emptySchedule(),
   dressCode: "",
-  thanksMessage: THANKS_MESSAGE_FALLBACK,
+  thanksMessage: THANKS_MESSAGE_FALLBACK.zh,
   showFamily: true,
   showSchedule: true,
   showDressCode: true,
@@ -189,6 +193,12 @@ function useObjectUrls(files: File[]): string[] {
 export function DraftEditor() {
   const router = useRouter();
   const locale = useLocale();
+  // Matches the same defaults applied in the hydration effect below and in
+  // lib/actions/weddings.ts's defaultGroomLabel/defaultBrideLabel - used
+  // here purely as a display fallback for whatever render happens before
+  // that effect has run.
+  const defaultGroomLabelText = locale === "en" ? "Groom" : "新郎";
+  const defaultBrideLabelText = locale === "en" ? "Bride" : "新娘";
   const showToast = useToast();
   const [draft, setDraft] = useState<DraftContent>(EMPTY_DRAFT);
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
@@ -257,9 +267,28 @@ export function DraftEditor() {
       hydrated = { ...hydrated, momentsStyle: momentsParam };
     }
 
+    // EMPTY_DRAFT's content defaults are the Chinese baseline (locale isn't
+    // known at module load time) - swap in the English equivalents here,
+    // but only for fields still sitting at that baseline, so a resumed
+    // draft's actual typed content is never overwritten.
+    if (locale === "en") {
+      if (hydrated.groomLabel === EMPTY_DRAFT.groomLabel) hydrated = { ...hydrated, groomLabel: "Groom" };
+      if (hydrated.brideLabel === EMPTY_DRAFT.brideLabel) hydrated = { ...hydrated, brideLabel: "Bride" };
+      if (hydrated.groomParentsRelation === EMPTY_DRAFT.groomParentsRelation) {
+        hydrated = { ...hydrated, groomParentsRelation: editForm.sonOfDefault.en };
+      }
+      if (hydrated.brideParentsRelation === EMPTY_DRAFT.brideParentsRelation) {
+        hydrated = { ...hydrated, brideParentsRelation: editForm.daughterOfDefault.en };
+      }
+      if (hydrated.thanksMessage === EMPTY_DRAFT.thanksMessage) {
+        hydrated = { ...hydrated, thanksMessage: THANKS_MESSAGE_FALLBACK.en };
+      }
+    }
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(hydrated);
     setDraftHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Google sign-in from the AuthModal is a full-page redirect (unlike the
@@ -389,8 +418,8 @@ export function DraftEditor() {
       momentsStyle: draft.momentsStyle,
       groomName: draft.groomName,
       brideName: draft.brideName,
-      groomLabel: draft.groomLabel || "新郎",
-      brideLabel: draft.brideLabel || "新娘",
+      groomLabel: draft.groomLabel || defaultGroomLabelText,
+      brideLabel: draft.brideLabel || defaultBrideLabelText,
       groomParents: draft.groomParents,
       groomParentsRelation: draft.groomParentsRelation,
       brideParents: draft.brideParents,
@@ -451,7 +480,7 @@ export function DraftEditor() {
   async function finalizeSave(user: User) {
     setSaving(true);
     try {
-      const weddingId = await saveDraftAsWedding(draft, photos, user.id);
+      const weddingId = await saveDraftAsWedding(draft, photos, user.id, locale);
       sessionStorage.removeItem(STORAGE_KEY);
       router.push(`/dashboard/${weddingId}/edit`);
     } catch (err) {
@@ -640,7 +669,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  {`${draft.groomLabel || "新郎"}${editForm.nameSuffix[locale]}`}
+                  {`${draft.groomLabel || defaultGroomLabelText}${editForm.nameSuffix[locale]}`}
                   <input
                     value={draft.groomName}
                     onChange={(e) => update("groomName", e.target.value)}
@@ -648,7 +677,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  {`${draft.brideLabel || "新娘"}${editForm.nameSuffix[locale]}`}
+                  {`${draft.brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
                   <input
                     value={draft.brideName}
                     onChange={(e) => update("brideName", e.target.value)}
@@ -671,39 +700,61 @@ export function DraftEditor() {
               {draft.showFamily ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className={labelClass}>
-                    {`${draft.groomLabel || "新郎"}${editForm.parentsSuffix[locale]}`}
+                    {`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsSuffix[locale]}`}
                     <div className="flex gap-2">
+                      {locale === "en" && (
+                        <input
+                          value={draft.groomParentsRelation}
+                          onChange={(e) => update("groomParentsRelation", e.target.value)}
+                          placeholder={editForm.sonOfDefault[locale]}
+                          aria-label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                          className={`${inputClass} w-28 shrink-0`}
+                        />
+                      )}
                       <input
                         value={draft.groomParents}
                         onChange={(e) => update("groomParents", e.target.value)}
-                        placeholder="林建平・王淑芬"
+                        placeholder={editForm.groomParentsPlaceholder[locale]}
                         className={`${inputClass} min-w-0 flex-1`}
                       />
-                      <input
-                        value={draft.groomParentsRelation}
-                        onChange={(e) => update("groomParentsRelation", e.target.value)}
-                        placeholder="之子"
-                        aria-label={`${draft.groomLabel || "新郎"}${editForm.parentsRelationAria[locale]}`}
-                        className={`${inputClass} w-20 shrink-0`}
-                      />
+                      {locale === "zh" && (
+                        <input
+                          value={draft.groomParentsRelation}
+                          onChange={(e) => update("groomParentsRelation", e.target.value)}
+                          placeholder={editForm.sonOfDefault[locale]}
+                          aria-label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                          className={`${inputClass} w-20 shrink-0`}
+                        />
+                      )}
                     </div>
                   </label>
                   <label className={labelClass}>
-                    {`${draft.brideLabel || "新娘"}${editForm.parentsSuffix[locale]}`}
+                    {`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsSuffix[locale]}`}
                     <div className="flex gap-2">
+                      {locale === "en" && (
+                        <input
+                          value={draft.brideParentsRelation}
+                          onChange={(e) => update("brideParentsRelation", e.target.value)}
+                          placeholder={editForm.daughterOfDefault[locale]}
+                          aria-label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                          className={`${inputClass} w-32 shrink-0`}
+                        />
+                      )}
                       <input
                         value={draft.brideParents}
                         onChange={(e) => update("brideParents", e.target.value)}
-                        placeholder="黃文昌・李美玲"
+                        placeholder={editForm.brideParentsPlaceholder[locale]}
                         className={`${inputClass} min-w-0 flex-1`}
                       />
-                      <input
-                        value={draft.brideParentsRelation}
-                        onChange={(e) => update("brideParentsRelation", e.target.value)}
-                        placeholder="之女"
-                        aria-label={`${draft.brideLabel || "新娘"}${editForm.parentsRelationAria[locale]}`}
-                        className={`${inputClass} w-20 shrink-0`}
-                      />
+                      {locale === "zh" && (
+                        <input
+                          value={draft.brideParentsRelation}
+                          onChange={(e) => update("brideParentsRelation", e.target.value)}
+                          placeholder={editForm.daughterOfDefault[locale]}
+                          aria-label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                          className={`${inputClass} w-20 shrink-0`}
+                        />
+                      )}
                     </div>
                   </label>
                 </div>
@@ -798,7 +849,7 @@ export function DraftEditor() {
                           {formatTimezoneLabel(timezone, locale)}
                         </span>
                       </p>
-                      <div className="h-48 overflow-hidden rounded border border-[var(--brand-line)]">
+                      <div className="relative z-0 h-48 overflow-hidden rounded border border-[var(--brand-line)]">
                         <VenueMap
                           lat={locationPreview.lat}
                           lng={locationPreview.lng}
@@ -853,7 +904,7 @@ export function DraftEditor() {
                           onChange={(e) =>
                             updateSchedule(i, { time: e.target.value })
                           }
-                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time}
+                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time[locale]}
                           className={`${inputClass} w-20 shrink-0 sm:w-28`}
                         />
                         <input
@@ -861,7 +912,7 @@ export function DraftEditor() {
                           onChange={(e) =>
                             updateSchedule(i, { event: e.target.value })
                           }
-                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event}
+                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event[locale]}
                           className={`${inputClass} min-w-0 flex-1`}
                         />
                         <button
@@ -914,7 +965,7 @@ export function DraftEditor() {
                 <textarea
                   value={draft.dressCode}
                   onChange={(e) => update("dressCode", e.target.value)}
-                  placeholder="建議服裝：香檳金、酒紅色系，避免純白色系"
+                  placeholder={editForm.dressCodePlaceholder[locale]}
                   rows={2}
                   className={`${inputClass} w-full`}
                 />

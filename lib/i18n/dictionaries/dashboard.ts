@@ -25,8 +25,27 @@ export const editForm = {
   // (rather than a function) so this stays a simple lookup like every
   // other entry; the leading space in the English suffix is intentional.
   nameSuffix: { zh: "姓名", en: " Name" },
-  parentsSuffix: { zh: "雙親", en: "’s Parents" },
-  parentsRelationAria: { zh: "與雙親的關係稱謂", en: "’s relationship to parents" },
+  // Straight apostrophe (not the curly ’) deliberately - the site's CJK
+  // body font (Noto Sans TC) renders U+2019 at CJK-punctuation width
+  // (~14px, vs ~4px for a plain U+0027), which reads as a stray gap
+  // wherever this suffix follows a name. See parentsRelationAria below too.
+  parentsSuffix: { zh: "雙親", en: "'s Parents" },
+  // Default/placeholder for the relation-word field next to the parents'
+  // names. Unlike other content defaults (新郎/新娘) this one's word order
+  // is locale-dependent - "之子" reads fine suffixed after the parents'
+  // names, but "Son of" only reads correctly prefixed - so both the
+  // value/placeholder text AND the two fields' on-screen order (see the
+  // `locale === "en"` swap around these fields in WeddingEditForm/
+  // DraftEditor) follow site locale.
+  sonOfDefault: { zh: "之子", en: "Son of" },
+  daughterOfDefault: { zh: "之女", en: "Daughter of" },
+  groomParentsPlaceholder: { zh: "林建平・王淑芬", en: "James Wilson & Susan Wilson" },
+  brideParentsPlaceholder: { zh: "黃文昌・李美玲", en: "Michael Johnson & Emily Johnson" },
+  dressCodePlaceholder: {
+    zh: "建議服裝：香檳金、酒紅色系，避免純白色系",
+    en: "Suggested attire: champagne gold and burgundy tones - please avoid all-white",
+  },
+  parentsRelationAria: { zh: "與雙親的關係稱謂", en: "'s relationship to parents" },
   venueName: { zh: "場地名稱", en: "Venue name" },
   venueHall: { zh: "廳別 / 樓層", en: "Hall / floor" },
   venueAddress: { zh: "地址", en: "Address" },

@@ -5,7 +5,16 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { geocodeVenue, timezoneForCoords } from "@/lib/geocode";
 import { wallTimeToUtcIso } from "@/lib/timezone";
+import { getLocale } from "@/lib/i18n/locale";
+import type { Locale } from "@/lib/i18n/shared";
 import type { ScheduleItem } from "@/components/templates/classic/types";
+
+function defaultGroomLabel(locale: Locale) {
+  return locale === "en" ? "Groom" : "新郎";
+}
+function defaultBrideLabel(locale: Locale) {
+  return locale === "en" ? "Bride" : "新娘";
+}
 
 const DEFAULT_TIMEZONE = "Asia/Taipei";
 
@@ -24,12 +33,18 @@ function randomSlugSuffix() {
 
 export async function createWedding() {
   const { supabase, user } = await requireUser();
+  const locale = await getLocale();
 
   const { data, error } = await supabase
     .from("weddings")
     .insert({
       owner_id: user.id,
       slug: `wedding-${randomSlugSuffix()}`,
+      // The DB column defaults are Chinese ('新郎'/'新娘') - override
+      // explicitly here so a wedding started from the English UI doesn't
+      // start with Chinese-only labels.
+      groom_label: defaultGroomLabel(locale),
+      bride_label: defaultBrideLabel(locale),
     })
     .select("id")
     .single();
@@ -49,6 +64,7 @@ export async function updateWeddingContent(
   formData: FormData
 ): Promise<UpdateWeddingState> {
   const { supabase } = await requireUser();
+  const locale = await getLocale();
 
   const slug = String(formData.get("slug") ?? "").trim();
   const eventDateRaw = String(formData.get("eventDate") ?? "").trim();
@@ -89,8 +105,8 @@ export async function updateWeddingContent(
       slug,
       groom_name: String(formData.get("groomName") ?? "").trim(),
       bride_name: String(formData.get("brideName") ?? "").trim(),
-      groom_label: String(formData.get("groomLabel") ?? "").trim() || "新郎",
-      bride_label: String(formData.get("brideLabel") ?? "").trim() || "新娘",
+      groom_label: String(formData.get("groomLabel") ?? "").trim() || defaultGroomLabel(locale),
+      bride_label: String(formData.get("brideLabel") ?? "").trim() || defaultBrideLabel(locale),
       groom_parents: String(formData.get("groomParents") ?? "").trim(),
       groom_parents_relation: String(formData.get("groomParentsRelation") ?? "").trim(),
       bride_parents: String(formData.get("brideParents") ?? "").trim(),

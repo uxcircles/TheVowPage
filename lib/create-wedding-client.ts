@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/client";
 import { wallTimeToUtcIso } from "@/lib/timezone";
 import { validatePhotoFile } from "@/lib/photoLimits";
 import type { ScheduleItem } from "@/components/templates/classic/types";
+import type { Locale } from "@/lib/i18n/shared";
 
 const DEFAULT_TIMEZONE = "Asia/Taipei";
 
@@ -77,7 +78,8 @@ function randomSlugSuffix() {
 export async function saveDraftAsWedding(
   draft: DraftContent,
   photos: DraftPhotos,
-  userId: string
+  userId: string,
+  locale: Locale
 ): Promise<string> {
   const supabase = createClient();
 
@@ -105,8 +107,8 @@ export async function saveDraftAsWedding(
       slug: `wedding-${randomSlugSuffix()}`,
       groom_name: draft.groomName,
       bride_name: draft.brideName,
-      groom_label: draft.groomLabel.trim() || "新郎",
-      bride_label: draft.brideLabel.trim() || "新娘",
+      groom_label: draft.groomLabel.trim() || (locale === "en" ? "Groom" : "新郎"),
+      bride_label: draft.brideLabel.trim() || (locale === "en" ? "Bride" : "新娘"),
       groom_parents: draft.groomParents,
       groom_parents_relation: draft.groomParentsRelation,
       bride_parents: draft.brideParents,

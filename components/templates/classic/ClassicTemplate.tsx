@@ -493,7 +493,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
               <p className="role">{data.groomLabel}</p>
               <p className="name">{data.groomName || data.groomLabel}</p>
               <p className="parents">
-                {[data.groomParents, data.groomParentsRelation].filter(Boolean).join("　")}
+                {(locale === "en"
+                  ? [data.groomParentsRelation, data.groomParents]
+                  : [data.groomParents, data.groomParentsRelation]
+                )
+                  .filter(Boolean)
+                  .join(locale === "en" ? " " : "　")}
               </p>
             </div>
             <div className="amp reveal">&amp;</div>
@@ -501,7 +506,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
               <p className="role">{data.brideLabel}</p>
               <p className="name">{data.brideName || data.brideLabel}</p>
               <p className="parents">
-                {[data.brideParents, data.brideParentsRelation].filter(Boolean).join("　")}
+                {(locale === "en"
+                  ? [data.brideParentsRelation, data.brideParents]
+                  : [data.brideParents, data.brideParentsRelation]
+                )
+                  .filter(Boolean)
+                  .join(locale === "en" ? " " : "　")}
               </p>
             </div>
           </div>
@@ -639,7 +649,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         )}
         <img className="bg-illus footer-rings-accent" src="/templates/classic/illus-rings.png" alt="" aria-hidden="true" />
         <p className="thanks" ref={footerThanksRef}>
-          {data.thanksMessage || THANKS_MESSAGE_FALLBACK}
+          {data.thanksMessage || THANKS_MESSAGE_FALLBACK[locale]}
         </p>
         <p className="names" ref={footerNamesRef}>
           {data.groomName}　＆　{data.brideName}
