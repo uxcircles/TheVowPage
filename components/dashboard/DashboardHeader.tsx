@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { headingFont } from "@/lib/fonts";
 
 /** Only shown on the top-level wedding list. One level deep into a specific
@@ -19,9 +20,12 @@ export function DashboardHeader() {
       <Link href="/dashboard" className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>
         The Vow Page 摯頁
       </Link>
-      <form action={signOut}>
-        <SignOutButton />
-      </form>
+      <div className="flex items-center gap-4">
+        <LanguageSwitcher />
+        <form action={signOut}>
+          <SignOutButton />
+        </form>
+      </div>
     </header>
   );
 }

@@ -18,6 +18,7 @@ import { setWeddingStatus } from "@/lib/actions/weddings";
 import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import type { ClassicTemplateData } from "@/components/templates/classic/types";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
@@ -283,13 +284,16 @@ export function WeddingChrome({
       <div className={previewData ? "hidden" : ""}>
         <div className="sticky top-0 z-30 -mx-6 border-b border-[var(--brand-line)] bg-[var(--background)]/95 px-6 backdrop-blur">
           <div className="mx-auto max-w-4xl pt-3">
-            <Link
-              href="/dashboard"
-              onClick={(e) => guardNavigation(e, "/dashboard")}
-              className="text-sm text-[var(--brand-gold)] hover:underline"
-            >
-              ← 返回
-            </Link>
+            <div className="flex items-center justify-between">
+              <Link
+                href="/dashboard"
+                onClick={(e) => guardNavigation(e, "/dashboard")}
+                className="text-sm text-[var(--brand-gold)] hover:underline"
+              >
+                ← 返回
+              </Link>
+              <LanguageSwitcher />
+            </div>
             <h1 className="mt-1.5 text-2xl font-medium text-foreground">
               {groomName || groomLabel} ＆ {brideName || brideLabel}
             </h1>

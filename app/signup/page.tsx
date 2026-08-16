@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { signUp } from "@/lib/actions/auth";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { useActionErrorToast } from "@/components/ui/Toast";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { headingFont } from "@/lib/fonts";
@@ -13,7 +14,8 @@ export default function SignupPage() {
   useActionErrorToast(pending, state?.error);
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-16">
+    <div className="flex min-h-screen flex-col">
+      <main className="flex flex-1 items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm">
         <h1 className={`${headingFont.className} text-center text-2xl text-[var(--brand-gold)]`}>The Vow Page 摯頁</h1>
         <p className="mt-2 text-center text-sm text-[var(--brand-ink-soft)]">建立你的帳號，開始製作喜帖</p>
@@ -78,6 +80,8 @@ export default function SignupPage() {
           。
         </p>
       </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

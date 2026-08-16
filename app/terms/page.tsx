@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { headingFont } from "@/lib/fonts";
 
 export const metadata = {
@@ -134,9 +135,7 @@ export default function TermsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-[var(--brand-line)]/60 px-6 py-8 text-center text-xs text-[var(--brand-ink-soft)]">
-        © {new Date().getFullYear()} The Vow Page 摯頁
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

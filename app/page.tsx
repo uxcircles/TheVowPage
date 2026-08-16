@@ -4,6 +4,7 @@ import { FaqItem } from "@/components/marketing/FaqItem";
 import { HeroPhones } from "@/components/marketing/HeroPhones";
 import { Reveal } from "@/components/marketing/Reveal";
 import { ShowcaseCarousel } from "@/components/marketing/ShowcaseCarousel";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
 import { headingFont } from "@/lib/fonts";
 
@@ -380,17 +381,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="flex flex-col items-center gap-3 border-t border-[var(--brand-line)]/60 px-6 py-8 text-center text-xs text-[var(--brand-ink-soft)]">
-        <div className="flex items-center gap-4">
-          <Link href="/terms" className="hover:text-[var(--brand-gold)]">
-            服務條款
-          </Link>
-          <Link href="/privacy" className="hover:text-[var(--brand-gold)]">
-            隱私權政策
-          </Link>
-        </div>
-        <p>© {new Date().getFullYear()} The Vow Page 摯頁</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
