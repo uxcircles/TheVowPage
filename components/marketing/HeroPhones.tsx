@@ -30,6 +30,7 @@ function PhoneScreen({
   screen,
   originSide,
   rotateDeg,
+  extraLeftInset = 0,
   children,
 }: {
   screen: { left: number; top: number; width: number; height: number };
@@ -38,40 +39,34 @@ function PhoneScreen({
    * away, so it's the pivot for the rotateY below. */
   originSide: "left" | "right";
   rotateDeg: number;
+  /** Extra pull-in from the left specifically, beyond SAFETY - both
+   * frames render some of the phone's own side/thickness as visually
+   * part of the left portion of the screen area, which isn't actually
+   * screen at all, so the safety-only inset wasn't enough there. */
+  extraLeftInset?: number;
   children: React.ReactNode;
 }) {
-  // Extra inward pull beyond the measured hole, and extra size beyond
-  // that again, both exist for the same reason: the hole's corners are
-  // rounded but this box is a plain rectangle, so a snug-fitting box
-  // pokes its sharp corners past the frame's opaque bezel right at the
-  // curve. Insetting first guarantees the un-rotated box tucks fully
-  // under the bezel; growing it back out (away from the near edge, and
-  // evenly top/bottom) then compensates for the far edge visually
-  // shrinking once rotateY is applied, so it still fully covers the hole
-  // there too. The frame image painted on top does the actual final
-  // clipping to the hole's true (rounded) shape either way.
-  const SAFETY = 0.006;
-  const OVERSIZE_W = 1.08;
-  const OVERSIZE_H = 1.05;
+  // Inward pull beyond the measured hole so this box's sharp corners
+  // tuck fully under the frame's rounded bezel instead of poking past it
+  // right at the curve (the hole itself is rounded; this box is a plain
+  // rectangle). The frame image painted on top still does the final
+  // precise clipping to the hole's true shape either way - this is just
+  // to stay safely inside it.
+  const SAFETY = 0.01;
 
-  const left = screen.left + SAFETY;
+  const left = screen.left + SAFETY + extraLeftInset;
   const top = screen.top + SAFETY;
-  const width = screen.width - SAFETY * 2;
+  const width = screen.width - SAFETY * 2 - extraLeftInset;
   const height = screen.height - SAFETY * 2;
-
-  const growW = width * (OVERSIZE_W - 1);
-  const growH = height * (OVERSIZE_H - 1);
-  const boxLeft = originSide === "left" ? left : left - growW;
-  const boxTop = top - growH / 2;
 
   return (
     <div
       className="absolute"
       style={{
-        left: `${boxLeft * 100}%`,
-        top: `${boxTop * 100}%`,
-        width: `${(width + growW) * 100}%`,
-        height: `${(height + growH) * 100}%`,
+        left: `${left * 100}%`,
+        top: `${top * 100}%`,
+        width: `${width * 100}%`,
+        height: `${height * 100}%`,
         perspective: "900px",
       }}
     >
@@ -119,7 +114,7 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_2.left * 100}%`, top: `${PHONE_2.top * 100}%`, width: `${PHONE_2.width * 100}%`, aspectRatio: PHONE_2.aspect }}
       >
-        <PhoneScreen screen={PHONE_2_SCREEN} originSide="right" rotateDeg={14}>
+        <PhoneScreen screen={PHONE_2_SCREEN} originSide="right" rotateDeg={14} extraLeftInset={0.015}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/showcase/demo-rose.jpg"
@@ -136,7 +131,7 @@ export function HeroPhones() {
         className="absolute will-change-transform"
         style={{ left: `${PHONE_1.left * 100}%`, top: `${PHONE_1.top * 100}%`, width: `${PHONE_1.width * 100}%`, aspectRatio: PHONE_1.aspect }}
       >
-        <PhoneScreen screen={PHONE_1_SCREEN} originSide="left" rotateDeg={14}>
+        <PhoneScreen screen={PHONE_1_SCREEN} originSide="left" rotateDeg={14} extraLeftInset={0.015}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/templates/classic/env.png"
