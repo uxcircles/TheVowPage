@@ -20,8 +20,8 @@ export const termsSections: Section[] = [
         en: "The Vow Page (the “Service”) is an online digital wedding invitation platform that lets couples choose an invitation template, edit its content, upload photos, and manage their guest list and RSVP replies.",
       },
       {
-        zh: "本服務由 UX CIRCLES Ltd（英國註冊公司，以下稱「我們」）提供，聯絡信箱為 thevowpage@gmail.com。",
-        en: "The Service is provided by UX CIRCLES Ltd (a company registered in the United Kingdom, “we” or “us”). You can contact us at thevowpage@gmail.com.",
+        zh: "本服務由 UX CIRCLES Ltd（於英格蘭與威爾斯註冊之公司，以下稱「我們」）提供，聯絡信箱為 thevowpage@gmail.com。",
+        en: "The Service is provided by UX CIRCLES Ltd (a company registered in England & Wales, “we” or “us”). You can contact us at thevowpage@gmail.com.",
       },
     ],
   },
