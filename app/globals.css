@@ -107,12 +107,12 @@ body {
 /* Hero phone screen: slowly pans a full-page screenshot from top to
    bottom (and back) so the whole invitation is visible over time inside
    the fixed phone-screen window, instead of just showing a cropped top
-   sliver. -85.8% is how far a 375x6904 screenshot has to travel once its
-   width is scaled to fill the screen cutout in hero-phone-2.webp
-   (measured from that PNG's transparent screen hole - see git history);
-   it stays a flat number rather than a live calc() since both the image
-   and the cutout scale together with the container, so the ratio holds
-   at any viewport width. */
+   sliver. -84.48% is how far a 375x6298 screenshot (demo-gold.jpg) has
+   to travel once its width is scaled to fill the screen cutout in
+   hero-phone-2.webp (measured from that PNG's transparent screen hole -
+   see git history); it stays a flat number rather than a live calc()
+   since both the image and the cutout scale together with the
+   container, so the ratio holds at any viewport width. */
 @keyframes hero-screen-pan {
   0%,
   8% {
@@ -120,7 +120,7 @@ body {
   }
   92%,
   100% {
-    transform: translateY(-85.8%);
+    transform: translateY(-84.48%);
   }
 }
 .animate-hero-screen-pan {

@@ -117,7 +117,7 @@ export function HeroPhones() {
         <PhoneScreen screen={PHONE_2_SCREEN} originSide="right" rotateDeg={14} extraLeftInset={0.015}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/showcase/demo-rose.jpg"
+            src="/showcase/demo-gold.jpg"
             alt="喜帖範例頁面截圖"
             className="block w-full animate-hero-screen-pan"
           />
