@@ -2,14 +2,16 @@
 
 import { useEffect, useRef } from "react";
 
-/** Position/size of each phone as a fraction of the shared container,
- * measured directly off the original merged mockup (2783x3690): phone 1
- * sits flush to the top-right, phone 2 sits lower-left, offset down by
- * exactly the gap between them. Keeping the two images separate (instead
- * of one merged image) is what lets them parallax at different speeds. */
+/** Position/size of each phone as a fraction of the shared container.
+ * Originally measured directly off the original merged mockup
+ * (2783x3690): phone 1 sits flush to the top-right, phone 2 lower-left.
+ * PHONE_2.top has since been hand-tuned upward from that measured value,
+ * shortening the vertical stagger between the two. Keeping the two
+ * images separate (instead of one merged image) is what lets them
+ * parallax at different speeds. */
 const CONTAINER_ASPECT = "2783 / 3690";
 const PHONE_1 = { left: 1484 / 2783, top: 0, width: 1299 / 2783, aspect: "1299 / 3086" };
-const PHONE_2 = { left: 0, top: 604 / 3690, width: 1298 / 2783, aspect: "1298 / 3086" };
+const PHONE_2 = { left: 0, top: 0.123686, width: 1298 / 2783, aspect: "1298 / 3086" };
 
 /** The screen cutout inside each frame PNG, as a fraction of that phone's
  * own box - i.e. where the frame is transparent, found by scanning each
