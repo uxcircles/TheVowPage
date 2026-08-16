@@ -79,7 +79,7 @@ function PhoneScreen({
       }}
     >
       <div
-        className="h-full w-full overflow-hidden rounded-[8%]"
+        className="h-full w-full overflow-hidden rounded-[12%]"
         style={{
           transform: `rotateY(${originSide === "left" ? -rotateDeg : rotateDeg}deg)`,
           transformOrigin: originSide === "left" ? "left center" : "right center",
@@ -99,7 +99,7 @@ export function HeroPhones() {
     let ticking = false;
     function update() {
       const y = window.scrollY;
-      if (phone1Ref.current) phone1Ref.current.style.transform = `translateY(${-Math.min(y * 0.06, 50)}px)`;
+      if (phone1Ref.current) phone1Ref.current.style.transform = `translateY(${Math.min(y * 0.03, 25)}px)`;
       if (phone2Ref.current) phone2Ref.current.style.transform = `translateY(${-Math.min(y * 0.12, 90)}px)`;
     }
     function onScroll() {
