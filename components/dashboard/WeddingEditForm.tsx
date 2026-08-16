@@ -247,11 +247,11 @@ export function WeddingEditForm({
             />
           </label>
           <label className={labelClass}>
-            {groomLabel || "新郎"}{editForm.nameSuffix[locale]}
+            {`${groomLabel || "新郎"}${editForm.nameSuffix[locale]}`}
             <input name="groomName" defaultValue={wedding.groom_name} className={inputClass} />
           </label>
           <label className={labelClass}>
-            {brideLabel || "新娘"}{editForm.nameSuffix[locale]}
+            {`${brideLabel || "新娘"}${editForm.nameSuffix[locale]}`}
             <input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />
           </label>
         </div>
@@ -267,7 +267,7 @@ export function WeddingEditForm({
             hidden form fields still submit their value normally. */}
         <div className={showFamily ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "hidden"}>
           <label className={labelClass}>
-            {groomLabel || "新郎"}{editForm.parentsSuffix[locale]}
+            {`${groomLabel || "新郎"}${editForm.parentsSuffix[locale]}`}
             <div className="flex gap-2">
               <input
                 name="groomParents"
@@ -285,7 +285,7 @@ export function WeddingEditForm({
             </div>
           </label>
           <label className={labelClass}>
-            {brideLabel || "新娘"}{editForm.parentsSuffix[locale]}
+            {`${brideLabel || "新娘"}${editForm.parentsSuffix[locale]}`}
             <div className="flex gap-2">
               <input
                 name="brideParents"

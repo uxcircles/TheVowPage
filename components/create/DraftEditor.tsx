@@ -640,7 +640,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  {draft.groomLabel || "新郎"}{editForm.nameSuffix[locale]}
+                  {`${draft.groomLabel || "新郎"}${editForm.nameSuffix[locale]}`}
                   <input
                     value={draft.groomName}
                     onChange={(e) => update("groomName", e.target.value)}
@@ -648,7 +648,7 @@ export function DraftEditor() {
                   />
                 </label>
                 <label className={labelClass}>
-                  {draft.brideLabel || "新娘"}{editForm.nameSuffix[locale]}
+                  {`${draft.brideLabel || "新娘"}${editForm.nameSuffix[locale]}`}
                   <input
                     value={draft.brideName}
                     onChange={(e) => update("brideName", e.target.value)}
@@ -671,7 +671,7 @@ export function DraftEditor() {
               {draft.showFamily ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className={labelClass}>
-                    {draft.groomLabel || "新郎"}{editForm.parentsSuffix[locale]}
+                    {`${draft.groomLabel || "新郎"}${editForm.parentsSuffix[locale]}`}
                     <div className="flex gap-2">
                       <input
                         value={draft.groomParents}
@@ -689,7 +689,7 @@ export function DraftEditor() {
                     </div>
                   </label>
                   <label className={labelClass}>
-                    {draft.brideLabel || "新娘"}{editForm.parentsSuffix[locale]}
+                    {`${draft.brideLabel || "新娘"}${editForm.parentsSuffix[locale]}`}
                     <div className="flex gap-2">
                       <input
                         value={draft.brideParents}
