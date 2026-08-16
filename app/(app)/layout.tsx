@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "@/components/ui/Toast";
 import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { getLocale } from "@/lib/i18n/locale";
-import "./globals.css";
+import "../globals.css";
 
 // Weights limited to what's actually used site-wide (font-medium/
 // font-semibold, plus the browser default 400/normal for unstyled text) -
@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
       };
 }
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   return (
     <html lang={locale === "en" ? "en-GB" : "zh-Hant"} className={`${notoSansTC.variable} h-full antialiased`}>

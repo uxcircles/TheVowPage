@@ -7,7 +7,7 @@ import { ShowcaseCarousel } from "@/components/marketing/ShowcaseCarousel";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
 import { headingFont } from "@/lib/fonts";
-import { getLocale } from "@/lib/i18n/locale";
+import type { Locale } from "@/lib/i18n/shared";
 import {
   nav,
   hero,
@@ -103,8 +103,7 @@ function PhoneIcon() {
 
 const BENEFIT_ICONS = [ShareIcon, LeafIcon, ClipboardCheckIcon, MapPinIcon, EditIcon, PhoneIcon];
 
-export default async function Home() {
-  const locale = await getLocale();
+export function HomePageContent({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-[var(--brand-line)]/60 bg-[var(--background)]/90 px-6 py-5 backdrop-blur sm:px-10">
@@ -301,7 +300,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </div>
   );
 }

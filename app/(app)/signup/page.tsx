@@ -10,6 +10,7 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { authCopy, signupCopy } from "@/lib/i18n/dictionaries/auth";
 import { footerCopy } from "@/lib/i18n/dictionaries/common";
+import { marketingHref } from "@/lib/i18n/marketingPaths";
 import { headingFont } from "@/lib/fonts";
 
 export default function SignupPage() {
@@ -94,11 +95,11 @@ export default function SignupPage() {
         </p>
         <p className="mt-4 text-center text-xs text-[var(--brand-ink-soft)]">
           {signupCopy.agreePrefix[locale]}{" "}
-          <Link href="/terms" className="underline hover:text-[var(--brand-gold)]">
+          <Link href={marketingHref("/terms", locale)} className="underline hover:text-[var(--brand-gold)]">
             {footerCopy.terms[locale]}
           </Link>{" "}
           {authCopy.and[locale]}{" "}
-          <Link href="/privacy" className="underline hover:text-[var(--brand-gold)]">
+          <Link href={marketingHref("/privacy", locale)} className="underline hover:text-[var(--brand-gold)]">
             {footerCopy.privacy[locale]}
           </Link>
           {locale === "en" ? "." : "。"}

@@ -1,23 +1,18 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { headingFont } from "@/lib/fonts";
-import { getLocale } from "@/lib/i18n/locale";
+import type { Locale } from "@/lib/i18n/shared";
+import { marketingHref } from "@/lib/i18n/marketingPaths";
 import { legalPageCopy, termsMeta, termsSections } from "@/lib/i18n/dictionaries/legal";
 
-export async function generateMetadata() {
-  const locale = await getLocale();
-  return { title: termsMeta.metaTitle[locale] };
-}
-
-export default async function TermsPage() {
-  const locale = await getLocale();
+export function TermsPageContent({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-1 flex-col">
       <header className="flex items-center justify-between border-b border-[var(--brand-line)]/60 px-6 py-5 sm:px-10">
-        <Link href="/" className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>
+        <Link href={marketingHref("/", locale)} className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>
           The Vow Page 摯頁
         </Link>
-        <Link href="/" className="text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]">
+        <Link href={marketingHref("/", locale)} className="text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]">
           {legalPageCopy.backToHome[locale]}
         </Link>
       </header>
@@ -43,7 +38,7 @@ export default async function TermsPage() {
         </div>
       </main>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </div>
   );
 }
