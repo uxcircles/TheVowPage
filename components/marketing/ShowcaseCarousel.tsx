@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Reveal } from "./Reveal";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { ClassicTheme } from "@/components/templates/classic/themes";
+
+const copy = {
+  popular: { zh: "熱門配色", en: "Popular" },
+  viewExample: { zh: "查看完整範例 →", en: "View full example →" },
+};
 
 // The card shows a fixed aspect-[4/5] window (matches the old hero-only
 // crop) onto the *top* of a full-page screenshot that's much taller than
@@ -55,6 +61,7 @@ function showcaseImageRef(img: HTMLImageElement | null) {
  * not the abstract InvitationCardVisual mockup - a real photo of the actual
  * product reads as more convincing than a generic placeholder. */
 export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
+  const locale = useLocale();
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -65,7 +72,7 @@ export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
   return (
     <>
       {themes.map((theme, i) => (
-        <Reveal key={theme.name} delay={(i % 4) * 100}>
+        <Reveal key={theme.name.zh} delay={(i % 4) * 100}>
           <Link
             href={`/w/demo-${theme.id}`}
             className={`group block transition-transform duration-500 ease-out ${
@@ -75,7 +82,7 @@ export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
             <div className="relative aspect-[4/5] w-full rounded-lg shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]">
               {active === i && (
                 <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--brand-gold-dark)] px-3 py-1 text-xs text-white shadow-sm">
-                  熱門配色
+                  {copy.popular[locale]}
                 </span>
               )}
               <div className="absolute inset-0 overflow-hidden rounded-lg">
@@ -83,22 +90,22 @@ export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
                 <img
                   ref={showcaseImageRef}
                   src={`/showcase/demo-${theme.id}.jpg`}
-                  alt={`${theme.name} 範例喜帖畫面`}
+                  alt={theme.name[locale]}
                   className="absolute inset-x-0 top-[-11%] w-full translate-y-0 transition-transform duration-[6000ms] ease-in-out group-hover:translate-y-[var(--scroll-pct)] group-hover:duration-[14000ms] group-hover:ease-linear"
                 />
               </div>
               <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
                 <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
-                  查看完整範例 →
+                  {copy.viewExample[locale]}
                 </span>
               </div>
             </div>
             <div className="mt-4">
-              <p className="font-medium text-foreground">{theme.name}</p>
-              <p className="text-sm text-[var(--brand-ink-soft)]">{theme.tagline}</p>
+              <p className="font-medium text-foreground">{theme.name[locale]}</p>
+              <p className="text-sm text-[var(--brand-ink-soft)]">{theme.tagline[locale]}</p>
             </div>
             <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-gold-dark)] [@media(hover:hover)]:hidden">
-              查看完整範例 →
+              {copy.viewExample[locale]}
             </span>
           </Link>
         </Reveal>

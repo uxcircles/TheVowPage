@@ -12,10 +12,19 @@ const notoSansTC = Noto_Sans_TC({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "The Vow Page 摯頁｜線上電子喜帖平台",
-  description: "為新人打造的電子喜帖平台：挑選模板、編輯內容、管理賓客與 RSVP、分享婚紗相簿。",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return locale === "en"
+    ? {
+        title: "The Vow Page | Online Wedding Invitations",
+        description:
+          "A digital wedding invitation platform: choose a template, edit your content, manage guests and RSVPs, and share your wedding photos.",
+      }
+    : {
+        title: "The Vow Page 摯頁｜線上電子喜帖平台",
+        description: "為新人打造的電子喜帖平台：挑選模板、編輯內容、管理賓客與 RSVP、分享婚紗相簿。",
+      };
+}
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();

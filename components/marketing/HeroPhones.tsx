@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { hero } from "@/lib/i18n/dictionaries/marketing";
 
 /** Position/size of each phone as a fraction of the shared container.
  * Originally measured directly off the original merged mockup
@@ -92,6 +94,7 @@ function PhoneScreen({
 }
 
 export function HeroPhones() {
+  const locale = useLocale();
   const phone1Ref = useRef<HTMLDivElement>(null);
   const phone2Ref = useRef<HTMLDivElement>(null);
 
@@ -144,7 +147,7 @@ export function HeroPhones() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/showcase/demo-gold.jpg"
-            alt="喜帖範例頁面截圖"
+            alt={hero.screenshotAlt[locale]}
             className="block w-full animate-hero-screen-pan"
           />
         </PhoneScreen>
@@ -174,7 +177,7 @@ export function HeroPhones() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/templates/classic/env.png"
-            alt="拆信封畫面"
+            alt={hero.envelopeAlt[locale]}
             className="block h-full w-full object-cover animate-hero-screen-kenburns"
           />
         </PhoneScreen>

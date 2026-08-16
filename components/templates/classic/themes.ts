@@ -2,8 +2,8 @@ export type ClassicThemeId = "gold" | "rose" | "blue";
 
 export type ClassicTheme = {
   id: ClassicThemeId;
-  name: string;
-  tagline: string;
+  name: { zh: string; en: string };
+  tagline: { zh: string; en: string };
   cream: string;
   creamDeep: string;
   ink: string;
@@ -23,8 +23,8 @@ export type ClassicTheme = {
 export const CLASSIC_THEMES: ClassicTheme[] = [
   {
     id: "gold",
-    name: "經典金",
-    tagline: "溫潤米金，百搭經典",
+    name: { zh: "經典金", en: "Classic Gold" },
+    tagline: { zh: "溫潤米金，百搭經典", en: "Warm gold tones, timelessly versatile" },
     cream: "#f8f3e9",
     creamDeep: "#f1e9da",
     ink: "#3c352c",
@@ -35,8 +35,8 @@ export const CLASSIC_THEMES: ClassicTheme[] = [
   },
   {
     id: "rose",
-    name: "霧粉玫瑰",
-    tagline: "柔霧粉調，浪漫細膩",
+    name: { zh: "霧粉玫瑰", en: "Dusty Rose" },
+    tagline: { zh: "柔霧粉調，浪漫細膩", en: "Soft, dusty pink with romantic detail" },
     cream: "#faf1ee",
     creamDeep: "#f2ddd8",
     ink: "#4a3330",
@@ -47,8 +47,8 @@ export const CLASSIC_THEMES: ClassicTheme[] = [
   },
   {
     id: "blue",
-    name: "晨霧灰藍",
-    tagline: "灰藍靜謐，優雅清新",
+    name: { zh: "晨霧灰藍", en: "Misty Blue" },
+    tagline: { zh: "灰藍靜謐，優雅清新", en: "Calm blue-grey, elegant and fresh" },
     cream: "#eef3f4",
     creamDeep: "#dbe7ea",
     ink: "#2d3f45",

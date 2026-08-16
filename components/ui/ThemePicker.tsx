@@ -30,7 +30,8 @@ export function ThemePicker({
               }}
             />
           </span>
-          <span className="text-sm font-medium text-foreground">{theme.name}</span>
+          {/* Dashboard UI translation is a separate pass (see i18n plan) - zh for now, matching the rest of this editor. */}
+          <span className="text-sm font-medium text-foreground">{theme.name.zh}</span>
         </button>
       ))}
     </div>
