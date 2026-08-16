@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EB_Garamond } from "next/font/google";
+import { FaqItem } from "@/components/marketing/FaqItem";
 import { Reveal } from "@/components/marketing/Reveal";
 import { ShowcaseCarousel } from "@/components/marketing/ShowcaseCarousel";
 import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
@@ -80,21 +81,6 @@ function PhoneIcon() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5" aria-hidden="true">
       <rect x="7" y="2" width="10" height="20" rx="2" strokeLinecap="round" strokeLinejoin="round" />
       <path strokeLinecap="round" d="M11 18h2" />
-    </svg>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      className="h-4 w-4 shrink-0 text-[var(--brand-ink-soft)] transition-transform duration-200 group-open:rotate-180"
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
     </svg>
   );
 }
@@ -358,13 +344,7 @@ export default function Home() {
             <div className="mt-10 flex flex-col divide-y divide-[var(--brand-line)] border-y border-[var(--brand-line)]">
               {FAQS.map((faq, i) => (
                 <Reveal key={faq.question} delay={(i % 3) * 80}>
-                  <details className="group py-5">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-foreground">
-                      {faq.question}
-                      <ChevronIcon />
-                    </summary>
-                    <p className="mt-3 text-sm leading-relaxed text-[var(--brand-ink-soft)]">{faq.answer}</p>
-                  </details>
+                  <FaqItem question={faq.question} answer={faq.answer} />
                 </Reveal>
               ))}
             </div>
