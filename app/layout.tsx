@@ -6,10 +6,15 @@ import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { getLocale } from "@/lib/i18n/locale";
 import "./globals.css";
 
+// Weights limited to what's actually used site-wide (font-medium/
+// font-semibold, plus the browser default 400/normal for unstyled text) -
+// no font-light or font-bold appear anywhere in the app. Each extra weight
+// roughly doubles this CJK font's @font-face CSS (~100 unicode-range rules
+// per weight), and that stylesheet is render-blocking on every page.
 const notoSansTC = Noto_Sans_TC({
   variable: "--font-noto-sans-tc",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {

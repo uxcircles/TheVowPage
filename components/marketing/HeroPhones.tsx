@@ -146,13 +146,21 @@ export function HeroPhones() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/showcase/demo-gold.jpg"
+            src="/showcase/demo-gold.webp"
             alt={hero.screenshotAlt[locale]}
+            width={375}
+            height={6298}
             className="block w-full animate-hero-screen-pan"
           />
         </PhoneScreen>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/templates/classic/hero-phone-2.webp" alt="" className="absolute inset-0 h-full w-full" />
+        <img
+          src="/templates/classic/hero-phone-2.webp"
+          alt=""
+          width={1298}
+          height={3086}
+          className="absolute inset-0 h-full w-full"
+        />
       </div>
 
       <div
@@ -176,13 +184,21 @@ export function HeroPhones() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/templates/classic/env.png"
+            src="/templates/classic/env.webp"
             alt={hero.envelopeAlt[locale]}
+            width={750}
+            height={1624}
             className="block h-full w-full object-cover animate-hero-screen-kenburns"
           />
         </PhoneScreen>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/templates/classic/hero-phone-1.webp" alt="" className="absolute inset-0 h-full w-full" />
+        <img
+          src="/templates/classic/hero-phone-1.webp"
+          alt=""
+          width={1299}
+          height={3086}
+          className="absolute inset-0 h-full w-full"
+        />
       </div>
     </div>
   );

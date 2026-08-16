@@ -56,7 +56,7 @@ function showcaseImageRef(img: HTMLImageElement | null) {
  * on touch - no double-tap-to-follow-the-link surprise.
  *
  * The card visual itself is a real, full-page screenshot of the matching
- * demo wedding (public/showcase/demo-{themeId}.jpg, regenerate via
+ * demo wedding (public/showcase/demo-{themeId}.webp, regenerate via
  * scripts/capture-showcase-screenshots.mjs if the demo content changes),
  * not the abstract InvitationCardVisual mockup - a real photo of the actual
  * product reads as more convincing than a generic placeholder. */
@@ -89,7 +89,7 @@ export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   ref={showcaseImageRef}
-                  src={`/showcase/demo-${theme.id}.jpg`}
+                  src={`/showcase/demo-${theme.id}.webp`}
                   alt={theme.name[locale]}
                   className="absolute inset-x-0 top-[-11%] w-full translate-y-0 transition-transform duration-[6000ms] ease-in-out group-hover:translate-y-[var(--scroll-pct)] group-hover:duration-[14000ms] group-hover:ease-linear"
                 />

@@ -38,9 +38,11 @@ const displayFont = EB_Garamond({
   variable: "--classic-font-display",
 });
 
+// Weights limited to what classic.css actually uses (400/500) - see the
+// same reasoning on Noto Sans TC in app/layout.tsx.
 const bodyFont = Noto_Serif_TC({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500"],
   variable: "--classic-font-body",
 });
 

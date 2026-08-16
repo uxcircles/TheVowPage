@@ -107,7 +107,7 @@ body {
 /* Hero phone screen: slowly pans a full-page screenshot from top to
    bottom (and back) so the whole invitation is visible over time inside
    the fixed phone-screen window, instead of just showing a cropped top
-   sliver. -84.48% is how far a 375x6298 screenshot (demo-gold.jpg) has
+   sliver. -84.48% is how far a 375x6298 screenshot (demo-gold.webp) has
    to travel once its width is scaled to fill the screen cutout in
    hero-phone-2.webp (measured from that PNG's transparent screen hole -
    see git history); it stays a flat number rather than a live calc()
