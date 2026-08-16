@@ -99,7 +99,7 @@ export function HeroPhones() {
     let ticking = false;
     function update() {
       const y = window.scrollY;
-      if (phone1Ref.current) phone1Ref.current.style.transform = `translateY(${Math.min(y * 0.03, 25)}px)`;
+      if (phone1Ref.current) phone1Ref.current.style.transform = `translateY(${Math.min(y * 0.05, 40)}px)`;
       if (phone2Ref.current) phone2Ref.current.style.transform = `translateY(${-Math.min(y * 0.12, 90)}px)`;
     }
     function onScroll() {
