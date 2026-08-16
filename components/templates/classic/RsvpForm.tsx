@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { rsvpCopy, dietOptions } from "@/lib/i18n/dictionaries/template";
 
 function WarningIcon() {
   return (
@@ -20,14 +22,14 @@ function WarningIcon() {
   );
 }
 
-const DIET_OPTIONS = ["素食", "全素", "不吃牛肉", "不吃豬肉", "海鮮過敏", "堅果過敏", "無麩質", "其他"];
 // Vegetarian/vegan already rule out beef/pork/seafood, so checking either
 // clears and disables those instead of leaving a contradictory combination
 // (matches v3's rsvp-diet behavior). Nut allergy and gluten-free are left
 // alone - those are independent of diet philosophy, not moot by it.
-const MEAT_DIET_OPTIONS = new Set(["不吃牛肉", "不吃豬肉", "海鮮過敏"]);
+const MEAT_DIET_IDS = new Set(["no-beef", "no-pork", "seafood-allergy"]);
 
 export function RsvpSection({ weddingId }: { weddingId: string }) {
+  const locale = useLocale();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [visible, setVisible] = useState(false);
   const [attending, setAttending] = useState<"yes" | "no">("yes");
@@ -35,17 +37,17 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const vegetarianOrVegan = diet.has("素食 Vegetarian") || diet.has("全素 Vegan");
+  const vegetarianOrVegan = diet.has("vegetarian") || diet.has("vegan");
 
-  function toggleDiet(option: string) {
+  function toggleDiet(id: string) {
     setDiet((prev) => {
       const next = new Set(prev);
-      if (next.has(option)) {
-        next.delete(option);
+      if (next.has(id)) {
+        next.delete(id);
       } else {
-        next.add(option);
-        if (option === "素食 Vegetarian" || option === "全素 Vegan") {
-          for (const meat of MEAT_DIET_OPTIONS) next.delete(meat);
+        next.add(id);
+        if (id === "vegetarian" || id === "vegan") {
+          for (const meat of MEAT_DIET_IDS) next.delete(meat);
         }
       }
       return next;
@@ -72,19 +74,25 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
     const adults = attending === "yes" ? Number(formData.get("adults") ?? 1) : 0;
     const children = attending === "yes" ? Number(formData.get("children") ?? 0) : 0;
     const dietNote = attending === "yes" ? String(formData.get("dietNote") ?? "").trim() : "";
-    const dietValue = attending === "yes" ? Array.from(diet).join("、") : "";
+    const dietValue =
+      attending === "yes"
+        ? dietOptions
+            .filter((option) => diet.has(option.id))
+            .map((option) => option[locale])
+            .join(locale === "en" ? ", " : "、")
+        : "";
 
     if (!name) return;
 
     if (!weddingId) {
       // Preview mode (no real wedding saved yet) - nothing to submit to.
-      setStatus("這是預覽畫面，儲存喜帖後賓客才能真的送出 RSVP。");
+      setStatus(rsvpCopy.previewNotice[locale]);
       form.reset();
       return;
     }
 
     setSubmitting(true);
-    setStatus("送出中...");
+    setStatus(rsvpCopy.submitting[locale]);
     const supabase = createClient();
     const { error } = await supabase.from("rsvps").insert({
       wedding_id: weddingId,
@@ -99,11 +107,11 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
     setSubmitting(false);
 
     if (error) {
-      setStatus("送出失敗，請稍後再試。");
+      setStatus(rsvpCopy.submitFailed[locale]);
       return;
     }
 
-    setStatus("感謝您的回覆！");
+    setStatus(rsvpCopy.submitSuccess[locale]);
     form.reset();
     setAttending("yes");
     setDiet(new Set());
@@ -115,9 +123,9 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
       <section className="rsvp">
         <img className="bg-illus" src="/templates/classic/illus-rose.png" alt="" aria-hidden="true" />
         <p className="eyebrow reveal">rsvp</p>
-        <p className="rsvp-intro reveal">敬請回覆，期待與您共度這個重要時刻</p>
+        <p className="rsvp-intro reveal">{rsvpCopy.intro[locale]}</p>
         <button type="button" className="rsvp-btn reveal" onClick={openDialog}>
-          立即回覆 RSVP
+          {rsvpCopy.openButton[locale]}
         </button>
       </section>
 
@@ -129,16 +137,16 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
         }}
       >
         <form className="rsvp-form" onSubmit={handleSubmit}>
-          <button type="button" className="rsvp-close" aria-label="關閉" onClick={closeDialog}>
+          <button type="button" className="rsvp-close" aria-label={rsvpCopy.close[locale]} onClick={closeDialog}>
             &times;
           </button>
           <h3>RSVP</h3>
           <label>
-            姓名
+            {rsvpCopy.name[locale]}
             <input type="text" name="name" required />
           </label>
           <fieldset className="rsvp-attend">
-            <legend>是否出席</legend>
+            <legend>{rsvpCopy.attendingLegend[locale]}</legend>
             <label>
               <input
                 type="radio"
@@ -147,7 +155,7 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
                 checked={attending === "yes"}
                 onChange={() => setAttending("yes")}
               />{" "}
-              準時出席
+              {rsvpCopy.attendingYes[locale]}
             </label>
             <label>
               <input
@@ -157,52 +165,52 @@ export function RsvpSection({ weddingId }: { weddingId: string }) {
                 checked={attending === "no"}
                 onChange={() => setAttending("no")}
               />{" "}
-              無法出席
+              {rsvpCopy.attendingNo[locale]}
             </label>
           </fieldset>
           {attending === "yes" && (
             <>
               <div className="rsvp-counts">
                 <label>
-                  大人人數
+                  {rsvpCopy.adultsCount[locale]}
                   <input type="number" name="adults" min={0} defaultValue={1} />
                 </label>
                 <label>
-                  小孩人數
+                  {rsvpCopy.childrenCount[locale]}
                   <input type="number" name="children" min={0} defaultValue={0} />
                 </label>
               </div>
               <fieldset className="rsvp-diet">
                 <legend>
                   <WarningIcon />
-                  飲食需求與過敏（可複選）
+                  {rsvpCopy.dietLegend[locale]}
                 </legend>
-                <p className="rsvp-diet-hint">請務必勾選您的飲食禁忌或過敏，方便新人為您安排合適的餐點。</p>
-                {DIET_OPTIONS.map((option) => (
-                  <label key={option}>
+                <p className="rsvp-diet-hint">{rsvpCopy.dietHint[locale]}</p>
+                {dietOptions.map((option) => (
+                  <label key={option.id}>
                     <input
                       type="checkbox"
-                      checked={diet.has(option)}
-                      disabled={vegetarianOrVegan && MEAT_DIET_OPTIONS.has(option)}
-                      onChange={() => toggleDiet(option)}
+                      checked={diet.has(option.id)}
+                      disabled={vegetarianOrVegan && MEAT_DIET_IDS.has(option.id)}
+                      onChange={() => toggleDiet(option.id)}
                     />{" "}
-                    {option}
+                    {option[locale]}
                   </label>
                 ))}
                 <label className="rsvp-diet-note">
-                  飲食需求備註
-                  <input type="text" name="dietNote" placeholder="有其他飲食限制或過敏，請補充說明（選填）" />
+                  {rsvpCopy.dietNote[locale]}
+                  <input type="text" name="dietNote" placeholder={rsvpCopy.dietNotePlaceholder[locale]} />
                 </label>
               </fieldset>
             </>
           )}
           <label>
-            給新人的話
-            <textarea name="message" rows={4} placeholder="想對他們說的話" />
+            {rsvpCopy.messageLabel[locale]}
+            <textarea name="message" rows={4} placeholder={rsvpCopy.messagePlaceholder[locale]} />
           </label>
           <div className="rsvp-submit-bar">
             <button type="submit" className="rsvp-submit" disabled={submitting}>
-              送出
+              {rsvpCopy.submit[locale]}
             </button>
             <p className="rsvp-status">{status}</p>
           </div>

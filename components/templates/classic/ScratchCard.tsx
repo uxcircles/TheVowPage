@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { launchConfetti } from "./confetti";
 import type { ClassicTheme } from "./themes";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { scratchCopy } from "@/lib/i18n/dictionaries/template";
+import type { Locale } from "@/lib/i18n/shared";
 
 // Lightens (positive percent) or darkens (negative percent) a hex color by
 // blending each channel toward white/black - used to build the scratch-foil
@@ -46,7 +49,16 @@ function zonedParts(date: Date, timeZone: string) {
 
 const WEEKDAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
-function formatDateLabel(date: Date, timeZone: string) {
+function formatDateLabel(date: Date, timeZone: string, locale: Locale) {
+  if (locale === "en") {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      weekday: "long",
+    }).format(date);
+  }
   const p = zonedParts(date, timeZone);
   return `${p.year}年${p.month}月${p.day}日 星期${WEEKDAYS[WEEKDAY_INDEX[p.weekday] ?? 0]}`;
 }
@@ -54,10 +66,10 @@ function formatDateLabel(date: Date, timeZone: string) {
 // Taiwanese wedding banquets are almost always either a lunch (午宴) or
 // dinner (晚宴) seating - infer which from the actual hour instead of
 // always saying "晚宴" regardless of what time was entered.
-function formatTimeLabel(date: Date, timeZone: string) {
+function formatTimeLabel(date: Date, timeZone: string, locale: Locale) {
   const p = zonedParts(date, timeZone);
   const hh = p.hour === "24" ? "00" : p.hour;
-  const mealLabel = Number(p.hour) < 15 ? "午宴入席" : "晚宴入席";
+  const mealLabel = Number(p.hour) < 15 ? scratchCopy.lunchSeating[locale] : scratchCopy.dinnerSeating[locale];
   return `${hh}:${p.minute} ${mealLabel}`;
 }
 
@@ -76,6 +88,7 @@ export function ScratchCard({
   timeZone: string;
   theme: ClassicTheme;
 }) {
+  const locale = useLocale();
   const cardRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const confettiLayerRef = useRef<HTMLDivElement>(null);
@@ -256,20 +269,20 @@ export function ScratchCard({
       if (intervalId) clearInterval(intervalId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventDate, theme]);
+  }, [eventDate, theme, locale]);
 
   return (
     <section className="scratch-section">
       <p className="eyebrow reveal">save the date</p>
       <div className="scratch-card reveal" ref={cardRef}>
         <div className="scratch-reveal">
-          <p className="cn">{eventDate ? formatDateLabel(eventDate, timeZone) : "日期籌備中"}</p>
-          <p className="detail">{eventDate ? formatTimeLabel(eventDate, timeZone) : ""}</p>
+          <p className="cn">{eventDate ? formatDateLabel(eventDate, timeZone, locale) : scratchCopy.dateFallback[locale]}</p>
+          <p className="detail">{eventDate ? formatTimeLabel(eventDate, timeZone, locale) : ""}</p>
           <p className="venue">{venueLabel}</p>
         </div>
         <canvas ref={canvasRef} className={`scratch-canvas${revealed ? " is-cleared" : ""}`} />
       </div>
-      <p className={`scratch-caption${revealed ? " is-hidden" : ""}`}>手指刮開，看看日期</p>
+      <p className={`scratch-caption${revealed ? " is-hidden" : ""}`}>{scratchCopy.caption[locale]}</p>
       {eventDate && (
         <div className={`countdown${revealed ? " is-visible" : ""}`}>
           <div className="countdown-item">

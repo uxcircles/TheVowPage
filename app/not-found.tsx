@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { EB_Garamond } from "next/font/google";
 import { headingFont } from "@/lib/fonts";
+import { getLocale } from "@/lib/i18n/locale";
+import { notFoundCopy } from "@/lib/i18n/dictionaries/template";
 
 const displayFont = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"] });
 
-export default function NotFound() {
+export default async function NotFound() {
+  const locale = await getLocale();
   return (
     <div className="flex flex-1 flex-col">
       <header className="flex items-center justify-between border-b border-[var(--brand-line)]/60 px-6 py-5 sm:px-10">
@@ -24,25 +27,25 @@ export default function NotFound() {
           404
         </p>
         <h1 className={`${headingFont.className} mt-3 text-2xl font-semibold text-foreground sm:text-3xl`}>
-          這份喜帖不存在，或尚未公開
+          {notFoundCopy.title[locale]}
         </h1>
         <p className="mt-4 max-w-sm text-sm text-[var(--brand-ink-soft)]">
-          可能是連結有誤，或喜帖還在準備中、尚未發布。
+          {notFoundCopy.body1[locale]}
           <br />
-          如果你是新人本人，登入後台即可確認發布狀態。
+          {notFoundCopy.body2[locale]}
         </p>
         <div className="mt-8 flex flex-col items-center gap-4">
           <Link
             href="/"
             className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-sm text-white transition-opacity hover:opacity-90"
           >
-            返回首頁
+            {notFoundCopy.backHome[locale]}
           </Link>
           <Link
             href="/login"
             className="text-sm text-[var(--brand-ink-soft)] underline underline-offset-4 hover:text-[var(--brand-gold)]"
           >
-            登入查看我的喜帖
+            {notFoundCopy.loginToView[locale]}
           </Link>
         </div>
       </main>

@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import { MomentsLightbox } from "./MomentsLightbox";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { momentsViewerCopy } from "@/lib/i18n/dictionaries/template";
 
 /** 3D coverflow-style carousel: 5 cards visible on desktop (center + 2 on
  * each side, the outer pair semi-transparent), 3 on mobile (the outer pair
@@ -9,6 +11,7 @@ import { MomentsLightbox } from "./MomentsLightbox";
  * side card to bring it to center, click the center card to open the
  * lightbox. */
 export function MomentsCarousel({ photoUrls }: { photoUrls: string[] }) {
+  const locale = useLocale();
   const [centerIndex, setCenterIndex] = useState(0);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const dragRef = useRef<{ startX: number } | null>(null);
@@ -58,7 +61,7 @@ export function MomentsCarousel({ photoUrls }: { photoUrls: string[] }) {
                 zIndex: 30 - abs * 10,
               }}
               onClick={() => (offset === 0 ? setOpenIndex(i) : goTo(i))}
-              aria-label={offset === 0 ? "放大照片" : "切換到這張照片"}
+              aria-label={offset === 0 ? momentsViewerCopy.zoomAria[locale] : momentsViewerCopy.switchAria[locale]}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrls[i]} alt="" draggable={false} />

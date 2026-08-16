@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { momentsViewerCopy } from "@/lib/i18n/dictionaries/template";
 
 /** Full-screen click-to-zoom viewer shared by both the grid and carousel
  * moments styles - prev/next, Escape, click-outside to close, all driven by
@@ -28,6 +30,7 @@ export function MomentsLightbox({
   onClose: () => void;
   onNavigate: (index: number) => void;
 }) {
+  const locale = useLocale();
   // Locks background scroll for as long as the lightbox is mounted (open to
   // close, not re-run per photo navigated to). `overflow: hidden` on body
   // alone doesn't stop touch-scroll on iOS Safari, which still rubber-bands
@@ -64,13 +67,13 @@ export function MomentsLightbox({
 
   return createPortal(
     <div className="lightbox is-open" onClick={onClose}>
-      <button type="button" className="lightbox-close" aria-label="關閉" onClick={onClose}>
+      <button type="button" className="lightbox-close" aria-label={momentsViewerCopy.closeAria[locale]} onClick={onClose}>
         &times;
       </button>
       <button
         type="button"
         className="lightbox-nav lightbox-prev"
-        aria-label="上一張"
+        aria-label={momentsViewerCopy.prevAria[locale]}
         onClick={(e) => {
           e.stopPropagation();
           onNavigate((openIndex - 1 + photoUrls.length) % photoUrls.length);
@@ -88,7 +91,7 @@ export function MomentsLightbox({
       <button
         type="button"
         className="lightbox-nav lightbox-next"
-        aria-label="下一張"
+        aria-label={momentsViewerCopy.nextAria[locale]}
         onClick={(e) => {
           e.stopPropagation();
           onNavigate((openIndex + 1) % photoUrls.length);

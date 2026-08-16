@@ -20,6 +20,16 @@ import {
   DEFAULT_SCHEDULE_FLOWER_VIEWBOX,
   SCHEDULE_FLOWER_BY_SEAL,
 } from "./scheduleFlowerPaths";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import {
+  envelopeCopy,
+  heroCopy,
+  familyCopy,
+  venueCopy,
+  scheduleCopy,
+  calendarEventCopy,
+  footerTemplateCopy,
+} from "@/lib/i18n/dictionaries/template";
 
 const displayFont = EB_Garamond({
   subsets: ["latin"],
@@ -54,6 +64,7 @@ function hexToUnitRgb(hex: string): [number, number, number] {
 }
 
 export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
+  const locale = useLocale();
   const rootRef = useRef<HTMLDivElement>(null);
   const heroFrameRef = useRef<HTMLDivElement>(null);
   const momentsSectionRef = useRef<HTMLElement>(null);
@@ -353,19 +364,23 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const eventTime = eventDate?.getTime() ?? null;
   const googleCalendarUrl = useMemo(() => {
     if (!eventDate) return null;
-    const title = `${data.groomName} ＆ ${data.brideName} 婚禮晚宴`;
-    const location = [data.venueName, data.venueHall, data.venueAddress].filter(Boolean).join("，");
+    const title = `${data.groomName} ＆ ${data.brideName} ${calendarEventCopy.titleSuffix[locale]}`;
+    const location = [data.venueName, data.venueHall, data.venueAddress]
+      .filter(Boolean)
+      .join(calendarEventCopy.locationSeparator[locale]);
     const details = scheduleDetails(data.schedule);
     const start = eventDate;
     const end = new Date(eventDate.getTime() + 4 * 60 * 60 * 1000);
     return buildGoogleCalendarUrl({ title, location, details, start, end });
-  }, [eventTime, data.groomName, data.brideName, data.venueName, data.venueHall, data.venueAddress, data.schedule]);
+  }, [eventTime, data.groomName, data.brideName, data.venueName, data.venueHall, data.venueAddress, data.schedule, locale]);
 
   const icsLinkRef = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     if (!eventDate || !icsLinkRef.current) return;
-    const title = `${data.groomName} ＆ ${data.brideName} 婚禮晚宴`;
-    const location = [data.venueName, data.venueHall, data.venueAddress].filter(Boolean).join("，");
+    const title = `${data.groomName} ＆ ${data.brideName} ${calendarEventCopy.titleSuffix[locale]}`;
+    const location = [data.venueName, data.venueHall, data.venueAddress]
+      .filter(Boolean)
+      .join(calendarEventCopy.locationSeparator[locale]);
     const details = scheduleDetails(data.schedule);
     const start = eventDate;
     const end = new Date(eventDate.getTime() + 4 * 60 * 60 * 1000);
@@ -378,10 +393,10 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       uid: `${data.weddingId}@classic-wedding`,
     });
     icsLinkRef.current.href = ics;
-    icsLinkRef.current.download = `${data.groomName}${data.brideName}婚禮.ics`;
+    icsLinkRef.current.download = `${data.groomName}${data.brideName}${calendarEventCopy.icsFilenameSuffix[locale]}.ics`;
     return () => URL.revokeObjectURL(ics);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventTime, data.groomName, data.brideName, data.venueName, data.venueHall, data.venueAddress, data.schedule, data.weddingId]);
+  }, [eventTime, data.groomName, data.brideName, data.venueName, data.venueHall, data.venueAddress, data.schedule, data.weddingId, locale]);
 
   const venueLabel = [data.venueName, data.venueHall].filter(Boolean).join(" ・ ");
   const envelopeImages = getEnvelopeImages(theme.id);
@@ -439,12 +454,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           </div>
           <div className="envelope-top-group">
             <img className="envelope-flap" src={envelopeImages.flap} alt="" />
-            <button type="button" className="wax-seal" aria-label="拆開信封" onClick={openEnvelope}>
+            <button type="button" className="wax-seal" aria-label={envelopeCopy.open[locale]} onClick={openEnvelope}>
               <img src={getSealImage(seal, theme.id)} alt="" />
             </button>
           </div>
         </div>
-        <p className="envelope-hint">點擊封蠟，拆開信封</p>
+        <p className="envelope-hint">{envelopeCopy.hint[locale]}</p>
       </div>
 
       <section className="hero">
@@ -456,7 +471,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         />
         <div className="frame reveal" id="hero-frame" ref={heroFrameRef}>
           {data.heroPhotoUrl ? (
-            <img className="photo-slot" src={data.heroPhotoUrl} alt={`${data.groomName} 與 ${data.brideName}`} />
+            <img className="photo-slot" src={data.heroPhotoUrl} alt={heroCopy.photoAlt[locale](data.groomName, data.brideName)} />
           ) : (
             <div className="photo-slot" />
           )}
@@ -492,7 +507,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           </div>
           {data.familyPhotoUrl && (
             <div className="family-photo-wrap">
-              <img className="family-photo reveal" src={data.familyPhotoUrl} alt="新人合影" />
+              <img className="family-photo reveal" src={data.familyPhotoUrl} alt={familyCopy.photoAlt[locale]} />
             </div>
           )}
           <img className="bg-illus is-left" src="/templates/classic/illus-peony-stem.png" alt="" aria-hidden="true" />
@@ -534,7 +549,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       <section className="venue">
         <img className="bg-illus" src="/templates/classic/illus-venue-building.png" alt="" aria-hidden="true" />
         <p className="eyebrow reveal">venue</p>
-        <h2 className="reveal">{data.venueName || "場地籌備中"}</h2>
+        <h2 className="reveal">{data.venueName || venueCopy.fallback[locale]}</h2>
         {data.venueHall && <p className="hall reveal">{data.venueHall}</p>}
         {data.venueAddress && <p className="addr reveal">{data.venueAddress}</p>}
         {data.venueAddress && (
@@ -583,7 +598,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
                 ))}
               </ul>
             ) : (
-              <p className="schedule-empty">流程籌備中</p>
+              <p className="schedule-empty">{scheduleCopy.empty[locale]}</p>
             )}
           </>
         )}
@@ -591,7 +606,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           {googleCalendarUrl && (
             <>
               <a className="cal-btn" href={googleCalendarUrl} target="_blank" rel="noopener">
-                + Google 日曆
+                {scheduleCopy.googleCalendar[locale]}
               </a>
               <a className="cal-btn" ref={icsLinkRef}>
                 + Apple / Outlook
@@ -619,7 +634,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       <footer ref={footerRef}>
         {data.footerPhotoUrl && (
           <div className="footer-photo">
-            <img ref={footerPhotoRef} src={data.footerPhotoUrl} alt="戒指" />
+            <img ref={footerPhotoRef} src={data.footerPhotoUrl} alt={footerTemplateCopy.ringsAlt[locale]} />
           </div>
         )}
         <img className="bg-illus footer-rings-accent" src="/templates/classic/illus-rings.png" alt="" aria-hidden="true" />
