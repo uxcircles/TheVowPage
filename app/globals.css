@@ -104,6 +104,29 @@ body {
   animation: upload-indeterminate 1.1s ease-in-out infinite;
 }
 
+/* Hero phone screen: slowly pans a full-page screenshot from top to
+   bottom (and back) so the whole invitation is visible over time inside
+   the fixed phone-screen window, instead of just showing a cropped top
+   sliver. -85.8% is how far a 375x6904 screenshot has to travel once its
+   width is scaled to fill the screen cutout in hero-phone-2.webp
+   (measured from that PNG's transparent screen hole - see git history);
+   it stays a flat number rather than a live calc() since both the image
+   and the cutout scale together with the container, so the ratio holds
+   at any viewport width. */
+@keyframes hero-screen-pan {
+  0%,
+  8% {
+    transform: translateY(0%);
+  }
+  92%,
+  100% {
+    transform: translateY(-85.8%);
+  }
+}
+.animate-hero-screen-pan {
+  animation: hero-screen-pan 26s ease-in-out infinite alternate;
+}
+
 /* Chromium/WebKit's native date/datetime-local calendar-picker icon
    renders solid black by default, clashing with every other hand-drawn
    icon in the app (TrashIcon, InfoTooltip's (i), etc., all

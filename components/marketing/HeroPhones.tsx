@@ -8,12 +8,19 @@ import { useEffect, useRef } from "react";
  * exactly the gap between them. Keeping the two images separate (instead
  * of one merged image) is what lets them parallax at different speeds. */
 const CONTAINER_ASPECT = "2783 / 3690";
-const PHONE_1 = { left: 1484 / 2783, top: 0, width: 1299 / 2783 };
-const PHONE_2 = { left: 0, top: 604 / 3690, width: 1298 / 2783 };
+const PHONE_1 = { left: 1484 / 2783, top: 0, width: 1299 / 2783, aspect: "1299 / 3086" };
+const PHONE_2 = { left: 0, top: 604 / 3690, width: 1298 / 2783, aspect: "1298 / 3086" };
+
+/** The screen cutout inside hero-phone-2.webp, as a fraction of that
+ * phone's own box - i.e. where the frame PNG is transparent, found by
+ * scanning each row for a transparent run that doesn't touch either
+ * image edge (the actual background transparency around the phone
+ * always does touch an edge, so this isolates just the screen hole). */
+const PHONE_2_SCREEN = { left: 118 / 1298, top: 45 / 3086, width: (1267 - 118) / 1298, height: (3039 - 45) / 3086 };
 
 export function HeroPhones() {
-  const phone1Ref = useRef<HTMLImageElement>(null);
-  const phone2Ref = useRef<HTMLImageElement>(null);
+  const phone1Ref = useRef<HTMLDivElement>(null);
+  const phone2Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let ticking = false;
@@ -37,22 +44,39 @@ export function HeroPhones() {
 
   return (
     <div className="relative w-full" style={{ aspectRatio: CONTAINER_ASPECT }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <div
         ref={phone2Ref}
-        src="/templates/classic/hero-phone-2.webp"
-        alt=""
         className="absolute will-change-transform"
-        style={{ left: `${PHONE_2.left * 100}%`, top: `${PHONE_2.top * 100}%`, width: `${PHONE_2.width * 100}%` }}
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+        style={{ left: `${PHONE_2.left * 100}%`, top: `${PHONE_2.top * 100}%`, width: `${PHONE_2.width * 100}%`, aspectRatio: PHONE_2.aspect }}
+      >
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            left: `${PHONE_2_SCREEN.left * 100}%`,
+            top: `${PHONE_2_SCREEN.top * 100}%`,
+            width: `${PHONE_2_SCREEN.width * 100}%`,
+            height: `${PHONE_2_SCREEN.height * 100}%`,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/showcase/demo-rose.jpg"
+            alt="喜帖範例頁面截圖"
+            className="block w-full animate-hero-screen-pan"
+          />
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/templates/classic/hero-phone-2.webp" alt="" className="absolute inset-0 h-full w-full" />
+      </div>
+
+      <div
         ref={phone1Ref}
-        src="/templates/classic/hero-phone-1.webp"
-        alt="喜帖範例畫面"
         className="absolute will-change-transform"
-        style={{ left: `${PHONE_1.left * 100}%`, top: `${PHONE_1.top * 100}%`, width: `${PHONE_1.width * 100}%` }}
-      />
+        style={{ left: `${PHONE_1.left * 100}%`, top: `${PHONE_1.top * 100}%`, width: `${PHONE_1.width * 100}%`, aspectRatio: PHONE_1.aspect }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/templates/classic/hero-phone-1.webp" alt="" className="absolute inset-0 h-full w-full" />
+      </div>
     </div>
   );
 }
