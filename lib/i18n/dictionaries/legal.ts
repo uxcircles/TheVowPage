@@ -17,11 +17,11 @@ export const termsSections: Section[] = [
     body: [
       {
         zh: "The Vow Page 摯頁（以下稱「本服務」）是一個線上電子喜帖平台，提供新人挑選喜帖模板、編輯內容、上傳照片、管理賓客名單與 RSVP 回覆等功能。",
-        en: "The Vow Page (the “Service”) is an online digital wedding invitation platform that lets couples choose an invitation template, edit its content, upload photos, and manage their guest list and RSVP replies.",
+        en: "The Vow Page (the \"Service\") is an online digital wedding invitation platform that lets couples choose an invitation template, edit its content, upload photos, and manage their guest list and RSVP replies.",
       },
       {
         zh: "本服務由 UX CIRCLES Ltd（於英格蘭與威爾斯註冊之公司，以下稱「我們」）提供，聯絡信箱為 thevowpage@gmail.com。",
-        en: "The Service is provided by UX CIRCLES Ltd (a company registered in England & Wales, “we” or “us”). You can contact us at thevowpage@gmail.com.",
+        en: "The Service is provided by UX CIRCLES Ltd (a company registered in England & Wales, \"we\" or \"us\"). You can contact us at thevowpage@gmail.com.",
       },
     ],
   },
@@ -43,7 +43,7 @@ export const termsSections: Section[] = [
     body: [
       {
         zh: "您可以在不註冊帳號的情況下，直接於「試做喜帖」頁面編輯喜帖內容、上傳照片並預覽效果。我們保留於系統合理使用範圍內，限制照片上傳數量或大小之權利。",
-        en: "You can edit your invitation, upload photos and preview the result on the “Try it” page without creating an account. We reserve the right to limit the number or size of photos you can upload, within the bounds of reasonable use of the system.",
+        en: "You can edit your invitation, upload photos and preview the result on the \"Try it\" page without creating an account. We reserve the right to limit the number or size of photos you can upload, within the bounds of reasonable use of the system.",
       },
       {
         zh: "若要將喜帖發布為可分享給賓客的公開網址，需要建立帳號並完成一次性付費。付費為一次性費用，非訂閱制；發布後的喜帖網址自付款完成日起提供一年的公開瀏覽期間，到期後將自動下架，其設定與內容仍保留在您的帳號中。",
@@ -68,11 +68,11 @@ export const termsSections: Section[] = [
       },
       {
         zh: "您同意按下「付款發布」後，我們將立即開始提供數位內容與公開網址服務。依據英國《消費者合約條例》（Consumer Contracts Regulations）及類似消費者保護法規，數位服務一經即時提供開始，即代表您同意放棄原本可能享有之無條件 14 天猶豫期取消與退款權利。",
-        en: "By clicking “Pay to publish”, you agree that we will begin supplying the digital content and public web address service immediately. Under the UK Consumer Contracts Regulations and similar consumer protection laws, once supply of digital content begins immediately in this way, you thereby acknowledge and agree that you lose any statutory unconditional 14-day cooling-off right to cancel and receive a refund.",
+        en: "By clicking \"Pay to publish\", you agree that we will begin supplying the digital content and public web address service immediately. Under the UK Consumer Contracts Regulations and similar consumer protection laws, once supply of digital content begins immediately in this way, you thereby acknowledge and agree that you lose any statutory unconditional 14-day cooling-off right to cancel and receive a refund.",
       },
       {
         zh: "儘管如此，我們仍自願提供「14 天安心退款保證」：自付款完成日起 14 天內，若您尚未收到任何賓客的 RSVP 回覆，可透過 thevowpage@gmail.com 申請全額退款；退款成功後，該喜帖網址將立即轉為草稿狀態並停止公開瀏覽。",
-        en: "Notwithstanding this, we voluntarily offer a “14-Day Peace of Mind Guarantee”: within 14 days of completing payment, if you have not yet received any guest RSVP replies, you may request a full refund by emailing thevowpage@gmail.com. Once a refund is issued, that invitation's web address is immediately reverted to draft status and taken offline.",
+        en: "Notwithstanding this, we voluntarily offer a \"14-Day Peace of Mind Guarantee\": within 14 days of completing payment, if you have not yet received any guest RSVP replies, you may request a full refund by emailing thevowpage@gmail.com. Once a refund is issued, that invitation's web address is immediately reverted to draft status and taken offline.",
       },
       {
         zh: "以下情形不適用本保證：（一）已有賓客透過公開喜帖頁面提交 RSVP 回覆（不含您自行測試用途的回覆）；（二）您的宴客日（喜帖內設定之婚禮日期）已於申請退款前到來。此時視為服務已實質履行。",
@@ -89,7 +89,7 @@ export const termsSections: Section[] = [
     body: [
       {
         zh: "您於本服務上傳、輸入的所有文字、照片與其他內容（以下稱「使用者內容」）之權利仍歸您所有。您保證您擁有上傳這些內容所需的權利，且內容不侵害第三人（包含照片中出現的人物）之權益。",
-        en: "You retain ownership of all text, photos and other content you upload or enter into the Service (“User Content”). You warrant that you hold the rights necessary to upload this content, and that it does not infringe the rights of any third party (including anyone appearing in your photos).",
+        en: "You retain ownership of all text, photos and other content you upload or enter into the Service (\"User Content\"). You warrant that you hold the rights necessary to upload this content, and that it does not infringe the rights of any third party (including anyone appearing in your photos).",
       },
       {
         zh: "為提供本服務（包含儲存、顯示、傳輸您的喜帖內容），您授予我們在必要範圍內使用、儲存與公開展示您使用者內容的權利，此授權於您刪除該內容或帳號後終止。",
@@ -97,7 +97,7 @@ export const termsSections: Section[] = [
       },
       {
         zh: "本服務之模板設計、程式碼、介面與品牌（包含「The Vow Page 摯頁」名稱與標誌）之智慧財產權歸我們所有，未經授權不得重製或另行商業使用。",
-        en: "Intellectual property rights in the Service's template designs, code, interface and branding (including the “The Vow Page” name and logo) belong to us and may not be reproduced or used commercially without authorisation.",
+        en: "Intellectual property rights in the Service's template designs, code, interface and branding (including the \"The Vow Page\" name and logo) belong to us and may not be reproduced or used commercially without authorisation.",
       },
       {
         zh: "若我們收到第三方（如攝影師、版權所有人或照片當事人）之通知，主張您上傳之內容侵害其智慧財產權或肖像權，我們保留於通知您後，暫時隱藏或移除該內容之權利。",
@@ -149,7 +149,7 @@ export const termsSections: Section[] = [
     body: [
       {
         zh: "在法律允許的最大範圍內，我們對於因使用或無法使用本服務所生之任何間接、附帶或衍生性損害，不負賠償責任。本服務依「現況」提供，不另作明示或默示之保證。",
-        en: "To the maximum extent permitted by law, we are not liable for any indirect, incidental or consequential loss arising from your use of, or inability to use, the Service. The Service is provided “as is”, without any further express or implied warranty.",
+        en: "To the maximum extent permitted by law, we are not liable for any indirect, incidental or consequential loss arising from your use of, or inability to use, the Service. The Service is provided \"as is\", without any further express or implied warranty.",
       },
       {
         zh: "在法律允許的最大範圍內，我們因本服務所生之最大總賠償責任，以您就該次爭議所涉之特定喜帖服務實際支付予我們之費用總額（即該次發布費用）為上限。",
@@ -184,7 +184,7 @@ export const termsSections: Section[] = [
     body: [
       {
         zh: "我們可能不時修改本條款，修改後將更新本頁面之公告日期。您於修改後繼續使用本服務，即視為同意修改後之條款。",
-        en: "We may update these Terms from time to time; the “last updated” date on this page will be revised accordingly. Your continued use of the Service after any changes take effect constitutes your acceptance of the updated Terms.",
+        en: "We may update these Terms from time to time; the \"last updated\" date on this page will be revised accordingly. Your continued use of the Service after any changes take effect constitutes your acceptance of the updated Terms.",
       },
     ],
   },
@@ -212,7 +212,7 @@ export const privacySections: Section[] = [
     body: [
       {
         zh: "本隱私權政策說明 The Vow Page 摯頁（以下稱「本服務」，由 UX CIRCLES Ltd 提供）如何蒐集、使用、儲存與保護您的個人資料，適用於所有使用本服務的帳號擁有者（新人）以及透過公開喜帖頁面填寫 RSVP 的賓客。",
-        en: "This Privacy Policy explains how The Vow Page (the “Service”, provided by UX CIRCLES Ltd) collects, uses, stores and protects your personal data. It applies to all account holders (couples) using the Service, as well as guests who submit an RSVP through a public invitation page.",
+        en: "This Privacy Policy explains how The Vow Page (the \"Service\", provided by UX CIRCLES Ltd) collects, uses, stores and protects your personal data. It applies to all account holders (couples) using the Service, as well as guests who submit an RSVP through a public invitation page.",
       },
       {
         zh: "使用本服務即表示您已閱讀並同意本政策之內容。",
@@ -344,7 +344,7 @@ export const privacySections: Section[] = [
     body: [
       {
         zh: "透過公開喜帖頁面填寫 RSVP 的賓客，其資料是應帳號擁有者（新人）的要求而蒐集，帳號擁有者為該筆資料實際的蒐集與管理者（即資料保護法規中的「資料控制者」，Data Controller），我們僅作為「資料處理者」（Data Processor），提供技術層面之儲存與呈現。",
-        en: "Data submitted by guests via RSVP on a public invitation page is collected at the request of the account holder (the couple), who is the actual collector and controller of that data (the “Data Controller” under data protection law). We act only as a “Data Processor”, providing storage and display at a technical level.",
+        en: "Data submitted by guests via RSVP on a public invitation page is collected at the request of the account holder (the couple), who is the actual collector and controller of that data (the \"Data Controller\" under data protection law). We act only as a \"Data Processor\", providing storage and display at a technical level.",
       },
       {
         zh: "若您是填寫 RSVP 的賓客，並希望查詢、更正或刪除您所填寫的資料，請直接聯絡邀請您的新人；若無法聯絡，您也可以透過 thevowpage@gmail.com 與我們聯絡，我們將協助處理。",
@@ -357,7 +357,7 @@ export const privacySections: Section[] = [
     body: [
       {
         zh: "本服務並非設計給兒童使用，帳號註冊須年滿法定成年年齡。RSVP 表單中的「小孩人數」欄位僅蒐集出席人數，不會另外蒐集兒童的姓名或其他可識別個人身分之資料。",
-        en: "The Service is not designed for use by children, and account registration requires you to have reached the legal age of majority. The “number of children” field in the RSVP form only collects a headcount, and does not separately collect children's names or other personally identifiable information.",
+        en: "The Service is not designed for use by children, and account registration requires you to have reached the legal age of majority. The \"number of children\" field in the RSVP form only collects a headcount, and does not separately collect children's names or other personally identifiable information.",
       },
     ],
   },
@@ -366,7 +366,7 @@ export const privacySections: Section[] = [
     body: [
       {
         zh: "我們可能不時修改本政策，修改後將更新本頁面之公告日期。若有重大變更，我們會以合理方式另行通知。您於修改後繼續使用本服務，即視為同意修改後之政策。",
-        en: "We may update this Policy from time to time; the “last updated” date on this page will be revised accordingly. Where changes are material, we will notify you separately by reasonable means. Your continued use of the Service after any changes take effect constitutes your acceptance of the updated Policy.",
+        en: "We may update this Policy from time to time; the \"last updated\" date on this page will be revised accordingly. Where changes are material, we will notify you separately by reasonable means. Your continued use of the Service after any changes take effect constitutes your acceptance of the updated Policy.",
       },
     ],
   },

@@ -104,7 +104,7 @@ export const showcaseSection = {
   title: { zh: "作品範例", en: "Example designs" },
   intro: {
     zh: "目前提供「經典」模板，可自由選擇配色氛圍；更多版面模板陸續推出",
-    en: "The “Classic” template is available now, with your choice of colour palette - more layouts are on the way.",
+    en: 'The "Classic" template is available now, with your choice of colour palette - more layouts are on the way.',
   },
   comingSoon: { zh: "Coming Soon", en: "Coming Soon" },
   comingSoonSubtitle: { zh: "更多模板敬請期待", en: "More templates coming soon" },
@@ -124,7 +124,7 @@ export const storySection = {
     },
     {
       zh: "婚禮過後，陸續收到身邊朋友問：「這個喜帖太棒了，之後能不能借我用？」這才催生了摯頁，一個讓每對新人都能輕鬆上手、自由編輯並發布的喜帖平台。",
-      en: "After the wedding, friends kept asking: “This invitation is lovely - could I use something like it too?” That's what led to The Vow Page: a platform where any couple can easily create, edit and publish their own.",
+      en: "After the wedding, friends kept asking: \"This invitation is lovely - could I use something like it too?\" That's what led to The Vow Page: a platform where any couple can easily create, edit and publish their own.",
     },
     {
       zh: "摯頁目前還是一個剛起步的小小雛形。如果你也喜歡這樣的儀式感，我們無比珍惜、也非常期待能參與你們這份專屬的幸福。",

@@ -70,7 +70,7 @@ export const editForm = {
   addScheduleItem: { zh: "+ 新增流程項目", en: "+ Add schedule item" },
   rsvpEnabledHint: {
     zh: "賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在「RSVP 回覆」頁面",
-    en: "Guests can RSVP directly on the invitation page - replies show up on the “RSVP” page",
+    en: "Guests can RSVP directly on the invitation page - replies show up on the \"RSVP\" page",
   },
 };
 
@@ -254,7 +254,7 @@ export const draftEditorCopy = {
   },
   rsvpHint: {
     zh: "賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在後台的「RSVP 回覆」頁面",
-    en: "Guests can RSVP directly on the invitation page - replies show up on the “RSVP” page in your dashboard",
+    en: "Guests can RSVP directly on the invitation page - replies show up on the \"RSVP\" page in your dashboard",
   },
   saveInvitation: { zh: "儲存喜帖", en: "Save invitation" },
   previewInvitation: { zh: "預覽喜帖", en: "Preview invitation" },
@@ -273,7 +273,7 @@ export const confirmDialogCopy = {
 export const editorCardCopy = {
   hiddenSectionHint: {
     zh: "這個區塊目前不會顯示在喜帖上。開啟「顯示」即可編輯內容。",
-    en: "This section won't show on your invitation right now. Turn on “Show” to edit its content.",
+    en: "This section won't show on your invitation right now. Turn on \"Show\" to edit its content.",
   },
 };
 
