@@ -4,6 +4,7 @@ import { getOwnedWedding } from "@/lib/weddings";
 import { RsvpTable } from "@/components/dashboard/RsvpTable";
 import { getLocale } from "@/lib/i18n/locale";
 import { editTabs, rsvpsPageCopy } from "@/lib/i18n/dictionaries/dashboard";
+import { dietOptions } from "@/lib/i18n/dictionaries/template";
 
 export default async function RsvpsPage({
   params,
@@ -34,6 +35,19 @@ export default async function RsvpsPage({
     { label: rsvpsPageCopy.stats.headcount[locale], value: totalHeadcount },
   ];
 
+  // Counts by RSVP submission (same semantic as the stats above - e.g. a
+  // family of three submitted under one reply with one diet selection
+  // counts once here, matching how "Attending" also counts replies, not
+  // headcount) rather than by adults+children, since diet is stored per
+  // submission, not per attendee. Only categories someone actually picked
+  // are shown, so this doesn't turn into a wall of mostly-zero boxes.
+  const dietCounts = dietOptions
+    .map((option) => ({
+      label: option[locale],
+      value: attending.filter((r) => r.diet === option.id).length,
+    }))
+    .filter((d) => d.value > 0);
+
   return (
     <div>
       <h2 className="mb-6 text-lg font-medium">{editTabs.rsvps[locale]}</h2>
@@ -46,6 +60,25 @@ export default async function RsvpsPage({
           </div>
         ))}
       </div>
+
+      {dietCounts.length > 0 && (
+        <div className="mb-8">
+          <h3 className="mb-3 text-sm font-medium text-[var(--brand-ink-soft)]">
+            {rsvpsPageCopy.dietStatsTitle[locale]}
+          </h3>
+          <div className="flex flex-wrap gap-3">
+            {dietCounts.map((d) => (
+              <div
+                key={d.label}
+                className="flex items-center gap-2 rounded border border-[var(--brand-line)] bg-white px-3 py-2"
+              >
+                <span className="text-lg font-medium text-[var(--brand-gold)]">{d.value}</span>
+                <span className="text-sm text-[var(--brand-ink-soft)]">{d.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <RsvpTable weddingId={weddingId} rsvps={list} />
     </div>

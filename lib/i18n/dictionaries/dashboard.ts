@@ -122,6 +122,7 @@ export const rsvpsPageCopy = {
     notAttending: { zh: "不出席", en: "Not attending" },
     headcount: { zh: "預估出席人數", en: "Estimated headcount" },
   },
+  dietStatsTitle: { zh: "飲食需求統計", en: "Dietary needs" },
 };
 
 export const guestListCopy = {
