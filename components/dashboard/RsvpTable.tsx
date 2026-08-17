@@ -7,6 +7,8 @@ import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { rsvpTableCopy, editForm } from "@/lib/i18n/dictionaries/dashboard";
+import { dietOptions } from "@/lib/i18n/dictionaries/template";
+import { toCsv, downloadCsv } from "@/lib/csv";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export function RsvpTable({
@@ -32,12 +34,48 @@ export function RsvpTable({
     });
   }
 
+  function dietLabel(diet: string, note: string) {
+    const label = dietOptions.find((d) => d.id === diet)?.[locale] ?? diet;
+    return [label, note].filter(Boolean).join(" - ");
+  }
+
+  function handleExport() {
+    const header = [
+      rsvpTableCopy.headers.name[locale],
+      rsvpTableCopy.headers.attending[locale],
+      rsvpTableCopy.headers.adults[locale],
+      rsvpTableCopy.headers.children[locale],
+      rsvpTableCopy.headers.diet[locale],
+      rsvpTableCopy.headers.message[locale],
+      rsvpTableCopy.headers.time[locale],
+    ];
+    const rows = rsvps.map((r) => [
+      r.name,
+      r.attending ? rsvpTableCopy.attendingYes[locale] : rsvpTableCopy.attendingNo[locale],
+      r.attending ? r.adults : "",
+      r.attending ? r.children : "",
+      r.attending && (r.diet || r.diet_note) ? dietLabel(r.diet, r.diet_note) : "",
+      r.message,
+      new Date(r.created_at).toLocaleString(locale === "en" ? "en-GB" : "zh-TW"),
+    ]);
+    downloadCsv(`rsvp-${new Date().toISOString().slice(0, 10)}.csv`, toCsv([header, ...rows]));
+  }
+
   if (rsvps.length === 0) {
     return <p className="text-sm text-[var(--brand-ink-soft)]">{rsvpTableCopy.empty[locale]}</p>;
   }
 
   return (
     <div>
+      <div className="mb-3 flex justify-end">
+        <button
+          type="button"
+          onClick={handleExport}
+          className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]"
+        >
+          {rsvpTableCopy.exportCsv[locale]}
+        </button>
+      </div>
       <div className="overflow-x-auto rounded border border-[var(--brand-line)] bg-white">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead>
@@ -61,8 +99,8 @@ export function RsvpTable({
                 <td className="px-4 py-3">{r.attending ? r.children : "-"}</td>
                 <td className="px-4 py-3 max-w-[200px]">
                   {r.attending && (r.diet || r.diet_note) ? (
-                    <span className="block truncate" title={[r.diet, r.diet_note].filter(Boolean).join(" - ")}>
-                      {[r.diet, r.diet_note].filter(Boolean).join(" - ")}
+                    <span className="block truncate" title={dietLabel(r.diet, r.diet_note)}>
+                      {dietLabel(r.diet, r.diet_note)}
                     </span>
                   ) : (
                     "-"

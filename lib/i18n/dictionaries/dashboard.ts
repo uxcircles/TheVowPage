@@ -146,6 +146,7 @@ export const rsvpTableCopy = {
   },
   attendingYes: { zh: "出席", en: "Attending" },
   attendingNo: { zh: "不出席", en: "Not attending" },
+  exportCsv: { zh: "匯出 CSV", en: "Export CSV" },
   empty: { zh: "還沒有收到回覆。", en: "No replies yet." },
   deleteFailed: { zh: "刪除失敗，請稍後再試。", en: "Couldn't delete. Please try again." },
   confirmTitle: { zh: "刪除回覆", en: "Delete reply" },
