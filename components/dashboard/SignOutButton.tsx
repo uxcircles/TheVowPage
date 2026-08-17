@@ -10,7 +10,11 @@ export function SignOutButton() {
   const locale = useLocale();
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending} className="text-sm text-[var(--brand-ink-soft)] underline disabled:opacity-60">
+    <button
+      type="submit"
+      disabled={pending}
+      className="text-xs text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)] disabled:opacity-60"
+    >
       {pending ? signOutCopy.signingOut[locale] : signOutCopy.signOut[locale]}
     </button>
   );
