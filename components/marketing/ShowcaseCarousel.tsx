@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Reveal } from "./Reveal";
-import { useLocale } from "@/components/i18n/LocaleProvider";
+import type { Locale } from "@/lib/i18n/shared";
 import type { ClassicTheme } from "@/components/templates/classic/themes";
 
 const copy = {
@@ -60,8 +60,18 @@ function showcaseImageRef(img: HTMLImageElement | null) {
  * scripts/capture-showcase-screenshots.mjs if the demo content changes),
  * not the abstract InvitationCardVisual mockup - a real photo of the actual
  * product reads as more convincing than a generic placeholder. */
-export function ShowcaseCarousel({ themes }: { themes: ClassicTheme[] }) {
-  const locale = useLocale();
+export function ShowcaseCarousel({
+  themes,
+  locale,
+}: {
+  themes: ClassicTheme[];
+  /** HomePageContent (the only caller) renders outside any LocaleProvider -
+   * the marketing pages are statically pre-rendered per locale rather than
+   * reading the locale cookie, so useLocale()'s context default ("zh")
+   * would otherwise always win regardless of which locale actually
+   * rendered the page. */
+  locale: Locale;
+}) {
   const [active, setActive] = useState(0);
 
   useEffect(() => {

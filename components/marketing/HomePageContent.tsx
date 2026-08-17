@@ -229,7 +229,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <p className="mt-3 max-w-lg text-[var(--brand-ink-soft)]">{showcaseSection.intro[locale]}</p>
             </Reveal>
             <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              <ShowcaseCarousel themes={CLASSIC_THEMES} />
+              <ShowcaseCarousel themes={CLASSIC_THEMES} locale={locale} />
               <Reveal delay={(CLASSIC_THEMES.length % 4) * 100}>
                 <div className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--brand-line)] text-center">
                   <p className={`${displayFont.className} text-lg text-[var(--brand-ink-soft)]`}>

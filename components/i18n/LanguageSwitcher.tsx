@@ -34,12 +34,17 @@ export function LanguageSwitcher({
 
   function setLocale(next: Locale) {
     if (next === locale) return;
+    // Always update the cookie, even on the marketing pages below - proxy.ts
+    // redirects a bare "/", "/terms" or "/privacy" request back to "/en..."
+    // whenever the cookie says "en", so switching en -> zh here without
+    // updating it first would have the "/" navigation immediately bounced
+    // straight back to "/en" by that same rule.
+    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; SameSite=Lax`;
     const marketingPath = marketingBasePath(pathname);
     if (marketingPath) {
       router.push(marketingHref(marketingPath, next));
       return;
     }
-    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; SameSite=Lax`;
     router.refresh();
   }
 
