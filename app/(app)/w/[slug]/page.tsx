@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EB_Garamond } from "next/font/google";
@@ -7,6 +8,7 @@ import { headingFont } from "@/lib/fonts";
 import { getLocale } from "@/lib/i18n/locale";
 import type { Locale } from "@/lib/i18n/shared";
 import { expiredNoticeCopy, tryDesignCopy } from "@/lib/i18n/dictionaries/template";
+import { buildMetadata } from "@/lib/seo";
 
 const displayFont = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"] });
 
@@ -108,6 +110,71 @@ function TryThisDesignCta({
       </Link>
     </div>
   );
+}
+
+const weddingOgCopy = {
+  titleSuffix: { zh: "的婚禮邀請", en: "'s Wedding Invitation" },
+  withDetails: {
+    zh: (names: string, date: string, venue: string) =>
+      `${names} 誠摯邀請您參加他們的婚禮${date ? `，${date}` : ""}${venue ? ` 於 ${venue}` : ""}。點擊查看喜帖並回覆 RSVP。`,
+    en: (names: string, date: string, venue: string) =>
+      `${names} invite you to their wedding${date ? ` on ${date}` : ""}${venue ? ` at ${venue}` : ""}. View the invitation and RSVP.`,
+  },
+  fallback: { zh: "點擊查看這份電子喜帖並回覆 RSVP。", en: "View this digital wedding invitation and RSVP." },
+  notFoundTitle: { zh: "找不到喜帖", en: "Invitation not found" },
+  notFoundDescription: {
+    zh: "這個連結指向的喜帖不存在，或尚未公開發布。",
+    en: "This link doesn't point to an existing or published invitation.",
+  },
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const [result, locale] = await Promise.all([getPublicWeddingData(slug), getLocale()]);
+
+  // A wedding's own OG image/title is real content someone might share -
+  // still worth good link-preview copy even once expired or if the slug
+  // never existed. But every /w/[slug] page (this branch and the "ok" one
+  // below) sets noIndex - these are the couple's private event details
+  // (date, venue address), not something that should turn up in Google
+  // for a stranger searching the couple's names.
+  if (result.status !== "ok") {
+    return buildMetadata({
+      title: weddingOgCopy.notFoundTitle[locale],
+      description: weddingOgCopy.notFoundDescription[locale],
+      path: `/w/${slug}`,
+      locale,
+      noIndex: true,
+    });
+  }
+
+  const { groomName, groomLabel, brideName, brideLabel, eventDate, timezone, venueName, heroPhotoUrl } = result.data;
+  const names = `${groomName || groomLabel} ＆ ${brideName || brideLabel}`;
+  const dateLabel = eventDate
+    ? new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "zh-Hant", {
+        timeZone: timezone || undefined,
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(eventDate))
+    : "";
+  const description =
+    dateLabel || venueName
+      ? weddingOgCopy.withDetails[locale](names, dateLabel, venueName || "")
+      : weddingOgCopy.fallback[locale];
+
+  return buildMetadata({
+    title: `${names}${weddingOgCopy.titleSuffix[locale]}`,
+    description,
+    path: `/w/${slug}`,
+    locale,
+    noIndex: true,
+    image: heroPhotoUrl ? { url: heroPhotoUrl } : undefined,
+  });
 }
 
 export default async function PublicWeddingPage({

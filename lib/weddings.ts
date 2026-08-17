@@ -33,7 +33,11 @@ export type PublicWeddingResult =
 // unpublished wedding's /w/[slug] link 404s for everyone, including the
 // owner viewing their own draft. Owners preview drafts via the dashboard's
 // own "預覽喜帖" button instead, which shows live unsaved edits too.
-export async function getPublicWeddingData(slug: string): Promise<PublicWeddingResult> {
+//
+// cache()'d because /w/[slug]'s generateMetadata (for the OG/Twitter tags)
+// and the page component itself both need this same row - without it,
+// every visit to a published invitation would hit Supabase twice.
+export const getPublicWeddingData = cache(async (slug: string): Promise<PublicWeddingResult> => {
   const supabase = await createClient();
   const { data: wedding, error } = await supabase
     .from("weddings")
@@ -91,4 +95,4 @@ export async function getPublicWeddingData(slug: string): Promise<PublicWeddingR
     showRsvp: wedding.show_rsvp,
   };
   return { status: "ok", data, isDemo: wedding.is_demo };
-}
+});
