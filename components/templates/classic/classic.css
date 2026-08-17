@@ -304,7 +304,10 @@
   margin-bottom: 22px;
 }
 .classic .name-logo {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.08em;
   width: 80vw;
   max-width: 420px;
   margin: 0 auto;
@@ -314,11 +317,16 @@
   font-size: clamp(30px, 8vw, 48px);
   color: var(--ink);
   letter-spacing: 0.04em;
-  /* CJK text can otherwise break between any two Han characters, splitting
-     a name mid-way if it doesn't fit on one line - keep-all restricts
-     wrapping to the spaces around "＆" instead, so long names wrap between
-     names (never inside one) while short names still sit on a single line. */
-  word-break: keep-all;
+}
+/* Always three lines (name / & / name), each name on its own nowrap line
+   so a two-word name can never split mid-name the way normal text
+   wrapping would - only ever between the two names, at the "&". */
+.classic .name-logo-name {
+  white-space: nowrap;
+}
+.classic .name-logo-amp {
+  font-size: 0.7em;
+  line-height: 1;
 }
 
 /* ---------- SCRATCH CARD + COUNTDOWN ---------- */

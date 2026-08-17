@@ -481,7 +481,19 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         </div>
         <p className="eyebrow reveal">wedding invitation</p>
         <p className="name-logo reveal">
-          {data.groomName || data.groomLabel} ＆ {data.brideName || data.brideLabel}
+          {/* Three explicit lines (name / & / name) rather than one
+              wrapping line of text - the browser wraps at any space, so a
+              two-word name ("Joe Smith & Lillian Johnson") could split
+              mid-name ("...& Lillian" / "Johnson") depending on width.
+              Each name is its own nowrap span so it only ever breaks
+              between the two names, at the "&", never inside one. Regular
+              "&" rather than the full-width "＆" used elsewhere - EB
+              Garamond (this element's --classic-font-display) has no
+              glyph for the full-width form, so it was silently falling
+              back to the system serif font for just that one character. */}
+          <span className="name-logo-name">{data.groomName || data.groomLabel}</span>
+          <span className="name-logo-amp">&</span>
+          <span className="name-logo-name">{data.brideName || data.brideLabel}</span>
         </p>
       </section>
 
@@ -654,7 +666,9 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           {data.thanksMessage || THANKS_MESSAGE_FALLBACK[locale]}
         </p>
         <p className="names" ref={footerNamesRef}>
-          {data.groomName}　＆　{data.brideName}
+          {/* Regular "&" rather than "＆" - same EB Garamond glyph-fallback
+              issue as the hero name-logo above. */}
+          {data.groomName}　&　{data.brideName}
         </p>
         <p className="credit" ref={footerCreditRef}>
           Made with{" "}
