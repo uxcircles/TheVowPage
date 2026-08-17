@@ -522,7 +522,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
               <img className="family-photo reveal" src={data.familyPhotoUrl} alt={familyCopy.photoAlt[locale]} />
             </div>
           )}
-          <img className="bg-illus is-left" src="/templates/classic/illus-peony-stem.png" alt="" aria-hidden="true" />
+          <img className="bg-illus is-left" src="/templates/classic/illus-peony-stem.webp" alt="" aria-hidden="true" />
         </section>
       )}
 

@@ -169,7 +169,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         <section className="relative overflow-hidden bg-white/50 px-6 py-20 sm:px-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/templates/classic/illus-peony-stem.png"
+            src="/templates/classic/illus-peony-stem.webp"
             alt=""
             aria-hidden="true"
             className="pointer-events-none absolute -right-6 -top-6 hidden w-40 opacity-25 sm:block lg:w-52"
@@ -281,7 +281,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <Reveal className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl bg-[var(--foreground)] px-8 py-16 text-center text-[var(--background)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/templates/classic/illus-cherub.png"
+              src="/templates/classic/illus-cherub.webp"
               alt=""
               aria-hidden="true"
               className="pointer-events-none absolute -right-10 bottom-0 w-64 opacity-40 sm:w-80"

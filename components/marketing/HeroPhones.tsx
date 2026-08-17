@@ -157,8 +157,8 @@ export function HeroPhones() {
         <img
           src="/templates/classic/hero-phone-2.webp"
           alt=""
-          width={1298}
-          height={3086}
+          width={600}
+          height={1427}
           className="absolute inset-0 h-full w-full"
         />
       </div>
@@ -186,8 +186,8 @@ export function HeroPhones() {
           <img
             src="/templates/classic/env.webp"
             alt={hero.envelopeAlt[locale]}
-            width={750}
-            height={1624}
+            width={500}
+            height={1083}
             className="block h-full w-full object-cover animate-hero-screen-kenburns"
           />
         </PhoneScreen>
@@ -195,8 +195,8 @@ export function HeroPhones() {
         <img
           src="/templates/classic/hero-phone-1.webp"
           alt=""
-          width={1299}
-          height={3086}
+          width={600}
+          height={1426}
           className="absolute inset-0 h-full w-full"
         />
       </div>

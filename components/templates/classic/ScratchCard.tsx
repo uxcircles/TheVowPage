@@ -305,7 +305,7 @@ export function ScratchCard({
       )}
       <img
         className="bg-illus is-right"
-        src="/templates/classic/illus-cherub.png"
+        src="/templates/classic/illus-cherub.webp"
         alt=""
         aria-hidden="true"
       />
