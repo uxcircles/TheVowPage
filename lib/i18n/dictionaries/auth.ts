@@ -19,6 +19,42 @@ export const loginCopy = {
   submitPending: { zh: "登入中...", en: "Logging in..." },
   noAccount: { zh: "還沒有帳號？", en: "Don't have an account?" },
   signUpLink: { zh: "立即註冊", en: "Sign up" },
+  forgotPassword: { zh: "忘記密碼？", en: "Forgot password?" },
+};
+
+export const forgotPasswordCopy = {
+  title: { zh: "重設密碼", en: "Reset your password" },
+  subtitle: {
+    zh: "輸入你的帳號 Email，我們會寄一封重設密碼的連結給你。",
+    en: "Enter your account email and we'll send you a link to reset your password.",
+  },
+  submit: { zh: "寄送重設連結", en: "Send reset link" },
+  submitPending: { zh: "寄送中...", en: "Sending..." },
+  backToLogin: { zh: "返回登入", en: "Back to log in" },
+  sentTitle: { zh: "請確認你的信箱", en: "Check your email" },
+  sentBody: {
+    zh: (email: string) => `我們已經寄出一封重設密碼的連結到 ${email}。`,
+    en: (email: string) => `We've sent a password reset link to ${email}.`,
+  },
+  sentHint: {
+    zh: "沒收到信？請檢查垃圾郵件匣，或稍後再試一次。",
+    en: "Didn't get it? Check your spam folder, or try again in a moment.",
+  },
+};
+
+export const resetPasswordCopy = {
+  title: { zh: "設定新密碼", en: "Set a new password" },
+  newPassword: { zh: "新密碼", en: "New password" },
+  confirmPassword: { zh: "確認新密碼", en: "Confirm new password" },
+  mismatch: { zh: "兩次輸入的密碼不一致。", en: "Passwords don't match." },
+  submit: { zh: "更新密碼", en: "Update password" },
+  submitPending: { zh: "更新中...", en: "Updating..." },
+  linkInvalidTitle: { zh: "連結已失效", en: "This link has expired" },
+  linkInvalidBody: {
+    zh: "這個重設密碼連結已過期或已使用過，請重新申請一次。",
+    en: "This password reset link has expired or already been used - please request a new one.",
+  },
+  requestNewLink: { zh: "重新申請重設連結", en: "Request a new reset link" },
 };
 
 export const signupCopy = {

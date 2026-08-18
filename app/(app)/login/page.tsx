@@ -69,6 +69,9 @@ export default function LoginPage() {
             {authCopy.password[locale]}
             <PasswordInput name="password" required minLength={6} autoComplete="current-password" />
           </label>
+          <Link href="/forgot-password" className="-mt-2 self-end text-xs text-[var(--brand-ink-soft)] underline hover:text-[var(--brand-gold)]">
+            {loginCopy.forgotPassword[locale]}
+          </Link>
 
           <button
             type="submit"
