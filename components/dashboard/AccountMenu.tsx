@@ -96,7 +96,10 @@ export function AccountMenu({
               </span>
             </button>
             {langOpen && (
-              <div className="mx-4 mt-1 overflow-hidden rounded-lg bg-[var(--background)]">
+              <div className="mb-1 mt-1">
+                {/* pl-10 = the 語言 label's own left offset (px-4 + icon +
+                    gap) above, so 中文/English line up under that text
+                    rather than under the globe icon. */}
                 {(["zh", "en"] as const).map((code) => (
                   <button
                     key={code}
@@ -105,7 +108,7 @@ export function AccountMenu({
                       setLangOpen(false);
                       if (code !== locale) setLocale(code);
                     }}
-                    className="flex w-full items-center justify-between px-3 py-1.5 text-sm leading-none text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
+                    className="flex w-full items-center justify-between py-1.5 pl-10 pr-4 text-sm leading-none text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-[var(--brand-gold)]"
                   >
                     <span>{LOCALE_LABELS[code]}</span>
                     {locale === code && <CheckIcon className="h-4 w-4 shrink-0 text-[var(--brand-gold)]" />}

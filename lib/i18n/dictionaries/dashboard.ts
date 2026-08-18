@@ -87,7 +87,7 @@ export const editForm = {
 
 export const chromeCopy = {
   backToEditing: { zh: "✕ 返回編輯", en: "✕ Back to editing" },
-  back: { zh: "← 返回", en: "← Back" },
+  back: { zh: "返回", en: "Back" },
   published: { zh: "已發布", en: "Published" },
   draft: { zh: "草稿", en: "Draft" },
   expired: { zh: "已到期", en: "Expired" },

@@ -25,6 +25,7 @@ import { chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { ArrowLeftIcon } from "@/components/ui/ArrowLeftIcon";
 
 function ShieldIcon() {
   return (
@@ -320,8 +321,9 @@ export function WeddingChrome({
               <Link
                 href="/dashboard"
                 onClick={(e) => guardNavigation(e, "/dashboard")}
-                className="text-sm text-[var(--brand-gold)] hover:underline"
+                className="inline-flex items-center gap-1 text-sm text-[var(--brand-gold)]"
               >
+                <ArrowLeftIcon className="h-4 w-4 shrink-0" />
                 {chromeCopy.back[locale]}
               </Link>
               <AccountMenu

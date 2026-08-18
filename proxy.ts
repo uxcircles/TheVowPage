@@ -11,23 +11,36 @@ const BARE_MARKETING_PATHS = new Set(["/", "/terms", "/privacy"]);
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // A visitor whose locale cookie is already "en" hitting a bare marketing
-  // URL (e.g. a bookmarked "/" or a link from search results) still expects
-  // the English site - send them to the /en equivalent so they don't land
-  // on the Chinese static page.
-  if (BARE_MARKETING_PATHS.has(pathname) && request.cookies.get(LOCALE_COOKIE)?.value === "en") {
+  // Existing cookie wins; a first-ever visit (no cookie yet) falls back to
+  // detecting from the browser's Accept-Language header. Using this
+  // resolved `locale` (rather than the raw cookie) for the redirect check
+  // below means a first-time English-browser visitor gets sent to /en on
+  // *this* request - not just remembered for the next one, which was the
+  // bug: the old code only set the cookie from Accept-Language *after*
+  // already deciding (based on the not-yet-set cookie) not to redirect.
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
+  const isFirstVisit = !cookieLocale;
+  const locale = cookieLocale ?? localeFromAcceptLanguage(request.headers.get("accept-language"));
+
+  // A visitor whose locale is "en" (saved or just detected) hitting a bare
+  // marketing URL (e.g. a bookmarked "/" or a link from search results)
+  // still expects the English site - send them to the /en equivalent so
+  // they don't land on the Chinese static page.
+  if (BARE_MARKETING_PATHS.has(pathname) && locale === "en") {
     const url = request.nextUrl.clone();
     url.pathname = pathname === "/" ? "/en" : `/en${pathname}`;
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    if (isFirstVisit) {
+      redirectResponse.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 31536000, sameSite: "lax" });
+    }
+    return redirectResponse;
   }
 
   const response = await updateSession(request);
 
-  // First visit (no saved preference yet): pick a default from the
-  // browser's Accept-Language header and remember it, so it doesn't
-  // need to be redetected on every request.
-  if (!request.cookies.has(LOCALE_COOKIE)) {
-    const locale = localeFromAcceptLanguage(request.headers.get("accept-language"));
+  // First visit (no saved preference yet): remember the detected default
+  // so it doesn't need to be redetected on every request.
+  if (isFirstVisit) {
     response.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 31536000, sameSite: "lax" });
   }
 

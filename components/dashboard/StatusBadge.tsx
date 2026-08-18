@@ -12,7 +12,7 @@
 export function StatusBadge({ published, label }: { published: boolean; label: string }) {
   return (
     <span
-      className={`rounded border px-2 py-1 text-xs font-medium ${
+      className={`inline-flex items-center rounded border px-2 py-1 text-xs font-medium leading-none ${
         published
           ? "border-[var(--brand-success)]/30 bg-[var(--brand-success)]/10 text-[var(--brand-success)]"
           : "border-gray-300 bg-gray-100 text-gray-600"
