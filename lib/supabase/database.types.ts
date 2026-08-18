@@ -20,6 +20,7 @@ export type Database = {
           id: string
           name: string
           note: string
+          rsvp_id: string | null
           wedding_id: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           id?: string
           name: string
           note?: string
+          rsvp_id?: string | null
           wedding_id: string
         }
         Update: {
@@ -34,9 +36,17 @@ export type Database = {
           id?: string
           name?: string
           note?: string
+          rsvp_id?: string | null
           wedding_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "guests_rsvp_id_fkey"
+            columns: ["rsvp_id"]
+            isOneToOne: false
+            referencedRelation: "rsvps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "guests_wedding_id_fkey"
             columns: ["wedding_id"]

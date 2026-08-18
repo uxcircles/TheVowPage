@@ -15,11 +15,10 @@ export default async function GuestsPage({
   if (!wedding) notFound();
 
   const supabase = await createClient();
-  const { data: guests } = await supabase
-    .from("guests")
-    .select("*")
-    .eq("wedding_id", weddingId)
-    .order("created_at", { ascending: true });
+  const [{ data: guests }, { data: rsvps }] = await Promise.all([
+    supabase.from("guests").select("*").eq("wedding_id", weddingId).order("created_at", { ascending: true }),
+    supabase.from("rsvps").select("*").eq("wedding_id", weddingId).order("created_at", { ascending: false }),
+  ]);
 
   const locale = await getLocale();
 
@@ -29,7 +28,7 @@ export default async function GuestsPage({
       <p className="mb-6 text-sm text-[var(--brand-ink-soft)]">
         {guestsPageCopy.hint[locale]}
       </p>
-      <GuestList weddingId={weddingId} guests={guests ?? []} />
+      <GuestList weddingId={weddingId} guests={guests ?? []} rsvps={rsvps ?? []} />
     </div>
   );
 }

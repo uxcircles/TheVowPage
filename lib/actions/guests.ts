@@ -32,3 +32,19 @@ export async function deleteGuest(weddingId: string, guestId: string) {
 
   revalidatePath(`/dashboard/${weddingId}/guests`);
 }
+
+export async function linkGuestToRsvp(weddingId: string, guestId: string, rsvpId: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("guests").update({ rsvp_id: rsvpId }).eq("id", guestId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/${weddingId}/guests`);
+}
+
+export async function unlinkGuest(weddingId: string, guestId: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("guests").update({ rsvp_id: null }).eq("id", guestId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/${weddingId}/guests`);
+}

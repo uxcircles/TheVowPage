@@ -133,6 +133,15 @@ export const guestListCopy = {
   addFailed: { zh: "新增賓客失敗，請稍後再試。", en: "Couldn't add guest. Please try again." },
   deleteFailed: { zh: "刪除賓客失敗，請稍後再試。", en: "Couldn't delete guest. Please try again." },
   empty: { zh: "還沒有賓客，新增第一位吧。", en: "No guests yet - add your first one." },
+  matchHint: {
+    zh: (name: string) => `疑似「${name}」的回覆`,
+    en: (name: string) => `Possibly "${name}"'s reply`,
+  },
+  confirmMatch: { zh: "確認", en: "Confirm" },
+  unlink: { zh: "取消連結", en: "Unlink" },
+  notRepliedYet: { zh: "尚未回覆", en: "Not yet replied" },
+  linkFailed: { zh: "連結失敗，請稍後再試。", en: "Couldn't link. Please try again." },
+  unlinkFailed: { zh: "取消連結失敗，請稍後再試。", en: "Couldn't unlink. Please try again." },
 };
 
 export const rsvpTableCopy = {
