@@ -7,7 +7,7 @@ import { geocodeVenue, timezoneForCoords } from "@/lib/geocode";
 import { wallTimeToUtcIso } from "@/lib/timezone";
 import { getLocale } from "@/lib/i18n/locale";
 import type { Locale } from "@/lib/i18n/shared";
-import type { ScheduleItem } from "@/components/templates/classic/types";
+import type { ContentEn, ScheduleItem } from "@/components/templates/classic/types";
 
 function defaultGroomLabel(locale: Locale) {
   return locale === "en" ? "Groom" : "新郎";
@@ -74,6 +74,24 @@ export async function updateWeddingContent(
   const schedule: ScheduleItem[] = times
     .map((time, i) => ({ time: time.trim(), event: (events[i] ?? "").trim() }))
     .filter((item) => item.time || item.event);
+  const enEvents = formData.getAll("en_scheduleEvent") as string[];
+  const scheduleEn = enEvents.map((event) => ({ event: event.trim() }));
+
+  const contentEn: ContentEn = {
+    groomName: String(formData.get("en_groomName") ?? "").trim(),
+    brideName: String(formData.get("en_brideName") ?? "").trim(),
+    groomLabel: String(formData.get("en_groomLabel") ?? "").trim(),
+    brideLabel: String(formData.get("en_brideLabel") ?? "").trim(),
+    groomParents: String(formData.get("en_groomParents") ?? "").trim(),
+    groomParentsRelation: String(formData.get("en_groomParentsRelation") ?? "").trim(),
+    brideParents: String(formData.get("en_brideParents") ?? "").trim(),
+    brideParentsRelation: String(formData.get("en_brideParentsRelation") ?? "").trim(),
+    venueName: String(formData.get("en_venueName") ?? "").trim(),
+    venueHall: String(formData.get("en_venueHall") ?? "").trim(),
+    dressCode: String(formData.get("en_dressCode") ?? "").trim(),
+    thanksMessage: String(formData.get("en_thanksMessage") ?? "").trim(),
+    schedule: scheduleEn,
+  };
 
   const venueName = String(formData.get("venueName") ?? "").trim();
   const venueAddress = String(formData.get("venueAddress") ?? "").trim();
@@ -104,9 +122,7 @@ export async function updateWeddingContent(
     .update({
       slug,
       groom_name: String(formData.get("groomName") ?? "").trim(),
-      groom_name_en: String(formData.get("groomNameEn") ?? "").trim(),
       bride_name: String(formData.get("brideName") ?? "").trim(),
-      bride_name_en: String(formData.get("brideNameEn") ?? "").trim(),
       groom_label: String(formData.get("groomLabel") ?? "").trim() || defaultGroomLabel(locale),
       bride_label: String(formData.get("brideLabel") ?? "").trim() || defaultBrideLabel(locale),
       groom_parents: String(formData.get("groomParents") ?? "").trim(),
@@ -119,7 +135,6 @@ export async function updateWeddingContent(
       event_date: wallTimeToUtcIso(eventDateRaw, timezone),
       timezone,
       venue_name: venueName,
-      venue_name_en: String(formData.get("venueNameEn") ?? "").trim(),
       venue_hall: String(formData.get("venueHall") ?? "").trim(),
       venue_address: venueAddress,
       venue_lat: venueLat,
@@ -134,6 +149,8 @@ export async function updateWeddingContent(
       show_dress_code: formData.get("showDressCode") === "on",
       show_rsvp: formData.get("showRsvp") === "on",
       thanks_message: String(formData.get("thanksMessage") ?? "").trim(),
+      bilingual_enabled: formData.get("bilingualEnabled") === "on",
+      content_en: contentEn,
     })
     .eq("id", weddingId);
 

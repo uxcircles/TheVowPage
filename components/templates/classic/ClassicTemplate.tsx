@@ -3,7 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { EB_Garamond, Noto_Serif_TC } from "next/font/google";
 import "./classic.css";
-import { THANKS_MESSAGE_FALLBACK, localizedName, type ClassicTemplateData } from "./types";
+import { THANKS_MESSAGE_FALLBACK, localizedText, type ClassicTemplateData } from "./types";
 import { getClassicTheme, getEnvelopeImages } from "./themes";
 import { getSealDesign, getSealImage } from "./seals";
 import { getMomentsStyle } from "./momentsStyles";
@@ -67,9 +67,34 @@ function hexToUnitRgb(hex: string): [number, number, number] {
 
 export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const locale = useLocale();
-  const groomDisplay = localizedName(data.groomName, data.groomNameEn, locale);
-  const brideDisplay = localizedName(data.brideName, data.brideNameEn, locale);
-  const venueNameDisplay = localizedName(data.venueName, data.venueNameEn, locale);
+  const bilingual = data.bilingualEnabled;
+  const contentEn = data.contentEn;
+  const groomDisplay = localizedText(data.groomName, contentEn.groomName, locale, bilingual);
+  const brideDisplay = localizedText(data.brideName, contentEn.brideName, locale, bilingual);
+  const groomLabelDisplay = localizedText(data.groomLabel, contentEn.groomLabel, locale, bilingual);
+  const brideLabelDisplay = localizedText(data.brideLabel, contentEn.brideLabel, locale, bilingual);
+  const groomParentsDisplay = localizedText(data.groomParents, contentEn.groomParents, locale, bilingual);
+  const brideParentsDisplay = localizedText(data.brideParents, contentEn.brideParents, locale, bilingual);
+  const groomParentsRelationDisplay = localizedText(
+    data.groomParentsRelation,
+    contentEn.groomParentsRelation,
+    locale,
+    bilingual
+  );
+  const brideParentsRelationDisplay = localizedText(
+    data.brideParentsRelation,
+    contentEn.brideParentsRelation,
+    locale,
+    bilingual
+  );
+  const venueNameDisplay = localizedText(data.venueName, contentEn.venueName, locale, bilingual);
+  const venueHallDisplay = localizedText(data.venueHall, contentEn.venueHall, locale, bilingual);
+  const dressCodeDisplay = localizedText(data.dressCode, contentEn.dressCode, locale, bilingual);
+  const thanksMessageDisplay = localizedText(data.thanksMessage, contentEn.thanksMessage, locale, bilingual);
+  const scheduleDisplay = data.schedule.map((item, i) => ({
+    time: item.time,
+    event: localizedText(item.event, contentEn.schedule?.[i]?.event, locale, bilingual),
+  }));
   const rootRef = useRef<HTMLDivElement>(null);
   const heroFrameRef = useRef<HTMLDivElement>(null);
   const momentsSectionRef = useRef<HTMLElement>(null);
@@ -370,23 +395,23 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const googleCalendarUrl = useMemo(() => {
     if (!eventDate) return null;
     const title = `${groomDisplay} ＆ ${brideDisplay} ${calendarEventCopy.titleSuffix[locale]}`;
-    const location = [venueNameDisplay, data.venueHall, data.venueAddress]
+    const location = [venueNameDisplay, venueHallDisplay, data.venueAddress]
       .filter(Boolean)
       .join(calendarEventCopy.locationSeparator[locale]);
-    const details = scheduleDetails(data.schedule);
+    const details = scheduleDetails(scheduleDisplay);
     const start = eventDate;
     const end = new Date(eventDate.getTime() + 4 * 60 * 60 * 1000);
     return buildGoogleCalendarUrl({ title, location, details, start, end });
-  }, [eventTime, groomDisplay, brideDisplay, venueNameDisplay, data.venueHall, data.venueAddress, data.schedule, locale]);
+  }, [eventTime, groomDisplay, brideDisplay, venueNameDisplay, venueHallDisplay, data.venueAddress, scheduleDisplay, locale]);
 
   const icsLinkRef = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     if (!eventDate || !icsLinkRef.current) return;
     const title = `${groomDisplay} ＆ ${brideDisplay} ${calendarEventCopy.titleSuffix[locale]}`;
-    const location = [venueNameDisplay, data.venueHall, data.venueAddress]
+    const location = [venueNameDisplay, venueHallDisplay, data.venueAddress]
       .filter(Boolean)
       .join(calendarEventCopy.locationSeparator[locale]);
-    const details = scheduleDetails(data.schedule);
+    const details = scheduleDetails(scheduleDisplay);
     const start = eventDate;
     const end = new Date(eventDate.getTime() + 4 * 60 * 60 * 1000);
     const ics = buildIcsDataUrl({
@@ -401,9 +426,9 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
     icsLinkRef.current.download = `${groomDisplay}${brideDisplay}${calendarEventCopy.icsFilenameSuffix[locale]}.ics`;
     return () => URL.revokeObjectURL(ics);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventTime, groomDisplay, brideDisplay, venueNameDisplay, data.venueHall, data.venueAddress, data.schedule, data.weddingId, locale]);
+  }, [eventTime, groomDisplay, brideDisplay, venueNameDisplay, venueHallDisplay, data.venueAddress, scheduleDisplay, data.weddingId, locale]);
 
-  const venueLabel = [venueNameDisplay, data.venueHall].filter(Boolean).join(" ・ ");
+  const venueLabel = [venueNameDisplay, venueHallDisplay].filter(Boolean).join(" ・ ");
   const envelopeImages = getEnvelopeImages(theme.id);
   // The decorative bg-illus PNGs (floral sprigs, the rings divider, etc.)
   // are pre-rendered in a single flat gold tone with no per-theme variants
@@ -494,9 +519,9 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
               Garamond (this element's --classic-font-display) has no
               glyph for the full-width form, so it was silently falling
               back to the system serif font for just that one character. */}
-          <span className="name-logo-name">{groomDisplay || data.groomLabel}</span>
+          <span className="name-logo-name">{groomDisplay || groomLabelDisplay}</span>
           <span className="name-logo-amp">&</span>
-          <span className="name-logo-name">{brideDisplay || data.brideLabel}</span>
+          <span className="name-logo-name">{brideDisplay || brideLabelDisplay}</span>
         </p>
       </section>
 
@@ -507,12 +532,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           <p className="eyebrow reveal">our families</p>
           <div className="family-grid">
             <div className="side reveal">
-              <p className="role">{data.groomLabel}</p>
-              <p className="name">{groomDisplay || data.groomLabel}</p>
+              <p className="role">{groomLabelDisplay}</p>
+              <p className="name">{groomDisplay || groomLabelDisplay}</p>
               <p className="parents">
                 {(locale === "en"
-                  ? [data.groomParentsRelation, data.groomParents]
-                  : [data.groomParents, data.groomParentsRelation]
+                  ? [groomParentsRelationDisplay, groomParentsDisplay]
+                  : [groomParentsDisplay, groomParentsRelationDisplay]
                 )
                   .filter(Boolean)
                   .join(locale === "en" ? " " : "　")}
@@ -520,12 +545,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
             </div>
             <div className="amp reveal">&amp;</div>
             <div className="side reveal">
-              <p className="role">{data.brideLabel}</p>
-              <p className="name">{brideDisplay || data.brideLabel}</p>
+              <p className="role">{brideLabelDisplay}</p>
+              <p className="name">{brideDisplay || brideLabelDisplay}</p>
               <p className="parents">
                 {(locale === "en"
-                  ? [data.brideParentsRelation, data.brideParents]
-                  : [data.brideParents, data.brideParentsRelation]
+                  ? [brideParentsRelationDisplay, brideParentsDisplay]
+                  : [brideParentsDisplay, brideParentsRelationDisplay]
                 )
                   .filter(Boolean)
                   .join(locale === "en" ? " " : "　")}
@@ -577,7 +602,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         <img className="bg-illus" src="/templates/classic/illus-venue-building.png" alt="" aria-hidden="true" />
         <p className="eyebrow reveal">venue</p>
         <h2 className="reveal">{venueNameDisplay || venueCopy.fallback[locale]}</h2>
-        {data.venueHall && <p className="hall reveal">{data.venueHall}</p>}
+        {venueHallDisplay && <p className="hall reveal">{venueHallDisplay}</p>}
         {data.venueAddress && <p className="addr reveal">{data.venueAddress}</p>}
         {data.venueAddress && (
           <a
@@ -607,9 +632,9 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
             <p className="eyebrow" ref={scheduleEyebrowRef}>
               schedule
             </p>
-            {data.schedule.length > 0 ? (
+            {scheduleDisplay.length > 0 ? (
               <ul className="timeline">
-                {data.schedule.map((item, i) => (
+                {scheduleDisplay.map((item, i) => (
                   <li
                     key={i}
                     ref={(el) => {
@@ -649,10 +674,10 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         />
       </section>
 
-      {data.showDressCode && data.dressCode && (
+      {data.showDressCode && dressCodeDisplay && (
         <section className="dress-code">
           <p className="eyebrow reveal">dress code</p>
-          <p className="dress-code-text reveal">{data.dressCode}</p>
+          <p className="dress-code-text reveal">{dressCodeDisplay}</p>
         </section>
       )}
 
@@ -666,7 +691,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         )}
         <img className="bg-illus footer-rings-accent" src="/templates/classic/illus-rings.png" alt="" aria-hidden="true" />
         <p className="thanks" ref={footerThanksRef}>
-          {data.thanksMessage || THANKS_MESSAGE_FALLBACK[locale]}
+          {thanksMessageDisplay || THANKS_MESSAGE_FALLBACK[locale]}
         </p>
         <p className="names" ref={footerNamesRef}>
           {/* Regular "&" rather than "＆" - same EB Garamond glyph-fallback

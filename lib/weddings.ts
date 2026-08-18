@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
-import type { ClassicTemplateData, ScheduleItem } from "@/components/templates/classic/types";
+import type { ClassicTemplateData, ContentEn, ScheduleItem } from "@/components/templates/classic/types";
 import type { Tables } from "@/lib/supabase/database.types";
 
 // The [weddingId] layout and each of its edit/guests/rsvps pages all
@@ -68,9 +68,7 @@ export const getPublicWeddingData = cache(async (slug: string): Promise<PublicWe
     sealDesign: wedding.seal,
     momentsStyle: wedding.moments_style,
     groomName: wedding.groom_name,
-    groomNameEn: wedding.groom_name_en,
     brideName: wedding.bride_name,
-    brideNameEn: wedding.bride_name_en,
     groomLabel: wedding.groom_label,
     brideLabel: wedding.bride_label,
     groomParents: wedding.groom_parents,
@@ -80,7 +78,6 @@ export const getPublicWeddingData = cache(async (slug: string): Promise<PublicWe
     eventDate: wedding.event_date,
     timezone: wedding.timezone,
     venueName: wedding.venue_name,
-    venueNameEn: wedding.venue_name_en,
     venueHall: wedding.venue_hall,
     venueAddress: wedding.venue_address,
     venueLat: wedding.venue_lat,
@@ -96,6 +93,8 @@ export const getPublicWeddingData = cache(async (slug: string): Promise<PublicWe
     showSchedule: wedding.show_schedule,
     showDressCode: wedding.show_dress_code,
     showRsvp: wedding.show_rsvp,
+    bilingualEnabled: wedding.bilingual_enabled,
+    contentEn: (wedding.content_en as ContentEn | null) ?? {},
   };
   return { status: "ok", data, isDemo: wedding.is_demo };
 });

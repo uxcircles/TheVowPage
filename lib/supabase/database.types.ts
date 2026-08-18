@@ -158,11 +158,13 @@ export type Database = {
       }
       weddings: {
         Row: {
+          bilingual_enabled: boolean
           bride_label: string
           bride_name: string
           bride_name_en: string
           bride_parents: string
           bride_parents_relation: string
+          content_en: Json
           created_at: string
           dress_code: string
           event_date: string | null
@@ -200,11 +202,13 @@ export type Database = {
           venue_name_en: string
         }
         Insert: {
+          bilingual_enabled?: boolean
           bride_label?: string
           bride_name?: string
           bride_name_en?: string
           bride_parents?: string
           bride_parents_relation?: string
+          content_en?: Json
           created_at?: string
           dress_code?: string
           event_date?: string | null
@@ -242,11 +246,13 @@ export type Database = {
           venue_name_en?: string
         }
         Update: {
+          bilingual_enabled?: boolean
           bride_label?: string
           bride_name?: string
           bride_name_en?: string
           bride_parents?: string
           bride_parents_relation?: string
+          content_en?: Json
           created_at?: string
           dress_code?: string
           event_date?: string | null

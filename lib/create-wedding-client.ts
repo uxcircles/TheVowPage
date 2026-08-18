@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { wallTimeToUtcIso } from "@/lib/timezone";
 import { validatePhotoFile } from "@/lib/photoLimits";
-import type { ScheduleItem } from "@/components/templates/classic/types";
+import type { ContentEn, ScheduleItem } from "@/components/templates/classic/types";
 import type { Locale } from "@/lib/i18n/shared";
 
 const DEFAULT_TIMEZONE = "Asia/Taipei";
@@ -11,9 +11,7 @@ export type DraftContent = {
   sealDesign: string;
   momentsStyle: string;
   groomName: string;
-  groomNameEn: string;
   brideName: string;
-  brideNameEn: string;
   groomLabel: string;
   brideLabel: string;
   groomParents: string;
@@ -22,7 +20,6 @@ export type DraftContent = {
   brideParentsRelation: string;
   eventDate: string; // datetime-local value, wall clock in the venue's timezone
   venueName: string;
-  venueNameEn: string;
   venueHall: string;
   venueAddress: string;
   manualCoords: boolean;
@@ -35,6 +32,8 @@ export type DraftContent = {
   showSchedule: boolean;
   showDressCode: boolean;
   showRsvp: boolean;
+  bilingualEnabled: boolean;
+  contentEn: ContentEn;
 };
 
 export type GeocodeApiResult = { lat: number; lng: number; timezone: string; address: string | null };
@@ -109,9 +108,7 @@ export async function saveDraftAsWedding(
       owner_id: userId,
       slug: `wedding-${randomSlugSuffix()}`,
       groom_name: draft.groomName,
-      groom_name_en: draft.groomNameEn,
       bride_name: draft.brideName,
-      bride_name_en: draft.brideNameEn,
       groom_label: draft.groomLabel.trim() || (locale === "en" ? "Groom" : "新郎"),
       bride_label: draft.brideLabel.trim() || (locale === "en" ? "Bride" : "新娘"),
       groom_parents: draft.groomParents,
@@ -124,7 +121,6 @@ export async function saveDraftAsWedding(
       seal: draft.sealDesign,
       moments_style: draft.momentsStyle,
       venue_name: draft.venueName,
-      venue_name_en: draft.venueNameEn,
       venue_hall: draft.venueHall,
       venue_address: draft.venueAddress,
       venue_lat: venueLat,
@@ -136,6 +132,8 @@ export async function saveDraftAsWedding(
       show_schedule: draft.showSchedule,
       show_dress_code: draft.showDressCode,
       show_rsvp: draft.showRsvp,
+      bilingual_enabled: draft.bilingualEnabled,
+      content_en: draft.contentEn,
     })
     .select("id")
     .single();

@@ -25,12 +25,17 @@ export const editForm = {
   // (rather than a function) so this stays a simple lookup like every
   // other entry; the leading space in the English suffix is intentional.
   nameSuffix: { zh: "姓名", en: " Name" },
-  // Optional secondary field so a couple can give guests an English
-  // rendering of a name that was typed in Chinese (or vice versa) -
-  // shown only when the site locale doesn't match what's in the primary
-  // field, see localizedName() in components/templates/classic/types.ts.
-  nameEnLabel: { zh: "英文姓名（選填）", en: "English name (optional)" },
-  venueNameEnLabel: { zh: "英文場地名稱（選填）", en: "English venue name (optional)" },
+  // Master switch for the whole editor's bilingual (ZH-HANT/EN) content
+  // fields - see BilingualField and localizedText() in
+  // components/templates/classic/types.ts. Phrased as "add [the other
+  // language]" relative to whichever locale the editor is currently being
+  // viewed in, not hardcoded to "add English" - offering to add English
+  // reads backwards to someone already looking at the English admin UI.
+  bilingualToggle: { zh: "雙語喜帖（新增英文版本）", en: "Bilingual invitation (add Chinese version)" },
+  bilingualToggleTooltip: {
+    zh: "賓客瀏覽器若設定為英文，會自動看到英文版喜帖；設定為中文則看到中文版 - 不需要另外分享不同連結。",
+    en: "Guests automatically see the English version if their browser is set to English, and the Chinese version if it's set to Chinese - no need to share separate links.",
+  },
   // Straight apostrophe (not the curly ’) deliberately - the site's CJK
   // body font (Noto Sans TC) renders U+2019 at CJK-punctuation width
   // (~14px, vs ~4px for a plain U+0027), which reads as a stray gap

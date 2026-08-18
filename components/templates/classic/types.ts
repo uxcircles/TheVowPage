@@ -7,13 +7,38 @@ export type ScheduleItem = {
 
 type Bilingual = { zh: string; en: string };
 
-// Couple/venue names are real proper nouns, not translatable UI copy - the
-// primary field is whatever language the couple typed (usually Chinese),
-// and the "En" field is an optional English rendering for English-locale
-// guests. Falls back to the primary name if no English version was given,
-// so a wedding that never filled it in still renders correctly.
-export function localizedName(primary: string, en: string, locale: Locale) {
-  return locale === "en" && en ? en : primary;
+// The couple's own written content (names, parents, venue, dress code,
+// schedule, thank-you message) isn't translatable UI copy - it's whatever
+// language they typed it in (usually Chinese). ContentEn is an optional
+// English rendering of that same content, gated behind the wedding's own
+// "bilingual" toggle (see bilingualEnabled below) rather than always-on,
+// so turning bilingual off hides English content without discarding it -
+// same "stays mounted, just hidden" pattern as showFamily/showSchedule
+// elsewhere. Address is deliberately NOT included: it's not a proper-noun
+// label like a name, and guests need the original-language address for
+// maps/taxis regardless of site locale.
+export type ContentEn = {
+  groomName?: string;
+  brideName?: string;
+  groomLabel?: string;
+  brideLabel?: string;
+  groomParents?: string;
+  groomParentsRelation?: string;
+  brideParents?: string;
+  brideParentsRelation?: string;
+  venueName?: string;
+  venueHall?: string;
+  dressCode?: string;
+  thanksMessage?: string;
+  schedule?: { event?: string }[];
+};
+
+// Falls back to the primary text whenever bilingual is off, the guest is
+// on the zh locale, or no English version was given for this field - so a
+// wedding that never used bilingual at all renders exactly as it always
+// has.
+export function localizedText(primary: string, en: string | undefined, locale: Locale, bilingualEnabled: boolean) {
+  return bilingualEnabled && locale === "en" && en ? en : primary;
 }
 
 // Placeholder hints shown per-row in the schedule editor - indexed (not
@@ -54,9 +79,7 @@ export type ClassicTemplateData = {
   sealDesign: string;
   momentsStyle: string;
   groomName: string;
-  groomNameEn: string;
   brideName: string;
-  brideNameEn: string;
   groomLabel: string;
   brideLabel: string;
   groomParents: string;
@@ -66,7 +89,6 @@ export type ClassicTemplateData = {
   eventDate: string | null; // ISO timestamp
   timezone: string; // IANA zone the eventDate should be displayed in
   venueName: string;
-  venueNameEn: string;
   venueHall: string;
   venueAddress: string;
   venueLat: number | null;
@@ -82,4 +104,6 @@ export type ClassicTemplateData = {
   showSchedule: boolean;
   showDressCode: boolean;
   showRsvp: boolean;
+  bilingualEnabled: boolean;
+  contentEn: ContentEn;
 };

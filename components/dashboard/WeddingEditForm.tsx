@@ -5,6 +5,7 @@ import { updateWeddingContent } from "@/lib/actions/weddings";
 import { fetchGeocode } from "@/lib/create-wedding-client";
 import { toDatetimeLocalValue, wallTimeToUtcIso, formatTimezoneLabel } from "@/lib/timezone";
 import { Toggle } from "@/components/ui/Toggle";
+import { BilingualField } from "@/components/ui/BilingualField";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
@@ -21,6 +22,7 @@ import {
   THANKS_MESSAGE_FALLBACK,
   emptySchedule,
   type ClassicTemplateData,
+  type ContentEn,
   type ScheduleItem,
 } from "@/components/templates/classic/types";
 
@@ -114,12 +116,19 @@ export function WeddingEditForm({
   const [manualCoords, setManualCoords] = useState(false);
   const [groomLabel, setGroomLabel] = useState(wedding.groom_label);
   const [brideLabel, setBrideLabel] = useState(wedding.bride_label);
-  const groomParentsRelationDefault =
-    wedding.groom_parents_relation ||
-    defaultParentsRelation(wedding.groom_label, defaultGroomLabelText, editForm.sonOfDefault[locale]);
-  const brideParentsRelationDefault =
-    wedding.bride_parents_relation ||
-    defaultParentsRelation(wedding.bride_label, defaultBrideLabelText, editForm.daughterOfDefault[locale]);
+  const [bilingual, setBilingual] = useState(wedding.bilingual_enabled);
+  const contentEn = (wedding.content_en as ContentEn | null) ?? {};
+  // Each pill row's default relation word is now fixed to that row's own
+  // language (ZH-HANT always "之子"/"之女", EN always "Son of"/"Daughter
+  // of") rather than following whichever locale the admin dashboard itself
+  // happens to be viewed in - the two rows are different languages by
+  // definition, independent of the editor's own UI language.
+  const groomParentsRelationDefaultZh =
+    wedding.groom_parents_relation || defaultParentsRelation(wedding.groom_label, "新郎", editForm.sonOfDefault.zh);
+  const brideParentsRelationDefaultZh =
+    wedding.bride_parents_relation || defaultParentsRelation(wedding.bride_label, "新娘", editForm.daughterOfDefault.zh);
+  const groomParentsRelationDefaultEn = contentEn.groomParentsRelation || editForm.sonOfDefault.en;
+  const brideParentsRelationDefaultEn = contentEn.brideParentsRelation || editForm.daughterOfDefault.en;
   const [showFamily, setShowFamily] = useState(wedding.show_family);
   const [showSchedule, setShowSchedule] = useState(wedding.show_schedule);
   const [showDressCode, setShowDressCode] = useState(wedding.show_dress_code);
@@ -180,15 +189,14 @@ export function WeddingEditForm({
     const timezone = previewTimezone ?? wedding.timezone;
     const times = fd.getAll("scheduleTime") as string[];
     const events = fd.getAll("scheduleEvent") as string[];
+    const enEvents = fd.getAll("en_scheduleEvent") as string[];
     return {
       weddingId: wedding.id,
       theme: String(fd.get("theme") ?? wedding.theme),
       sealDesign: String(fd.get("seal") ?? wedding.seal),
       momentsStyle: String(fd.get("momentsStyle") ?? wedding.moments_style),
       groomName: String(fd.get("groomName") ?? ""),
-      groomNameEn: String(fd.get("groomNameEn") ?? ""),
       brideName: String(fd.get("brideName") ?? ""),
-      brideNameEn: String(fd.get("brideNameEn") ?? ""),
       groomLabel: groomLabel || defaultGroomLabelText,
       brideLabel: brideLabel || defaultBrideLabelText,
       groomParents: String(fd.get("groomParents") ?? ""),
@@ -198,7 +206,6 @@ export function WeddingEditForm({
       eventDate: wallTimeToUtcIso(String(fd.get("eventDate") ?? ""), timezone),
       timezone,
       venueName: String(fd.get("venueName") ?? ""),
-      venueNameEn: String(fd.get("venueNameEn") ?? ""),
       venueHall: String(fd.get("venueHall") ?? ""),
       venueAddress: String(fd.get("venueAddress") ?? ""),
       venueLat: locationPreview?.lat ?? wedding.venue_lat,
@@ -216,11 +223,28 @@ export function WeddingEditForm({
       showSchedule,
       showDressCode,
       showRsvp,
+      bilingualEnabled: bilingual,
+      contentEn: {
+        groomName: String(fd.get("en_groomName") ?? ""),
+        brideName: String(fd.get("en_brideName") ?? ""),
+        groomLabel: String(fd.get("en_groomLabel") ?? ""),
+        brideLabel: String(fd.get("en_brideLabel") ?? ""),
+        groomParents: String(fd.get("en_groomParents") ?? ""),
+        groomParentsRelation: String(fd.get("en_groomParentsRelation") ?? ""),
+        brideParents: String(fd.get("en_brideParents") ?? ""),
+        brideParentsRelation: String(fd.get("en_brideParentsRelation") ?? ""),
+        venueName: String(fd.get("en_venueName") ?? ""),
+        venueHall: String(fd.get("en_venueHall") ?? ""),
+        dressCode: String(fd.get("en_dressCode") ?? ""),
+        thanksMessage: String(fd.get("en_thanksMessage") ?? ""),
+        schedule: enEvents.map((event) => ({ event })),
+      },
     };
   }, [
     wedding,
     previewTimezone,
     locationPreview,
+    bilingual,
     heroPhotoUrl,
     familyPhotoUrl,
     footerPhotoUrl,
@@ -237,45 +261,58 @@ export function WeddingEditForm({
   return (
     <form ref={formRef} id={FORM_ID} action={formAction} className="flex flex-col gap-6">
 
+      <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--brand-line)] bg-white p-4 shadow-sm">
+        <input type="hidden" name="bilingualEnabled" value={bilingual ? "on" : "off"} />
+        <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+          {editForm.bilingualToggle[locale]}
+          <InfoTooltip text={editForm.bilingualToggleTooltip[locale]} />
+        </span>
+        <Toggle checked={bilingual} onChange={setBilingual} />
+      </div>
+
       <EditorCard title={editForm.sections.basicInfo[locale]}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Editable role labels (default 新郎/新娘) so the invitation can
               read correctly for same-sex couples too, e.g. "新人一/新人二" -
               they double as the field labels below via live state. */}
-          <label className={labelClass}>
-            {editForm.groomLabelField[locale]}
-            <input
-              name="groomLabel"
-              value={groomLabel}
-              onChange={(e) => setGroomLabel(e.target.value)}
-              className={inputClass}
-            />
-          </label>
-          <label className={labelClass}>
-            {editForm.brideLabelField[locale]}
-            <input
-              name="brideLabel"
-              value={brideLabel}
-              onChange={(e) => setBrideLabel(e.target.value)}
-              className={inputClass}
-            />
-          </label>
-          <label className={labelClass}>
-            {`${groomLabel || defaultGroomLabelText}${editForm.nameSuffix[locale]}`}
-            <input name="groomName" defaultValue={wedding.groom_name} className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            {`${brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
-            <input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            {editForm.nameEnLabel[locale]}
-            <input name="groomNameEn" defaultValue={wedding.groom_name_en} className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            {editForm.nameEnLabel[locale]}
-            <input name="brideNameEn" defaultValue={wedding.bride_name_en} className={inputClass} />
-          </label>
+          <BilingualField
+            label={editForm.groomLabelField[locale]}
+            bilingual={bilingual}
+            zhInput={
+              <input
+                name="groomLabel"
+                value={groomLabel}
+                onChange={(e) => setGroomLabel(e.target.value)}
+                className={inputClass}
+              />
+            }
+            enInput={<input name="en_groomLabel" defaultValue={contentEn.groomLabel ?? ""} className={inputClass} />}
+          />
+          <BilingualField
+            label={editForm.brideLabelField[locale]}
+            bilingual={bilingual}
+            zhInput={
+              <input
+                name="brideLabel"
+                value={brideLabel}
+                onChange={(e) => setBrideLabel(e.target.value)}
+                className={inputClass}
+              />
+            }
+            enInput={<input name="en_brideLabel" defaultValue={contentEn.brideLabel ?? ""} className={inputClass} />}
+          />
+          <BilingualField
+            label={`${groomLabel || defaultGroomLabelText}${editForm.nameSuffix[locale]}`}
+            bilingual={bilingual}
+            zhInput={<input name="groomName" defaultValue={wedding.groom_name} className={inputClass} />}
+            enInput={<input name="en_groomName" defaultValue={contentEn.groomName ?? ""} className={inputClass} />}
+          />
+          <BilingualField
+            label={`${brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
+            bilingual={bilingual}
+            zhInput={<input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />}
+            enInput={<input name="en_brideName" defaultValue={contentEn.brideName ?? ""} className={inputClass} />}
+          />
         </div>
       </EditorCard>
 
@@ -288,82 +325,100 @@ export function WeddingEditForm({
             so saving while hidden doesn't wipe out already-entered content -
             hidden form fields still submit their value normally. */}
         <div className={showFamily ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "hidden"}>
-          <label className={labelClass}>
-            {`${groomLabel || defaultGroomLabelText}${editForm.parentsSuffix[locale]}`}
-            <div className="flex gap-2">
-              {locale === "en" && (
+          <BilingualField
+            label={`${groomLabel || defaultGroomLabelText}${editForm.parentsSuffix[locale]}`}
+            bilingual={bilingual}
+            zhInput={
+              <div className="flex gap-2">
+                <input
+                  name="groomParents"
+                  defaultValue={wedding.groom_parents}
+                  placeholder={editForm.groomParentsPlaceholder.zh}
+                  className={`${inputClass} min-w-0 flex-1`}
+                />
                 <input
                   name="groomParentsRelation"
-                  defaultValue={groomParentsRelationDefault}
-                  placeholder={editForm.sonOfDefault[locale]}
+                  defaultValue={groomParentsRelationDefaultZh}
+                  placeholder={editForm.sonOfDefault.zh}
+                  aria-label={`${groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                  className={`${inputClass} w-20 shrink-0`}
+                />
+              </div>
+            }
+            enInput={
+              <div className="flex gap-2">
+                <input
+                  name="en_groomParentsRelation"
+                  defaultValue={groomParentsRelationDefaultEn}
+                  placeholder={editForm.sonOfDefault.en}
                   aria-label={`${groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
                   className={`${inputClass} w-28 shrink-0`}
                 />
-              )}
-              <input
-                name="groomParents"
-                defaultValue={wedding.groom_parents}
-                placeholder={editForm.groomParentsPlaceholder[locale]}
-                className={`${inputClass} min-w-0 flex-1`}
-              />
-              {locale === "zh" && (
                 <input
-                  name="groomParentsRelation"
-                  defaultValue={groomParentsRelationDefault}
-                  placeholder={editForm.sonOfDefault[locale]}
-                  aria-label={`${groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
-                  className={`${inputClass} w-20 shrink-0`}
+                  name="en_groomParents"
+                  defaultValue={contentEn.groomParents ?? ""}
+                  placeholder={editForm.groomParentsPlaceholder.en}
+                  className={`${inputClass} min-w-0 flex-1`}
                 />
-              )}
-            </div>
-          </label>
-          <label className={labelClass}>
-            {`${brideLabel || defaultBrideLabelText}${editForm.parentsSuffix[locale]}`}
-            <div className="flex gap-2">
-              {locale === "en" && (
+              </div>
+            }
+          />
+          <BilingualField
+            label={`${brideLabel || defaultBrideLabelText}${editForm.parentsSuffix[locale]}`}
+            bilingual={bilingual}
+            zhInput={
+              <div className="flex gap-2">
+                <input
+                  name="brideParents"
+                  defaultValue={wedding.bride_parents}
+                  placeholder={editForm.brideParentsPlaceholder.zh}
+                  className={`${inputClass} min-w-0 flex-1`}
+                />
                 <input
                   name="brideParentsRelation"
-                  defaultValue={brideParentsRelationDefault}
-                  placeholder={editForm.daughterOfDefault[locale]}
+                  defaultValue={brideParentsRelationDefaultZh}
+                  placeholder={editForm.daughterOfDefault.zh}
+                  aria-label={`${brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                  className={`${inputClass} w-20 shrink-0`}
+                />
+              </div>
+            }
+            enInput={
+              <div className="flex gap-2">
+                <input
+                  name="en_brideParentsRelation"
+                  defaultValue={brideParentsRelationDefaultEn}
+                  placeholder={editForm.daughterOfDefault.en}
                   aria-label={`${brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
                   className={`${inputClass} w-32 shrink-0`}
                 />
-              )}
-              <input
-                name="brideParents"
-                defaultValue={wedding.bride_parents}
-                placeholder={editForm.brideParentsPlaceholder[locale]}
-                className={`${inputClass} min-w-0 flex-1`}
-              />
-              {locale === "zh" && (
                 <input
-                  name="brideParentsRelation"
-                  defaultValue={brideParentsRelationDefault}
-                  placeholder={editForm.daughterOfDefault[locale]}
-                  aria-label={`${brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
-                  className={`${inputClass} w-20 shrink-0`}
+                  name="en_brideParents"
+                  defaultValue={contentEn.brideParents ?? ""}
+                  placeholder={editForm.brideParentsPlaceholder.en}
+                  className={`${inputClass} min-w-0 flex-1`}
                 />
-              )}
-            </div>
-          </label>
+              </div>
+            }
+          />
         </div>
         {!showFamily && <HiddenSectionHint />}
       </EditorCard>
 
       <EditorCard title={editForm.sections.venue[locale]}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className={labelClass}>
-            {editForm.venueName[locale]}
-            <input ref={venueNameRef} name="venueName" defaultValue={wedding.venue_name} className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            {editForm.venueNameEnLabel[locale]}
-            <input name="venueNameEn" defaultValue={wedding.venue_name_en} className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            {editForm.venueHall[locale]}
-            <input name="venueHall" defaultValue={wedding.venue_hall} className={inputClass} />
-          </label>
+          <BilingualField
+            label={editForm.venueName[locale]}
+            bilingual={bilingual}
+            zhInput={<input ref={venueNameRef} name="venueName" defaultValue={wedding.venue_name} className={inputClass} />}
+            enInput={<input name="en_venueName" defaultValue={contentEn.venueName ?? ""} className={inputClass} />}
+          />
+          <BilingualField
+            label={editForm.venueHall[locale]}
+            bilingual={bilingual}
+            zhInput={<input name="venueHall" defaultValue={wedding.venue_hall} className={inputClass} />}
+            enInput={<input name="en_venueHall" defaultValue={contentEn.venueHall ?? ""} className={inputClass} />}
+          />
           <label className={`${labelClass} sm:col-span-2`}>
             {editForm.venueAddress[locale]}
             <input
@@ -472,29 +527,66 @@ export function WeddingEditForm({
             above - the timeline row inputs must keep submitting even while
             hidden, or a save while hidden would erase the schedule. */}
         <div className={showSchedule ? "" : "hidden"}>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {schedule.map((item, i) => (
-              <div key={i} className="flex gap-2">
-                <input
-                  name="scheduleTime"
-                  defaultValue={item.time}
-                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time[locale]}
-                  className={`${inputClass} w-20 shrink-0 sm:w-28`}
-                />
-                <input
-                  name="scheduleEvent"
-                  defaultValue={item.event}
-                  placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event[locale]}
-                  className={`${inputClass} min-w-0 flex-1`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
-                  aria-label={editForm.deleteAria[locale]}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
-                >
-                  <TrashIcon className="h-4 w-4" />
-                </button>
+              <div key={i} className="flex flex-col gap-1.5">
+                <div className="flex items-stretch gap-2">
+                  <div className="flex items-stretch">
+                    <span
+                      className={
+                        bilingual
+                          ? "flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
+                          : "hidden"
+                      }
+                    >
+                      ZH-HANT
+                    </span>
+                    <input
+                      name="scheduleTime"
+                      defaultValue={item.time}
+                      placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time.zh}
+                      className={`${inputClass} w-20 shrink-0 sm:w-28 ${bilingual ? "rounded-l-none" : ""}`}
+                    />
+                  </div>
+                  <input
+                    name="scheduleEvent"
+                    defaultValue={item.event}
+                    placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.zh}
+                    className={`${inputClass} min-w-0 flex-1`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
+                    aria-label={editForm.deleteAria[locale]}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
+                </div>
+                {/* Indented to align under the event column above - the EN
+                    row only ever carries the event translation (time is
+                    universal, no EN row for it), so its leading spacer
+                    reproduces the ZH-HANT pill + time field's combined
+                    width exactly, keeping the EN pill+field lined up under
+                    "event" rather than starting from the far left. */}
+                <div className={bilingual ? "flex items-stretch gap-2" : "hidden"}>
+                  <div className="flex shrink-0" aria-hidden="true">
+                    <span className="w-16 shrink-0" />
+                    <span className="w-20 shrink-0 sm:w-28" />
+                  </div>
+                  <div className="flex min-w-0 flex-1 items-stretch">
+                    <span className="flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
+                      EN
+                    </span>
+                    <input
+                      name="en_scheduleEvent"
+                      defaultValue={contentEn.schedule?.[i]?.event ?? ""}
+                      placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.en}
+                      className={`${inputClass} min-w-0 flex-1 rounded-l-none`}
+                    />
+                  </div>
+                  <span className="w-10 shrink-0" aria-hidden="true" />
+                </div>
               </div>
             ))}
           </div>
@@ -515,12 +607,26 @@ export function WeddingEditForm({
       >
         <input type="hidden" name="showDressCode" value={showDressCode ? "on" : "off"} />
         <div className={showDressCode ? "" : "hidden"}>
-          <textarea
-            name="dressCode"
-            defaultValue={wedding.dress_code}
-            placeholder={editForm.dressCodePlaceholder[locale]}
-            rows={2}
-            className={`${inputClass} w-full`}
+          <BilingualField
+            bilingual={bilingual}
+            zhInput={
+              <textarea
+                name="dressCode"
+                defaultValue={wedding.dress_code}
+                placeholder={editForm.dressCodePlaceholder.zh}
+                rows={2}
+                className={`${inputClass} min-w-0 flex-1`}
+              />
+            }
+            enInput={
+              <textarea
+                name="en_dressCode"
+                defaultValue={contentEn.dressCode ?? ""}
+                placeholder={editForm.dressCodePlaceholder.en}
+                rows={2}
+                className={`${inputClass} min-w-0 flex-1`}
+              />
+            }
           />
         </div>
         {!showDressCode && <HiddenSectionHint />}
@@ -539,11 +645,25 @@ export function WeddingEditForm({
       </EditorCard>
 
       <EditorCard title={editForm.sections.thanks[locale]}>
-        <textarea
-          name="thanksMessage"
-          defaultValue={wedding.thanks_message || THANKS_MESSAGE_FALLBACK[locale]}
-          rows={3}
-          className={`${inputClass} w-full`}
+        <BilingualField
+          bilingual={bilingual}
+          zhInput={
+            <textarea
+              name="thanksMessage"
+              defaultValue={wedding.thanks_message || THANKS_MESSAGE_FALLBACK.zh}
+              rows={3}
+              className={`${inputClass} min-w-0 flex-1`}
+            />
+          }
+          enInput={
+            <textarea
+              name="en_thanksMessage"
+              defaultValue={contentEn.thanksMessage ?? ""}
+              placeholder={THANKS_MESSAGE_FALLBACK.en}
+              rows={3}
+              className={`${inputClass} min-w-0 flex-1`}
+            />
+          }
         />
       </EditorCard>
     </form>

@@ -22,6 +22,7 @@ import { CLASSIC_THEMES } from "@/components/templates/classic/themes";
 import { SEAL_DESIGNS } from "@/components/templates/classic/seals";
 import { MOMENTS_STYLES } from "@/components/templates/classic/momentsStyles";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
+import { BilingualField } from "@/components/ui/BilingualField";
 import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
@@ -37,6 +38,7 @@ import {
   SCHEDULE_PLACEHOLDER_FALLBACK,
   THANKS_MESSAGE_FALLBACK,
   type ClassicTemplateData,
+  type ContentEn,
   type ScheduleItem,
 } from "@/components/templates/classic/types";
 import type { User } from "@supabase/supabase-js";
@@ -49,9 +51,7 @@ const EMPTY_DRAFT: DraftContent = {
   sealDesign: "calla",
   momentsStyle: "stack",
   groomName: "",
-  groomNameEn: "",
   brideName: "",
-  brideNameEn: "",
   // Chinese baseline - a fresh visitor's actual locale isn't known at
   // module load time (this runs on the server too), so these are
   // overridden to English right after mount, in the hydration effect
@@ -64,7 +64,6 @@ const EMPTY_DRAFT: DraftContent = {
   brideParentsRelation: "之女",
   eventDate: "",
   venueName: "",
-  venueNameEn: "",
   venueHall: "",
   venueAddress: "",
   manualCoords: false,
@@ -77,6 +76,8 @@ const EMPTY_DRAFT: DraftContent = {
   showSchedule: true,
   showDressCode: true,
   showRsvp: true,
+  bilingualEnabled: false,
+  contentEn: {},
 };
 
 const inputClass =
@@ -85,18 +86,24 @@ const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
 
 // Fields whose *starting* value is a system default rather than the
 // couple's own content, and whose correct-looking value depends on which
-// language they're viewing the editor in (新郎/新娘 vs Groom/Bride, 之子/
-// 之女 vs Son of/Daughter of, the thanks-message fallback). Listing both
-// locales' text per field lets applyLocaleDefaults recognise "still at a
-// default" from *either* language - not just the one EMPTY_DRAFT happened
-// to start in - so switching site language mid-session (no reload) can
-// still correct a value that was set by an earlier locale, while never
-// touching anything the couple actually typed themselves.
+// language they're viewing the editor in (新郎/新娘 vs Groom/Bride, the
+// thanks-message fallback). Listing both locales' text per field lets
+// applyLocaleDefaults recognise "still at a default" from *either*
+// language - not just the one EMPTY_DRAFT happened to start in - so
+// switching site language mid-session (no reload) can still correct a
+// value that was set by an earlier locale, while never touching anything
+// the couple actually typed themselves.
+//
+// groomParentsRelation/brideParentsRelation are deliberately NOT here -
+// once bilingual content exists, that field's ZH-HANT row is always
+// Chinese ("之子"/"之女") and its EN row (see BilingualField in the
+// family section below) is always English ("Son of"/"Daughter of"),
+// regardless of which locale the editor itself is being viewed in - two
+// different pieces of content, not one field whose language follows the
+// admin's own UI.
 const LOCALE_DEFAULT_FIELDS = [
   { key: "groomLabel", zh: "新郎", en: "Groom" },
   { key: "brideLabel", zh: "新娘", en: "Bride" },
-  { key: "groomParentsRelation", zh: "之子", en: "Son of" },
-  { key: "brideParentsRelation", zh: "之女", en: "Daughter of" },
   { key: "thanksMessage", zh: THANKS_MESSAGE_FALLBACK.zh, en: THANKS_MESSAGE_FALLBACK.en },
 ] as const satisfies readonly { key: keyof DraftContent; zh: string; en: string }[];
 
@@ -379,6 +386,10 @@ export function DraftEditor() {
     setDraft((d) => ({ ...d, [key]: value }));
   }
 
+  function updateEn<K extends keyof ContentEn>(key: K, value: ContentEn[K]) {
+    setDraft((d) => ({ ...d, contentEn: { ...d.contentEn, [key]: value } }));
+  }
+
   function updateSchedule(i: number, patch: Partial<ScheduleItem>) {
     setDraft((d) => ({
       ...d,
@@ -386,6 +397,15 @@ export function DraftEditor() {
         idx === i ? { ...item, ...patch } : item,
       ),
     }));
+  }
+
+  function updateScheduleEn(i: number, event: string) {
+    setDraft((d) => {
+      const schedule = [...(d.contentEn.schedule ?? [])];
+      while (schedule.length <= i) schedule.push({});
+      schedule[i] = { event };
+      return { ...d, contentEn: { ...d.contentEn, schedule } };
+    });
   }
 
   async function locateVenue() {
@@ -446,9 +466,7 @@ export function DraftEditor() {
       sealDesign: draft.sealDesign,
       momentsStyle: draft.momentsStyle,
       groomName: draft.groomName,
-      groomNameEn: draft.groomNameEn,
       brideName: draft.brideName,
-      brideNameEn: draft.brideNameEn,
       groomLabel: draft.groomLabel || defaultGroomLabelText,
       brideLabel: draft.brideLabel || defaultBrideLabelText,
       groomParents: draft.groomParents,
@@ -458,7 +476,6 @@ export function DraftEditor() {
       eventDate: wallTimeToUtcIso(draft.eventDate, timezone),
       timezone,
       venueName: draft.venueName,
-      venueNameEn: draft.venueNameEn,
       venueHall: draft.venueHall,
       venueAddress: draft.venueAddress,
       venueLat:
@@ -478,6 +495,8 @@ export function DraftEditor() {
       showSchedule: draft.showSchedule,
       showDressCode: draft.showDressCode,
       showRsvp: draft.showRsvp,
+      bilingualEnabled: draft.bilingualEnabled,
+      contentEn: draft.contentEn,
     });
 
     return () => {
@@ -678,60 +697,92 @@ export function DraftEditor() {
         <section className="mt-10">
           <h2 className="mb-4 text-lg font-medium">{draftEditorCopy.contentSection[locale]}</h2>
           <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--brand-line)] bg-white p-4 shadow-sm">
+              <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                {editForm.bilingualToggle[locale]}
+                <InfoTooltip text={editForm.bilingualToggleTooltip[locale]} />
+              </span>
+              <Toggle checked={draft.bilingualEnabled} onChange={(v) => update("bilingualEnabled", v)} />
+            </div>
+
             <EditorCard title={editForm.sections.basicInfo[locale]}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {/* Editable role labels (default 新郎/新娘) so the
                     invitation can read correctly for same-sex couples too,
                     e.g. "新人一/新人二" - they double as the field labels
                     below via live state. */}
-                <label className={labelClass}>
-                  {editForm.groomLabelField[locale]}
-                  <input
-                    value={draft.groomLabel}
-                    onChange={(e) => update("groomLabel", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  {editForm.brideLabelField[locale]}
-                  <input
-                    value={draft.brideLabel}
-                    onChange={(e) => update("brideLabel", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  {`${draft.groomLabel || defaultGroomLabelText}${editForm.nameSuffix[locale]}`}
-                  <input
-                    value={draft.groomName}
-                    onChange={(e) => update("groomName", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  {`${draft.brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
-                  <input
-                    value={draft.brideName}
-                    onChange={(e) => update("brideName", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  {editForm.nameEnLabel[locale]}
-                  <input
-                    value={draft.groomNameEn}
-                    onChange={(e) => update("groomNameEn", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  {editForm.nameEnLabel[locale]}
-                  <input
-                    value={draft.brideNameEn}
-                    onChange={(e) => update("brideNameEn", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
+                <BilingualField
+                  label={editForm.groomLabelField[locale]}
+                  bilingual={draft.bilingualEnabled}
+                  zhInput={
+                    <input
+                      value={draft.groomLabel}
+                      onChange={(e) => update("groomLabel", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                  enInput={
+                    <input
+                      value={draft.contentEn.groomLabel ?? ""}
+                      onChange={(e) => updateEn("groomLabel", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                />
+                <BilingualField
+                  label={editForm.brideLabelField[locale]}
+                  bilingual={draft.bilingualEnabled}
+                  zhInput={
+                    <input
+                      value={draft.brideLabel}
+                      onChange={(e) => update("brideLabel", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                  enInput={
+                    <input
+                      value={draft.contentEn.brideLabel ?? ""}
+                      onChange={(e) => updateEn("brideLabel", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                />
+                <BilingualField
+                  label={`${draft.groomLabel || defaultGroomLabelText}${editForm.nameSuffix[locale]}`}
+                  bilingual={draft.bilingualEnabled}
+                  zhInput={
+                    <input
+                      value={draft.groomName}
+                      onChange={(e) => update("groomName", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                  enInput={
+                    <input
+                      value={draft.contentEn.groomName ?? ""}
+                      onChange={(e) => updateEn("groomName", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                />
+                <BilingualField
+                  label={`${draft.brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
+                  bilingual={draft.bilingualEnabled}
+                  zhInput={
+                    <input
+                      value={draft.brideName}
+                      onChange={(e) => update("brideName", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                  enInput={
+                    <input
+                      value={draft.contentEn.brideName ?? ""}
+                      onChange={(e) => updateEn("brideName", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                />
               </div>
             </EditorCard>
 
@@ -747,64 +798,82 @@ export function DraftEditor() {
             >
               {draft.showFamily ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className={labelClass}>
-                    {`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsSuffix[locale]}`}
-                    <div className="flex gap-2">
-                      {locale === "en" && (
+                  <BilingualField
+                    label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsSuffix[locale]}`}
+                    bilingual={draft.bilingualEnabled}
+                    zhInput={
+                      <div className="flex gap-2">
+                        <input
+                          value={draft.groomParents}
+                          onChange={(e) => update("groomParents", e.target.value)}
+                          placeholder={editForm.groomParentsPlaceholder.zh}
+                          className={`${inputClass} min-w-0 flex-1`}
+                        />
                         <input
                           value={draft.groomParentsRelation}
                           onChange={(e) => update("groomParentsRelation", e.target.value)}
-                          placeholder={editForm.sonOfDefault[locale]}
+                          placeholder={editForm.sonOfDefault.zh}
+                          aria-label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                          className={`${inputClass} w-20 shrink-0`}
+                        />
+                      </div>
+                    }
+                    enInput={
+                      <div className="flex gap-2">
+                        <input
+                          value={draft.contentEn.groomParentsRelation ?? ""}
+                          onChange={(e) => updateEn("groomParentsRelation", e.target.value)}
+                          placeholder={editForm.sonOfDefault.en}
                           aria-label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
                           className={`${inputClass} w-28 shrink-0`}
                         />
-                      )}
-                      <input
-                        value={draft.groomParents}
-                        onChange={(e) => update("groomParents", e.target.value)}
-                        placeholder={editForm.groomParentsPlaceholder[locale]}
-                        className={`${inputClass} min-w-0 flex-1`}
-                      />
-                      {locale === "zh" && (
                         <input
-                          value={draft.groomParentsRelation}
-                          onChange={(e) => update("groomParentsRelation", e.target.value)}
-                          placeholder={editForm.sonOfDefault[locale]}
-                          aria-label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
-                          className={`${inputClass} w-20 shrink-0`}
+                          value={draft.contentEn.groomParents ?? ""}
+                          onChange={(e) => updateEn("groomParents", e.target.value)}
+                          placeholder={editForm.groomParentsPlaceholder.en}
+                          className={`${inputClass} min-w-0 flex-1`}
                         />
-                      )}
-                    </div>
-                  </label>
-                  <label className={labelClass}>
-                    {`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsSuffix[locale]}`}
-                    <div className="flex gap-2">
-                      {locale === "en" && (
+                      </div>
+                    }
+                  />
+                  <BilingualField
+                    label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsSuffix[locale]}`}
+                    bilingual={draft.bilingualEnabled}
+                    zhInput={
+                      <div className="flex gap-2">
+                        <input
+                          value={draft.brideParents}
+                          onChange={(e) => update("brideParents", e.target.value)}
+                          placeholder={editForm.brideParentsPlaceholder.zh}
+                          className={`${inputClass} min-w-0 flex-1`}
+                        />
                         <input
                           value={draft.brideParentsRelation}
                           onChange={(e) => update("brideParentsRelation", e.target.value)}
-                          placeholder={editForm.daughterOfDefault[locale]}
+                          placeholder={editForm.daughterOfDefault.zh}
+                          aria-label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                          className={`${inputClass} w-20 shrink-0`}
+                        />
+                      </div>
+                    }
+                    enInput={
+                      <div className="flex gap-2">
+                        <input
+                          value={draft.contentEn.brideParentsRelation ?? ""}
+                          onChange={(e) => updateEn("brideParentsRelation", e.target.value)}
+                          placeholder={editForm.daughterOfDefault.en}
                           aria-label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
                           className={`${inputClass} w-32 shrink-0`}
                         />
-                      )}
-                      <input
-                        value={draft.brideParents}
-                        onChange={(e) => update("brideParents", e.target.value)}
-                        placeholder={editForm.brideParentsPlaceholder[locale]}
-                        className={`${inputClass} min-w-0 flex-1`}
-                      />
-                      {locale === "zh" && (
                         <input
-                          value={draft.brideParentsRelation}
-                          onChange={(e) => update("brideParentsRelation", e.target.value)}
-                          placeholder={editForm.daughterOfDefault[locale]}
-                          aria-label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
-                          className={`${inputClass} w-20 shrink-0`}
+                          value={draft.contentEn.brideParents ?? ""}
+                          onChange={(e) => updateEn("brideParents", e.target.value)}
+                          placeholder={editForm.brideParentsPlaceholder.en}
+                          className={`${inputClass} min-w-0 flex-1`}
                         />
-                      )}
-                    </div>
-                  </label>
+                      </div>
+                    }
+                  />
                 </div>
               ) : (
                 <HiddenSectionHint />
@@ -813,30 +882,42 @@ export function DraftEditor() {
 
             <EditorCard title={editForm.sections.venue[locale]}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className={labelClass}>
-                  {editForm.venueName[locale]}
-                  <input
-                    value={draft.venueName}
-                    onChange={(e) => update("venueName", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  {editForm.venueNameEnLabel[locale]}
-                  <input
-                    value={draft.venueNameEn}
-                    onChange={(e) => update("venueNameEn", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  {editForm.venueHall[locale]}
-                  <input
-                    value={draft.venueHall}
-                    onChange={(e) => update("venueHall", e.target.value)}
-                    className={inputClass}
-                  />
-                </label>
+                <BilingualField
+                  label={editForm.venueName[locale]}
+                  bilingual={draft.bilingualEnabled}
+                  zhInput={
+                    <input
+                      value={draft.venueName}
+                      onChange={(e) => update("venueName", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                  enInput={
+                    <input
+                      value={draft.contentEn.venueName ?? ""}
+                      onChange={(e) => updateEn("venueName", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                />
+                <BilingualField
+                  label={editForm.venueHall[locale]}
+                  bilingual={draft.bilingualEnabled}
+                  zhInput={
+                    <input
+                      value={draft.venueHall}
+                      onChange={(e) => update("venueHall", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                  enInput={
+                    <input
+                      value={draft.contentEn.venueHall ?? ""}
+                      onChange={(e) => updateEn("venueHall", e.target.value)}
+                      className={inputClass}
+                    />
+                  }
+                />
                 <label className={`${labelClass} sm:col-span-2`}>
                   {editForm.venueAddress[locale]}
                   <input
@@ -952,40 +1033,80 @@ export function DraftEditor() {
             >
               {draft.showSchedule ? (
                 <>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {draft.schedule.map((item, i) => (
-                      <div key={i} className="flex gap-2">
-                        <input
-                          value={item.time}
-                          onChange={(e) =>
-                            updateSchedule(i, { time: e.target.value })
-                          }
-                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time[locale]}
-                          className={`${inputClass} w-20 shrink-0 sm:w-28`}
-                        />
-                        <input
-                          value={item.event}
-                          onChange={(e) =>
-                            updateSchedule(i, { event: e.target.value })
-                          }
-                          placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event[locale]}
-                          className={`${inputClass} min-w-0 flex-1`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setDraft((d) => ({
-                              ...d,
-                              schedule: d.schedule.filter(
-                                (_, idx) => idx !== i,
-                              ),
-                            }))
-                          }
-                          aria-label={editForm.deleteAria[locale]}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
+                      <div key={i} className="flex flex-col gap-1.5">
+                        <div className="flex items-stretch gap-2">
+                          <div className="flex items-stretch">
+                            <span
+                              className={
+                                draft.bilingualEnabled
+                                  ? "flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
+                                  : "hidden"
+                              }
+                            >
+                              ZH-HANT
+                            </span>
+                            <input
+                              value={item.time}
+                              onChange={(e) =>
+                                updateSchedule(i, { time: e.target.value })
+                              }
+                              placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time.zh}
+                              className={`${inputClass} w-20 shrink-0 sm:w-28 ${draft.bilingualEnabled ? "rounded-l-none" : ""}`}
+                            />
+                          </div>
+                          <input
+                            value={item.event}
+                            onChange={(e) =>
+                              updateSchedule(i, { event: e.target.value })
+                            }
+                            placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.zh}
+                            className={`${inputClass} min-w-0 flex-1`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setDraft((d) => ({
+                                ...d,
+                                schedule: d.schedule.filter(
+                                  (_, idx) => idx !== i,
+                                ),
+                                contentEn: {
+                                  ...d.contentEn,
+                                  schedule: (d.contentEn.schedule ?? []).filter((_, idx) => idx !== i),
+                                },
+                              }))
+                            }
+                            aria-label={editForm.deleteAria[locale]}
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                        {/* Indented to align under the event column above -
+                            the EN row only ever carries the event
+                            translation (time is universal), so its leading
+                            spacer reproduces the ZH-HANT pill + time
+                            field's combined width exactly. */}
+                        <div className={draft.bilingualEnabled ? "flex items-stretch gap-2" : "hidden"}>
+                          <div className="flex shrink-0" aria-hidden="true">
+                            <span className="w-16 shrink-0" />
+                            <span className="w-20 shrink-0 sm:w-28" />
+                          </div>
+                          <div className="flex min-w-0 flex-1 items-stretch">
+                            <span className="flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
+                              EN
+                            </span>
+                            <input
+                              value={draft.contentEn.schedule?.[i]?.event ?? ""}
+                              onChange={(e) => updateScheduleEn(i, e.target.value)}
+                              placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.en}
+                              className={`${inputClass} min-w-0 flex-1 rounded-l-none`}
+                            />
+                          </div>
+                          <span className="w-10 shrink-0" aria-hidden="true" />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -995,6 +1116,7 @@ export function DraftEditor() {
                       setDraft((d) => ({
                         ...d,
                         schedule: [...d.schedule, { time: "", event: "" }],
+                        contentEn: { ...d.contentEn, schedule: [...(d.contentEn.schedule ?? []), {}] },
                       }))
                     }
                     className="mt-2 rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]"
@@ -1018,12 +1140,26 @@ export function DraftEditor() {
               }
             >
               {draft.showDressCode ? (
-                <textarea
-                  value={draft.dressCode}
-                  onChange={(e) => update("dressCode", e.target.value)}
-                  placeholder={editForm.dressCodePlaceholder[locale]}
-                  rows={2}
-                  className={`${inputClass} w-full`}
+                <BilingualField
+                  bilingual={draft.bilingualEnabled}
+                  zhInput={
+                    <textarea
+                      value={draft.dressCode}
+                      onChange={(e) => update("dressCode", e.target.value)}
+                      placeholder={editForm.dressCodePlaceholder.zh}
+                      rows={2}
+                      className={`${inputClass} min-w-0 flex-1`}
+                    />
+                  }
+                  enInput={
+                    <textarea
+                      value={draft.contentEn.dressCode ?? ""}
+                      onChange={(e) => updateEn("dressCode", e.target.value)}
+                      placeholder={editForm.dressCodePlaceholder.en}
+                      rows={2}
+                      className={`${inputClass} min-w-0 flex-1`}
+                    />
+                  }
                 />
               ) : (
                 <HiddenSectionHint />
@@ -1050,11 +1186,25 @@ export function DraftEditor() {
             </EditorCard>
 
             <EditorCard title={editForm.sections.thanks[locale]}>
-              <textarea
-                value={draft.thanksMessage}
-                onChange={(e) => update("thanksMessage", e.target.value)}
-                rows={3}
-                className={`${inputClass} w-full`}
+              <BilingualField
+                bilingual={draft.bilingualEnabled}
+                zhInput={
+                  <textarea
+                    value={draft.thanksMessage}
+                    onChange={(e) => update("thanksMessage", e.target.value)}
+                    rows={3}
+                    className={`${inputClass} min-w-0 flex-1`}
+                  />
+                }
+                enInput={
+                  <textarea
+                    value={draft.contentEn.thanksMessage ?? ""}
+                    onChange={(e) => updateEn("thanksMessage", e.target.value)}
+                    placeholder={THANKS_MESSAGE_FALLBACK.en}
+                    rows={3}
+                    className={`${inputClass} min-w-0 flex-1`}
+                  />
+                }
               />
             </EditorCard>
           </div>
