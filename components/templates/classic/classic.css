@@ -1141,6 +1141,7 @@
   border: 1px solid var(--line);
   border-radius: 2px;
   padding: 10px 12px;
+  width: 100%;
 }
 .classic .rsvp-diet-note input[type="text"]:focus {
   outline: none;
