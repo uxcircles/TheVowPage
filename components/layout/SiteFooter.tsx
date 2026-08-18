@@ -26,10 +26,9 @@ export function SiteFooter({ locale: localeProp }: { locale?: Locale } = {}) {
         </Link>
       </div>
       <LanguageSwitcher locale={locale} />
-      <p>
-        © {new Date().getFullYear()} {footerCopy.copyright[locale]}
+      <p className="max-w-sm text-[11px] leading-relaxed text-[var(--brand-ink-soft)]/80">
+        {footerCopy.copyrightLine[locale](new Date().getFullYear())}
       </p>
-      <p className="max-w-sm text-[11px] text-[var(--brand-ink-soft)]/80">{footerCopy.companyAttribution[locale]}</p>
     </footer>
   );
 }
