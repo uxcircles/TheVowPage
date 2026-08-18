@@ -6,6 +6,7 @@ import { signOut } from "@/lib/actions/auth";
 import { LOCALE_LABELS, useLocaleSwitch } from "@/components/i18n/LanguageSwitcher";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { accountMenuCopy, signOutCopy } from "@/lib/i18n/dictionaries/dashboard";
+import { CheckIcon, ChevronDownIcon, GlobeIcon, LockIcon, SignOutIcon } from "@/components/ui/AccountMenuIcons";
 
 export function AccountMenu({
   email,
@@ -85,15 +86,13 @@ export function AccountMenu({
               aria-expanded={langOpen}
               className="flex w-full items-center justify-between px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-[var(--brand-gold)]"
             >
-              <span className="flex items-center gap-2">
-                <span aria-hidden="true">🌐</span>
-                {accountMenuCopy.language[locale]}
+              <span className="flex items-center gap-2 leading-none">
+                <GlobeIcon className="h-4 w-4 shrink-0" />
+                <span>{accountMenuCopy.language[locale]}</span>
               </span>
-              <span className="flex items-center gap-1 text-xs">
-                {LOCALE_LABELS[locale]}
-                <span aria-hidden="true" className={`transition-transform ${langOpen ? "rotate-180" : ""}`}>
-                  ⌄
-                </span>
+              <span className="flex items-center gap-1 text-xs leading-none">
+                <span>{LOCALE_LABELS[locale]}</span>
+                <ChevronDownIcon className={`h-3.5 w-3.5 shrink-0 transition-transform ${langOpen ? "rotate-180" : ""}`} />
               </span>
             </button>
             {langOpen && (
@@ -106,14 +105,10 @@ export function AccountMenu({
                       setLangOpen(false);
                       if (code !== locale) setLocale(code);
                     }}
-                    className="flex w-full items-center justify-between px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
+                    className="flex w-full items-center justify-between px-3 py-1.5 text-sm leading-none text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
                   >
-                    {LOCALE_LABELS[code]}
-                    {locale === code && (
-                      <span aria-hidden="true" className="text-[var(--brand-gold)]">
-                        ✓
-                      </span>
-                    )}
+                    <span>{LOCALE_LABELS[code]}</span>
+                    {locale === code && <CheckIcon className="h-4 w-4 shrink-0 text-[var(--brand-gold)]" />}
                   </button>
                 ))}
               </div>
@@ -122,10 +117,10 @@ export function AccountMenu({
             <Link
               href="/account/password"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-[var(--brand-gold)]"
+              className="flex items-center gap-2 px-4 py-2 text-sm leading-none text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-[var(--brand-gold)]"
             >
-              <span aria-hidden="true">🔒</span>
-              {hasPassword ? accountMenuCopy.changePassword[locale] : accountMenuCopy.setPassword[locale]}
+              <LockIcon className="h-4 w-4 shrink-0" />
+              <span>{hasPassword ? accountMenuCopy.changePassword[locale] : accountMenuCopy.setPassword[locale]}</span>
             </Link>
           </div>
 
@@ -134,10 +129,10 @@ export function AccountMenu({
           <form action={signOut}>
             <button
               type="submit"
-              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-[var(--brand-ink-soft)] hover:bg-red-50 hover:text-red-500"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm leading-none text-[var(--brand-ink-soft)] hover:bg-red-50 hover:text-red-500"
             >
-              <span aria-hidden="true">🚪</span>
-              {signOutCopy.signOut[locale]}
+              <SignOutIcon className="h-4 w-4 shrink-0" />
+              <span>{signOutCopy.signOut[locale]}</span>
             </button>
           </form>
         </div>
