@@ -49,7 +49,9 @@ const EMPTY_DRAFT: DraftContent = {
   sealDesign: "calla",
   momentsStyle: "stack",
   groomName: "",
+  groomNameEn: "",
   brideName: "",
+  brideNameEn: "",
   // Chinese baseline - a fresh visitor's actual locale isn't known at
   // module load time (this runs on the server too), so these are
   // overridden to English right after mount, in the hydration effect
@@ -62,6 +64,7 @@ const EMPTY_DRAFT: DraftContent = {
   brideParentsRelation: "之女",
   eventDate: "",
   venueName: "",
+  venueNameEn: "",
   venueHall: "",
   venueAddress: "",
   manualCoords: false,
@@ -443,7 +446,9 @@ export function DraftEditor() {
       sealDesign: draft.sealDesign,
       momentsStyle: draft.momentsStyle,
       groomName: draft.groomName,
+      groomNameEn: draft.groomNameEn,
       brideName: draft.brideName,
+      brideNameEn: draft.brideNameEn,
       groomLabel: draft.groomLabel || defaultGroomLabelText,
       brideLabel: draft.brideLabel || defaultBrideLabelText,
       groomParents: draft.groomParents,
@@ -453,6 +458,7 @@ export function DraftEditor() {
       eventDate: wallTimeToUtcIso(draft.eventDate, timezone),
       timezone,
       venueName: draft.venueName,
+      venueNameEn: draft.venueNameEn,
       venueHall: draft.venueHall,
       venueAddress: draft.venueAddress,
       venueLat:
@@ -710,6 +716,22 @@ export function DraftEditor() {
                     className={inputClass}
                   />
                 </label>
+                <label className={labelClass}>
+                  {editForm.nameEnLabel[locale]}
+                  <input
+                    value={draft.groomNameEn}
+                    onChange={(e) => update("groomNameEn", e.target.value)}
+                    className={inputClass}
+                  />
+                </label>
+                <label className={labelClass}>
+                  {editForm.nameEnLabel[locale]}
+                  <input
+                    value={draft.brideNameEn}
+                    onChange={(e) => update("brideNameEn", e.target.value)}
+                    className={inputClass}
+                  />
+                </label>
               </div>
             </EditorCard>
 
@@ -796,6 +818,14 @@ export function DraftEditor() {
                   <input
                     value={draft.venueName}
                     onChange={(e) => update("venueName", e.target.value)}
+                    className={inputClass}
+                  />
+                </label>
+                <label className={labelClass}>
+                  {editForm.venueNameEnLabel[locale]}
+                  <input
+                    value={draft.venueNameEn}
+                    onChange={(e) => update("venueNameEn", e.target.value)}
                     className={inputClass}
                   />
                 </label>

@@ -3,7 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { EB_Garamond, Noto_Serif_TC } from "next/font/google";
 import "./classic.css";
-import { THANKS_MESSAGE_FALLBACK, type ClassicTemplateData } from "./types";
+import { THANKS_MESSAGE_FALLBACK, localizedName, type ClassicTemplateData } from "./types";
 import { getClassicTheme, getEnvelopeImages } from "./themes";
 import { getSealDesign, getSealImage } from "./seals";
 import { getMomentsStyle } from "./momentsStyles";
@@ -67,6 +67,9 @@ function hexToUnitRgb(hex: string): [number, number, number] {
 
 export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const locale = useLocale();
+  const groomDisplay = localizedName(data.groomName, data.groomNameEn, locale);
+  const brideDisplay = localizedName(data.brideName, data.brideNameEn, locale);
+  const venueNameDisplay = localizedName(data.venueName, data.venueNameEn, locale);
   const rootRef = useRef<HTMLDivElement>(null);
   const heroFrameRef = useRef<HTMLDivElement>(null);
   const momentsSectionRef = useRef<HTMLElement>(null);
@@ -366,21 +369,21 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
   const eventTime = eventDate?.getTime() ?? null;
   const googleCalendarUrl = useMemo(() => {
     if (!eventDate) return null;
-    const title = `${data.groomName} ＆ ${data.brideName} ${calendarEventCopy.titleSuffix[locale]}`;
-    const location = [data.venueName, data.venueHall, data.venueAddress]
+    const title = `${groomDisplay} ＆ ${brideDisplay} ${calendarEventCopy.titleSuffix[locale]}`;
+    const location = [venueNameDisplay, data.venueHall, data.venueAddress]
       .filter(Boolean)
       .join(calendarEventCopy.locationSeparator[locale]);
     const details = scheduleDetails(data.schedule);
     const start = eventDate;
     const end = new Date(eventDate.getTime() + 4 * 60 * 60 * 1000);
     return buildGoogleCalendarUrl({ title, location, details, start, end });
-  }, [eventTime, data.groomName, data.brideName, data.venueName, data.venueHall, data.venueAddress, data.schedule, locale]);
+  }, [eventTime, groomDisplay, brideDisplay, venueNameDisplay, data.venueHall, data.venueAddress, data.schedule, locale]);
 
   const icsLinkRef = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     if (!eventDate || !icsLinkRef.current) return;
-    const title = `${data.groomName} ＆ ${data.brideName} ${calendarEventCopy.titleSuffix[locale]}`;
-    const location = [data.venueName, data.venueHall, data.venueAddress]
+    const title = `${groomDisplay} ＆ ${brideDisplay} ${calendarEventCopy.titleSuffix[locale]}`;
+    const location = [venueNameDisplay, data.venueHall, data.venueAddress]
       .filter(Boolean)
       .join(calendarEventCopy.locationSeparator[locale]);
     const details = scheduleDetails(data.schedule);
@@ -395,12 +398,12 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       uid: `${data.weddingId}@classic-wedding`,
     });
     icsLinkRef.current.href = ics;
-    icsLinkRef.current.download = `${data.groomName}${data.brideName}${calendarEventCopy.icsFilenameSuffix[locale]}.ics`;
+    icsLinkRef.current.download = `${groomDisplay}${brideDisplay}${calendarEventCopy.icsFilenameSuffix[locale]}.ics`;
     return () => URL.revokeObjectURL(ics);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventTime, data.groomName, data.brideName, data.venueName, data.venueHall, data.venueAddress, data.schedule, data.weddingId, locale]);
+  }, [eventTime, groomDisplay, brideDisplay, venueNameDisplay, data.venueHall, data.venueAddress, data.schedule, data.weddingId, locale]);
 
-  const venueLabel = [data.venueName, data.venueHall].filter(Boolean).join(" ・ ");
+  const venueLabel = [venueNameDisplay, data.venueHall].filter(Boolean).join(" ・ ");
   const envelopeImages = getEnvelopeImages(theme.id);
   // The decorative bg-illus PNGs (floral sprigs, the rings divider, etc.)
   // are pre-rendered in a single flat gold tone with no per-theme variants
@@ -473,7 +476,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         />
         <div className="frame reveal" id="hero-frame" ref={heroFrameRef}>
           {data.heroPhotoUrl ? (
-            <img className="photo-slot" src={data.heroPhotoUrl} alt={heroCopy.photoAlt[locale](data.groomName, data.brideName)} />
+            <img className="photo-slot" src={data.heroPhotoUrl} alt={heroCopy.photoAlt[locale](groomDisplay, brideDisplay)} />
           ) : (
             <div className="photo-slot" />
           )}
@@ -491,9 +494,9 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
               Garamond (this element's --classic-font-display) has no
               glyph for the full-width form, so it was silently falling
               back to the system serif font for just that one character. */}
-          <span className="name-logo-name">{data.groomName || data.groomLabel}</span>
+          <span className="name-logo-name">{groomDisplay || data.groomLabel}</span>
           <span className="name-logo-amp">&</span>
-          <span className="name-logo-name">{data.brideName || data.brideLabel}</span>
+          <span className="name-logo-name">{brideDisplay || data.brideLabel}</span>
         </p>
       </section>
 
@@ -505,7 +508,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
           <div className="family-grid">
             <div className="side reveal">
               <p className="role">{data.groomLabel}</p>
-              <p className="name">{data.groomName || data.groomLabel}</p>
+              <p className="name">{groomDisplay || data.groomLabel}</p>
               <p className="parents">
                 {(locale === "en"
                   ? [data.groomParentsRelation, data.groomParents]
@@ -518,7 +521,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
             <div className="amp reveal">&amp;</div>
             <div className="side reveal">
               <p className="role">{data.brideLabel}</p>
-              <p className="name">{data.brideName || data.brideLabel}</p>
+              <p className="name">{brideDisplay || data.brideLabel}</p>
               <p className="parents">
                 {(locale === "en"
                   ? [data.brideParentsRelation, data.brideParents]
@@ -573,7 +576,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
       <section className="venue">
         <img className="bg-illus" src="/templates/classic/illus-venue-building.png" alt="" aria-hidden="true" />
         <p className="eyebrow reveal">venue</p>
-        <h2 className="reveal">{data.venueName || venueCopy.fallback[locale]}</h2>
+        <h2 className="reveal">{venueNameDisplay || venueCopy.fallback[locale]}</h2>
         {data.venueHall && <p className="hall reveal">{data.venueHall}</p>}
         {data.venueAddress && <p className="addr reveal">{data.venueAddress}</p>}
         {data.venueAddress && (
@@ -588,7 +591,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         )}
         {data.venueLat !== null && data.venueLng !== null && (
           <div className="map-wrap reveal">
-            <VenueMap lat={data.venueLat} lng={data.venueLng} label={data.venueName} />
+            <VenueMap lat={data.venueLat} lng={data.venueLng} label={venueNameDisplay} />
           </div>
         )}
       </section>
@@ -668,7 +671,7 @@ export function ClassicTemplate({ data }: { data: ClassicTemplateData }) {
         <p className="names" ref={footerNamesRef}>
           {/* Regular "&" rather than "＆" - same EB Garamond glyph-fallback
               issue as the hero name-logo above. */}
-          {data.groomName}　&　{data.brideName}
+          {groomDisplay}　&　{brideDisplay}
         </p>
         <p className="credit" ref={footerCreditRef}>
           Made with{" "}

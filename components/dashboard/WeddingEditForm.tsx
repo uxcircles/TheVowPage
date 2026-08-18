@@ -186,7 +186,9 @@ export function WeddingEditForm({
       sealDesign: String(fd.get("seal") ?? wedding.seal),
       momentsStyle: String(fd.get("momentsStyle") ?? wedding.moments_style),
       groomName: String(fd.get("groomName") ?? ""),
+      groomNameEn: String(fd.get("groomNameEn") ?? ""),
       brideName: String(fd.get("brideName") ?? ""),
+      brideNameEn: String(fd.get("brideNameEn") ?? ""),
       groomLabel: groomLabel || defaultGroomLabelText,
       brideLabel: brideLabel || defaultBrideLabelText,
       groomParents: String(fd.get("groomParents") ?? ""),
@@ -196,6 +198,7 @@ export function WeddingEditForm({
       eventDate: wallTimeToUtcIso(String(fd.get("eventDate") ?? ""), timezone),
       timezone,
       venueName: String(fd.get("venueName") ?? ""),
+      venueNameEn: String(fd.get("venueNameEn") ?? ""),
       venueHall: String(fd.get("venueHall") ?? ""),
       venueAddress: String(fd.get("venueAddress") ?? ""),
       venueLat: locationPreview?.lat ?? wedding.venue_lat,
@@ -264,6 +267,14 @@ export function WeddingEditForm({
           <label className={labelClass}>
             {`${brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
             <input name="brideName" defaultValue={wedding.bride_name} className={inputClass} />
+          </label>
+          <label className={labelClass}>
+            {editForm.nameEnLabel[locale]}
+            <input name="groomNameEn" defaultValue={wedding.groom_name_en} className={inputClass} />
+          </label>
+          <label className={labelClass}>
+            {editForm.nameEnLabel[locale]}
+            <input name="brideNameEn" defaultValue={wedding.bride_name_en} className={inputClass} />
           </label>
         </div>
       </EditorCard>
@@ -344,6 +355,10 @@ export function WeddingEditForm({
           <label className={labelClass}>
             {editForm.venueName[locale]}
             <input ref={venueNameRef} name="venueName" defaultValue={wedding.venue_name} className={inputClass} />
+          </label>
+          <label className={labelClass}>
+            {editForm.venueNameEnLabel[locale]}
+            <input name="venueNameEn" defaultValue={wedding.venue_name_en} className={inputClass} />
           </label>
           <label className={labelClass}>
             {editForm.venueHall[locale]}

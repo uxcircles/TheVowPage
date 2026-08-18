@@ -104,7 +104,9 @@ export async function updateWeddingContent(
     .update({
       slug,
       groom_name: String(formData.get("groomName") ?? "").trim(),
+      groom_name_en: String(formData.get("groomNameEn") ?? "").trim(),
       bride_name: String(formData.get("brideName") ?? "").trim(),
+      bride_name_en: String(formData.get("brideNameEn") ?? "").trim(),
       groom_label: String(formData.get("groomLabel") ?? "").trim() || defaultGroomLabel(locale),
       bride_label: String(formData.get("brideLabel") ?? "").trim() || defaultBrideLabel(locale),
       groom_parents: String(formData.get("groomParents") ?? "").trim(),
@@ -117,6 +119,7 @@ export async function updateWeddingContent(
       event_date: wallTimeToUtcIso(eventDateRaw, timezone),
       timezone,
       venue_name: venueName,
+      venue_name_en: String(formData.get("venueNameEn") ?? "").trim(),
       venue_hall: String(formData.get("venueHall") ?? "").trim(),
       venue_address: venueAddress,
       venue_lat: venueLat,

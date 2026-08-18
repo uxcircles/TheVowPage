@@ -160,6 +160,7 @@ export type Database = {
         Row: {
           bride_label: string
           bride_name: string
+          bride_name_en: string
           bride_parents: string
           bride_parents_relation: string
           created_at: string
@@ -168,6 +169,7 @@ export type Database = {
           expires_at: string | null
           groom_label: string
           groom_name: string
+          groom_name_en: string
           groom_parents: string
           groom_parents_relation: string
           id: string
@@ -195,10 +197,12 @@ export type Database = {
           venue_lat: number | null
           venue_lng: number | null
           venue_name: string
+          venue_name_en: string
         }
         Insert: {
           bride_label?: string
           bride_name?: string
+          bride_name_en?: string
           bride_parents?: string
           bride_parents_relation?: string
           created_at?: string
@@ -207,6 +211,7 @@ export type Database = {
           expires_at?: string | null
           groom_label?: string
           groom_name?: string
+          groom_name_en?: string
           groom_parents?: string
           groom_parents_relation?: string
           id?: string
@@ -234,10 +239,12 @@ export type Database = {
           venue_lat?: number | null
           venue_lng?: number | null
           venue_name?: string
+          venue_name_en?: string
         }
         Update: {
           bride_label?: string
           bride_name?: string
+          bride_name_en?: string
           bride_parents?: string
           bride_parents_relation?: string
           created_at?: string
@@ -246,6 +253,7 @@ export type Database = {
           expires_at?: string | null
           groom_label?: string
           groom_name?: string
+          groom_name_en?: string
           groom_parents?: string
           groom_parents_relation?: string
           id?: string
@@ -273,6 +281,7 @@ export type Database = {
           venue_lat?: number | null
           venue_lng?: number | null
           venue_name?: string
+          venue_name_en?: string
         }
         Relationships: []
       }

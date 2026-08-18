@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EB_Garamond } from "next/font/google";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
+import { localizedName } from "@/components/templates/classic/types";
 import { getPublicWeddingData } from "@/lib/weddings";
 import { headingFont } from "@/lib/fonts";
 import { getLocale } from "@/lib/i18n/locale";
@@ -152,8 +153,23 @@ export async function generateMetadata({
     });
   }
 
-  const { groomName, groomLabel, brideName, brideLabel, eventDate, timezone, venueName, heroPhotoUrl } = result.data;
-  const names = `${groomName || groomLabel} ＆ ${brideName || brideLabel}`;
+  const {
+    groomName,
+    groomNameEn,
+    groomLabel,
+    brideName,
+    brideNameEn,
+    brideLabel,
+    eventDate,
+    timezone,
+    venueName,
+    venueNameEn,
+    heroPhotoUrl,
+  } = result.data;
+  const groomDisplay = localizedName(groomName, groomNameEn, locale);
+  const brideDisplay = localizedName(brideName, brideNameEn, locale);
+  const venueNameDisplay = localizedName(venueName, venueNameEn, locale);
+  const names = `${groomDisplay || groomLabel} ＆ ${brideDisplay || brideLabel}`;
   const dateLabel = eventDate
     ? new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "zh-Hant", {
         timeZone: timezone || undefined,
@@ -163,8 +179,8 @@ export async function generateMetadata({
       }).format(new Date(eventDate))
     : "";
   const description =
-    dateLabel || venueName
-      ? weddingOgCopy.withDetails[locale](names, dateLabel, venueName || "")
+    dateLabel || venueNameDisplay
+      ? weddingOgCopy.withDetails[locale](names, dateLabel, venueNameDisplay || "")
       : weddingOgCopy.fallback[locale];
 
   return buildMetadata({

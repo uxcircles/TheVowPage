@@ -1,9 +1,20 @@
+import type { Locale } from "@/lib/i18n/shared";
+
 export type ScheduleItem = {
   time: string;
   event: string;
 };
 
 type Bilingual = { zh: string; en: string };
+
+// Couple/venue names are real proper nouns, not translatable UI copy - the
+// primary field is whatever language the couple typed (usually Chinese),
+// and the "En" field is an optional English rendering for English-locale
+// guests. Falls back to the primary name if no English version was given,
+// so a wedding that never filled it in still renders correctly.
+export function localizedName(primary: string, en: string, locale: Locale) {
+  return locale === "en" && en ? en : primary;
+}
 
 // Placeholder hints shown per-row in the schedule editor - indexed (not
 // cycled) so each of the default rows shows a distinct example instead of
@@ -43,7 +54,9 @@ export type ClassicTemplateData = {
   sealDesign: string;
   momentsStyle: string;
   groomName: string;
+  groomNameEn: string;
   brideName: string;
+  brideNameEn: string;
   groomLabel: string;
   brideLabel: string;
   groomParents: string;
@@ -53,6 +66,7 @@ export type ClassicTemplateData = {
   eventDate: string | null; // ISO timestamp
   timezone: string; // IANA zone the eventDate should be displayed in
   venueName: string;
+  venueNameEn: string;
   venueHall: string;
   venueAddress: string;
   venueLat: number | null;

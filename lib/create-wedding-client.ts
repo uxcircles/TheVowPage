@@ -11,7 +11,9 @@ export type DraftContent = {
   sealDesign: string;
   momentsStyle: string;
   groomName: string;
+  groomNameEn: string;
   brideName: string;
+  brideNameEn: string;
   groomLabel: string;
   brideLabel: string;
   groomParents: string;
@@ -20,6 +22,7 @@ export type DraftContent = {
   brideParentsRelation: string;
   eventDate: string; // datetime-local value, wall clock in the venue's timezone
   venueName: string;
+  venueNameEn: string;
   venueHall: string;
   venueAddress: string;
   manualCoords: boolean;
@@ -106,7 +109,9 @@ export async function saveDraftAsWedding(
       owner_id: userId,
       slug: `wedding-${randomSlugSuffix()}`,
       groom_name: draft.groomName,
+      groom_name_en: draft.groomNameEn,
       bride_name: draft.brideName,
+      bride_name_en: draft.brideNameEn,
       groom_label: draft.groomLabel.trim() || (locale === "en" ? "Groom" : "新郎"),
       bride_label: draft.brideLabel.trim() || (locale === "en" ? "Bride" : "新娘"),
       groom_parents: draft.groomParents,
@@ -119,6 +124,7 @@ export async function saveDraftAsWedding(
       seal: draft.sealDesign,
       moments_style: draft.momentsStyle,
       venue_name: draft.venueName,
+      venue_name_en: draft.venueNameEn,
       venue_hall: draft.venueHall,
       venue_address: draft.venueAddress,
       venue_lat: venueLat,
