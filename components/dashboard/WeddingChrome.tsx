@@ -19,7 +19,7 @@ import { setWeddingStatus } from "@/lib/actions/weddings";
 import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import type { ClassicTemplateData } from "@/components/templates/classic/types";
-import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { AccountMenu } from "@/components/dashboard/AccountMenu";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 import { useToast } from "@/components/ui/Toast";
@@ -147,6 +147,11 @@ export function WeddingChrome({
   expiresAt,
   tabs,
   children,
+  email,
+  displayName,
+  avatarUrl,
+  hasGoogleLinked,
+  hasPassword,
 }: {
   weddingId: string;
   groomName: string;
@@ -158,6 +163,11 @@ export function WeddingChrome({
   expiresAt: string | null;
   tabs: { href: string; label: string }[];
   children: React.ReactNode;
+  email: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  hasGoogleLinked: boolean;
+  hasPassword: boolean;
 }) {
   const locale = useLocale();
   const pathname = usePathname();
@@ -316,7 +326,13 @@ export function WeddingChrome({
               >
                 {chromeCopy.back[locale]}
               </Link>
-              <LanguageSwitcher />
+              <AccountMenu
+                email={email}
+                displayName={displayName}
+                avatarUrl={avatarUrl}
+                hasGoogleLinked={hasGoogleLinked}
+                hasPassword={hasPassword}
+              />
             </div>
             <h1 className="mt-1.5 text-2xl font-medium text-foreground">
               {groomName || groomLabel} ＆ {brideName || brideLabel}
@@ -327,12 +343,9 @@ export function WeddingChrome({
                 label={isPublished ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
               />
               {expiryLabel && (
-                <>
-                  <span className="text-[var(--brand-line)]">·</span>
-                  <span className={isExpired ? "text-[var(--brand-error)]" : "text-[var(--brand-ink-soft)]"}>
-                    {isExpired ? chromeCopy.expired[locale] : `${chromeCopy.validUntilPrefix[locale]}${expiryLabel}`}
-                  </span>
-                </>
+                <span className={isExpired ? "text-[var(--brand-error)]" : "text-[var(--brand-ink-soft)]"}>
+                  {isExpired ? chromeCopy.expired[locale] : `${chromeCopy.validUntilPrefix[locale]}${expiryLabel}`}
+                </span>
               )}
             </div>
             <nav className="mt-5 flex gap-6">

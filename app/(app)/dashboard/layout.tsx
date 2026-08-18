@@ -7,9 +7,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!user) redirect("/login");
 
+  const hasGoogleLinked = user.identities?.some((i) => i.provider === "google") ?? false;
+  const hasPassword = user.identities?.some((i) => i.provider === "email") ?? false;
+
   return (
     <div className="min-h-screen">
-      <DashboardHeader />
+      <DashboardHeader
+        email={user.email ?? ""}
+        displayName={(user.user_metadata?.display_name as string | undefined) ?? null}
+        avatarUrl={(user.user_metadata?.avatar_url as string | undefined) ?? null}
+        hasGoogleLinked={hasGoogleLinked}
+        hasPassword={hasPassword}
+      />
       {/* No vertical padding here - WeddingChrome (used under
           /dashboard/[weddingId]) manages its own top/bottom spacing, so
           adding py-10 here stacked with it to leave a big gap above its

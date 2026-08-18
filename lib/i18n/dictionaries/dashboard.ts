@@ -225,6 +225,20 @@ export const signOutCopy = {
   signOut: { zh: "登出", en: "Sign out" },
 };
 
+export const accountMenuCopy = {
+  menuAria: { zh: "帳號選單", en: "Account menu" },
+  // "Change" vs "Set" - a Google-only account (no email/password identity
+  // yet) has never had a password to *change*.
+  changePassword: { zh: "修改密碼", en: "Change password" },
+  setPassword: { zh: "設定密碼", en: "Set password" },
+  // Purely informational - no "link Google account" action. Supabase
+  // already auto-links an existing email/password account the first time
+  // its owner signs in with Google using that same (verified) email, so
+  // there's nothing for an explicit link button to do that isn't already
+  // covered by "Continue with Google" on the login page.
+  googleLinked: { zh: "已連結 Google 帳號", en: "Google account linked" },
+};
+
 export const loadingCopy = {
   loading: { zh: "載入中", en: "Loading" },
 };

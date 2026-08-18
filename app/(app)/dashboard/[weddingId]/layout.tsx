@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getOwnedWedding } from "@/lib/weddings";
+import { getCurrentUser } from "@/lib/supabase/server";
 import { WeddingChrome } from "@/components/dashboard/WeddingChrome";
 import { getLocale } from "@/lib/i18n/locale";
 import { editTabs } from "@/lib/i18n/dictionaries/dashboard";
@@ -12,7 +13,7 @@ export default async function WeddingLayout({
   params: Promise<{ weddingId: string }>;
 }) {
   const { weddingId } = await params;
-  const wedding = await getOwnedWedding(weddingId);
+  const [wedding, user] = await Promise.all([getOwnedWedding(weddingId), getCurrentUser()]);
 
   if (!wedding) notFound();
 
@@ -22,6 +23,8 @@ export default async function WeddingLayout({
     { href: `/dashboard/${weddingId}/guests`, label: editTabs.guests[locale] },
     { href: `/dashboard/${weddingId}/rsvps`, label: editTabs.rsvps[locale] },
   ];
+  const hasGoogleLinked = user?.identities?.some((i) => i.provider === "google") ?? false;
+  const hasPassword = user?.identities?.some((i) => i.provider === "email") ?? false;
 
   return (
     <WeddingChrome
@@ -34,6 +37,11 @@ export default async function WeddingLayout({
       plan={wedding.plan}
       expiresAt={wedding.expires_at}
       tabs={tabs}
+      email={user?.email ?? ""}
+      displayName={(user?.user_metadata?.display_name as string | undefined) ?? null}
+      avatarUrl={(user?.user_metadata?.avatar_url as string | undefined) ?? null}
+      hasGoogleLinked={hasGoogleLinked}
+      hasPassword={hasPassword}
     >
       {children}
     </WeddingChrome>
