@@ -267,7 +267,13 @@ export function WeddingEditForm({
           {editForm.bilingualToggle[locale]}
           <InfoTooltip text={editForm.bilingualToggleTooltip[locale]} />
         </span>
-        <Toggle checked={bilingual} onChange={setBilingual} />
+        <Toggle
+          checked={bilingual}
+          onChange={(v) => {
+            setBilingual(v);
+            setDirty(true);
+          }}
+        />
       </div>
 
       <EditorCard title={editForm.sections.basicInfo[locale]}>
@@ -531,7 +537,13 @@ export function WeddingEditForm({
             {schedule.map((item, i) => (
               <div key={i} className="flex flex-col gap-1.5">
                 <div className="flex items-stretch gap-2">
-                  <div className="flex items-stretch">
+                  <input
+                    name="scheduleTime"
+                    defaultValue={item.time}
+                    placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time.zh}
+                    className={`${inputClass} w-20 shrink-0 sm:w-28`}
+                  />
+                  <div className="flex min-w-0 flex-1 items-stretch">
                     <span
                       className={
                         bilingual
@@ -542,18 +554,12 @@ export function WeddingEditForm({
                       ZH-HANT
                     </span>
                     <input
-                      name="scheduleTime"
-                      defaultValue={item.time}
-                      placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time.zh}
-                      className={`${inputClass} w-20 shrink-0 sm:w-28 ${bilingual ? "rounded-l-none" : ""}`}
+                      name="scheduleEvent"
+                      defaultValue={item.event}
+                      placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.zh}
+                      className={`${inputClass} min-w-0 flex-1 ${bilingual ? "rounded-l-none" : ""}`}
                     />
                   </div>
-                  <input
-                    name="scheduleEvent"
-                    defaultValue={item.event}
-                    placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.zh}
-                    className={`${inputClass} min-w-0 flex-1`}
-                  />
                   <button
                     type="button"
                     onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
@@ -563,17 +569,14 @@ export function WeddingEditForm({
                     <TrashIcon className="h-4 w-4" />
                   </button>
                 </div>
-                {/* Indented to align under the event column above - the EN
-                    row only ever carries the event translation (time is
-                    universal, no EN row for it), so its leading spacer
-                    reproduces the ZH-HANT pill + time field's combined
-                    width exactly, keeping the EN pill+field lined up under
-                    "event" rather than starting from the far left. */}
+                {/* Indented to align under the event column above - time is
+                    universal (no EN row for it), so the EN row's leading
+                    spacer only needs to match the time field's own width,
+                    not a pill's too, since the pill now marks "event" (the
+                    actual translatable text) on both rows instead of
+                    "time" (which has no language). */}
                 <div className={bilingual ? "flex items-stretch gap-2" : "hidden"}>
-                  <div className="flex shrink-0" aria-hidden="true">
-                    <span className="w-16 shrink-0" />
-                    <span className="w-20 shrink-0 sm:w-28" />
-                  </div>
+                  <span className="w-20 shrink-0 sm:w-28" aria-hidden="true" />
                   <div className="flex min-w-0 flex-1 items-stretch">
                     <span className="flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
                       EN
@@ -650,7 +653,8 @@ export function WeddingEditForm({
           zhInput={
             <textarea
               name="thanksMessage"
-              defaultValue={wedding.thanks_message || THANKS_MESSAGE_FALLBACK.zh}
+              defaultValue={wedding.thanks_message}
+              placeholder={THANKS_MESSAGE_FALLBACK.zh}
               rows={3}
               className={`${inputClass} min-w-0 flex-1`}
             />

@@ -46,11 +46,17 @@ export function BilingualField({
 // The content wrapper is a plain block div, not a flex container, so a
 // bare <input>/<textarea> dropped straight into it (every simple field -
 // name, label, venue, dress code, thanks message) reverts to the
-// browser's own intrinsic form-control width instead of filling the row,
-// unless something forces it wide. [&>input]:w-full/[&>textarea]:w-full
-// does that for a bare direct child; it's scoped to *direct* children only
-// (`>`, not a descendant selector) so it never reaches into a compound
-// row's own inner flex div and fights that row's own w-20/flex-1 sizing.
+// browser's own intrinsic form-control size instead of filling the row,
+// unless something forces it to. [&>input]:w-full/[&>textarea]:w-full
+// covers width; [&>textarea]:h-full covers height specifically for
+// textareas, whose `rows` attribute gives them a shorter intrinsic
+// height than the row (driven by the pill's own height) stretches the
+// wrapper to - without it the pill's border ran a few pixels past the
+// visibly-shorter textarea's own bottom border, looking unattached.
+// (A plain <input> doesn't need the same h-full: its intrinsic height
+// already matches the pill's.) Both are scoped to *direct* children only
+// (`>`, not a descendant selector) so they never reach into a compound
+// row's own inner flex div and fight that row's own w-20/flex-1 sizing.
 function LangRow({
   tag,
   children,
@@ -76,8 +82,8 @@ function LangRow({
       <div
         className={
           tagHidden
-            ? "min-w-0 flex-1 [&>input]:w-full [&>textarea]:w-full"
-            : "min-w-0 flex-1 [&_input:first-child]:rounded-l-none [&_textarea:first-child]:rounded-l-none [&>input]:w-full [&>textarea]:w-full"
+            ? "min-w-0 flex-1 [&>input]:w-full [&>textarea]:w-full [&>textarea]:h-full"
+            : "min-w-0 flex-1 [&_input:first-child]:rounded-l-none [&_textarea:first-child]:rounded-l-none [&>input]:w-full [&>textarea]:w-full [&>textarea]:h-full"
         }
       >
         {children}

@@ -71,7 +71,7 @@ const EMPTY_DRAFT: DraftContent = {
   venueLng: "",
   schedule: emptySchedule(),
   dressCode: "",
-  thanksMessage: THANKS_MESSAGE_FALLBACK.zh,
+  thanksMessage: "",
   showFamily: true,
   showSchedule: true,
   showDressCode: true,
@@ -86,25 +86,26 @@ const labelClass = "flex flex-col gap-1 text-sm text-[var(--brand-ink-soft)]";
 
 // Fields whose *starting* value is a system default rather than the
 // couple's own content, and whose correct-looking value depends on which
-// language they're viewing the editor in (新郎/新娘 vs Groom/Bride, the
-// thanks-message fallback). Listing both locales' text per field lets
-// applyLocaleDefaults recognise "still at a default" from *either*
-// language - not just the one EMPTY_DRAFT happened to start in - so
-// switching site language mid-session (no reload) can still correct a
-// value that was set by an earlier locale, while never touching anything
-// the couple actually typed themselves.
+// language they're viewing the editor in (新郎/新娘 vs Groom/Bride).
+// Listing both locales' text per field lets applyLocaleDefaults recognise
+// "still at a default" from *either* language - not just the one
+// EMPTY_DRAFT happened to start in - so switching site language
+// mid-session (no reload) can still correct a value that was set by an
+// earlier locale, while never touching anything the couple actually typed
+// themselves.
 //
-// groomParentsRelation/brideParentsRelation are deliberately NOT here -
-// once bilingual content exists, that field's ZH-HANT row is always
-// Chinese ("之子"/"之女") and its EN row (see BilingualField in the
-// family section below) is always English ("Son of"/"Daughter of"),
-// regardless of which locale the editor itself is being viewed in - two
-// different pieces of content, not one field whose language follows the
-// admin's own UI.
+// groomParentsRelation/brideParentsRelation/thanksMessage are
+// deliberately NOT here - once bilingual content exists, each of those
+// fields' ZH-HANT row is always Chinese and its EN row (see
+// BilingualField below) is always English, regardless of which locale
+// the editor itself is being viewed in - two different pieces of
+// content, not one field whose language follows the admin's own UI.
+// thanksMessage in particular now starts empty and shows its fallback as
+// a *placeholder* (same pattern as dressCode), not a pre-filled value -
+// so there's nothing left to swap between locales here either.
 const LOCALE_DEFAULT_FIELDS = [
   { key: "groomLabel", zh: "新郎", en: "Groom" },
   { key: "brideLabel", zh: "新娘", en: "Bride" },
-  { key: "thanksMessage", zh: THANKS_MESSAGE_FALLBACK.zh, en: THANKS_MESSAGE_FALLBACK.en },
 ] as const satisfies readonly { key: keyof DraftContent; zh: string; en: string }[];
 
 function applyLocaleDefaults(content: DraftContent, locale: "zh" | "en"): DraftContent {
@@ -1037,7 +1038,15 @@ export function DraftEditor() {
                     {draft.schedule.map((item, i) => (
                       <div key={i} className="flex flex-col gap-1.5">
                         <div className="flex items-stretch gap-2">
-                          <div className="flex items-stretch">
+                          <input
+                            value={item.time}
+                            onChange={(e) =>
+                              updateSchedule(i, { time: e.target.value })
+                            }
+                            placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time.zh}
+                            className={`${inputClass} w-20 shrink-0 sm:w-28`}
+                          />
+                          <div className="flex min-w-0 flex-1 items-stretch">
                             <span
                               className={
                                 draft.bilingualEnabled
@@ -1048,22 +1057,14 @@ export function DraftEditor() {
                               ZH-HANT
                             </span>
                             <input
-                              value={item.time}
+                              value={item.event}
                               onChange={(e) =>
-                                updateSchedule(i, { time: e.target.value })
+                                updateSchedule(i, { event: e.target.value })
                               }
-                              placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time.zh}
-                              className={`${inputClass} w-20 shrink-0 sm:w-28 ${draft.bilingualEnabled ? "rounded-l-none" : ""}`}
+                              placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.zh}
+                              className={`${inputClass} min-w-0 flex-1 ${draft.bilingualEnabled ? "rounded-l-none" : ""}`}
                             />
                           </div>
-                          <input
-                            value={item.event}
-                            onChange={(e) =>
-                              updateSchedule(i, { event: e.target.value })
-                            }
-                            placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.zh}
-                            className={`${inputClass} min-w-0 flex-1`}
-                          />
                           <button
                             type="button"
                             onClick={() =>
@@ -1085,15 +1086,13 @@ export function DraftEditor() {
                           </button>
                         </div>
                         {/* Indented to align under the event column above -
-                            the EN row only ever carries the event
-                            translation (time is universal), so its leading
-                            spacer reproduces the ZH-HANT pill + time
-                            field's combined width exactly. */}
+                            time is universal (no EN row for it), so the EN
+                            row's leading spacer only needs to match the
+                            time field's own width, not a pill's too, since
+                            the pill now marks "event" (the actual
+                            translatable text) on both rows. */}
                         <div className={draft.bilingualEnabled ? "flex items-stretch gap-2" : "hidden"}>
-                          <div className="flex shrink-0" aria-hidden="true">
-                            <span className="w-16 shrink-0" />
-                            <span className="w-20 shrink-0 sm:w-28" />
-                          </div>
+                          <span className="w-20 shrink-0 sm:w-28" aria-hidden="true" />
                           <div className="flex min-w-0 flex-1 items-stretch">
                             <span className="flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
                               EN
@@ -1192,6 +1191,7 @@ export function DraftEditor() {
                   <textarea
                     value={draft.thanksMessage}
                     onChange={(e) => update("thanksMessage", e.target.value)}
+                    placeholder={THANKS_MESSAGE_FALLBACK.zh}
                     rows={3}
                     className={`${inputClass} min-w-0 flex-1`}
                   />
