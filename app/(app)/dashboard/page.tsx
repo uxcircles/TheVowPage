@@ -5,6 +5,7 @@ import { createWedding } from "@/lib/actions/weddings";
 import { WeddingRowMenu } from "@/components/dashboard/WeddingRowMenu";
 import { CreateWeddingButton } from "@/components/dashboard/CreateWeddingButton";
 import { DeletedNotice } from "@/components/dashboard/DeletedNotice";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { getLocale } from "@/lib/i18n/locale";
 import { dashboardPageCopy, chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 
@@ -66,12 +67,11 @@ export default async function DashboardPage() {
                 </span>
                 <span className="break-all text-sm text-[var(--brand-ink-soft)]">/w/{w.slug}</span>
               </span>
-              <span
-                className={`self-start rounded px-2 py-1 text-xs sm:self-auto ${
-                  w.status === "published" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {w.status === "published" ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
+              <span className="self-start sm:self-auto">
+                <StatusBadge
+                  published={w.status === "published"}
+                  label={w.status === "published" ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
+                />
               </span>
             </div>
             {w.status !== "published" && (

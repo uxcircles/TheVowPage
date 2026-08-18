@@ -24,6 +24,7 @@ import { useLocale } from "@/components/i18n/LocaleProvider";
 import { chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
 
 function ShieldIcon() {
   return (
@@ -321,16 +322,10 @@ export function WeddingChrome({
               {groomName || groomLabel} ＆ {brideName || brideLabel}
             </h1>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
-              <span className="flex items-center gap-1.5">
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    isPublished ? "bg-green-500" : "bg-gray-400"
-                  }`}
-                />
-                <span className={isPublished ? "text-green-700" : "text-[var(--brand-ink-soft)]"}>
-                  {isPublished ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
-                </span>
-              </span>
+              <StatusBadge
+                published={isPublished}
+                label={isPublished ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
+              />
               {expiryLabel && (
                 <>
                   <span className="text-[var(--brand-line)]">·</span>
