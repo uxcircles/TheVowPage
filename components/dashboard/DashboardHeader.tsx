@@ -13,13 +13,11 @@ export function DashboardHeader({
   email,
   displayName,
   avatarUrl,
-  hasGoogleLinked,
   hasPassword,
 }: {
   email: string;
   displayName: string | null;
   avatarUrl: string | null;
-  hasGoogleLinked: boolean;
   hasPassword: boolean;
 }) {
   const pathname = usePathname();
@@ -34,7 +32,6 @@ export function DashboardHeader({
         email={email}
         displayName={displayName}
         avatarUrl={avatarUrl}
-        hasGoogleLinked={hasGoogleLinked}
         hasPassword={hasPassword}
       />
     </header>

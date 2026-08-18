@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { signOut } from "@/lib/actions/auth";
-import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { LOCALE_LABELS, useLocaleSwitch } from "@/components/i18n/LanguageSwitcher";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { accountMenuCopy, signOutCopy } from "@/lib/i18n/dictionaries/dashboard";
 
@@ -11,33 +11,35 @@ export function AccountMenu({
   email,
   displayName,
   avatarUrl,
-  hasGoogleLinked,
   hasPassword,
 }: {
   email: string;
   displayName: string | null;
   avatarUrl: string | null;
-  /** Purely informational (see accountMenuCopy.googleLinked) - no "link
-   * Google account" action, since Supabase already auto-links this same
-   * account the first time its owner signs in with Google using this
-   * same verified email. */
-  hasGoogleLinked: boolean;
   /** Whether the account has an email/password identity at all - a
    * Google-only sign-up has never set one, so "change password" doesn't
    * make sense for them yet (see accountMenuCopy.setPassword). */
   hasPassword: boolean;
 }) {
   const locale = useLocale();
+  const setLocale = useLocaleSwitch();
   const [open, setOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     function handlePointerDown(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setLangOpen(false);
+      }
     }
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        setLangOpen(false);
+      }
     }
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
@@ -68,39 +70,73 @@ export function AccountMenu({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-30 mt-2 w-64 rounded border border-[var(--brand-line)] bg-white py-2 text-left shadow-lg">
-          <div className="px-4 py-2">
-            <p className="truncate text-sm font-medium text-foreground">{label}</p>
+        <div className="absolute right-0 top-full z-30 mt-2 w-64 rounded-xl bg-white py-2 text-left shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+          <div className="px-4 py-3">
+            <p className="truncate text-sm font-semibold text-foreground">{label}</p>
             <p className="truncate text-xs text-[var(--brand-ink-soft)]">{email}</p>
           </div>
 
-          <div className="my-1 border-t border-[var(--brand-line)]" />
+          <div className="mx-4 border-t border-[var(--brand-line)]/70" />
 
-          <div className="px-4 py-2">
-            <LanguageSwitcher locale={locale} />
+          <div className="py-1">
+            <button
+              type="button"
+              onClick={() => setLangOpen((o) => !o)}
+              aria-expanded={langOpen}
+              className="flex w-full items-center justify-between px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-[var(--brand-gold)]"
+            >
+              <span className="flex items-center gap-2">
+                <span aria-hidden="true">🌐</span>
+                {accountMenuCopy.language[locale]}
+              </span>
+              <span className="flex items-center gap-1 text-xs">
+                {LOCALE_LABELS[locale]}
+                <span aria-hidden="true" className={`transition-transform ${langOpen ? "rotate-180" : ""}`}>
+                  ⌄
+                </span>
+              </span>
+            </button>
+            {langOpen && (
+              <div className="mx-4 mt-1 overflow-hidden rounded-lg bg-[var(--background)]">
+                {(["zh", "en"] as const).map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => {
+                      setLangOpen(false);
+                      if (code !== locale) setLocale(code);
+                    }}
+                    className="flex w-full items-center justify-between px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
+                  >
+                    {LOCALE_LABELS[code]}
+                    {locale === code && (
+                      <span aria-hidden="true" className="text-[var(--brand-gold)]">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <Link
+              href="/account/password"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-[var(--brand-gold)]"
+            >
+              <span aria-hidden="true">🔒</span>
+              {hasPassword ? accountMenuCopy.changePassword[locale] : accountMenuCopy.setPassword[locale]}
+            </Link>
           </div>
 
-          <div className="my-1 border-t border-[var(--brand-line)]" />
-
-          <Link
-            href="/account/password"
-            onClick={() => setOpen(false)}
-            className="block px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-[var(--brand-gold)]"
-          >
-            {hasPassword ? accountMenuCopy.changePassword[locale] : accountMenuCopy.setPassword[locale]}
-          </Link>
-
-          {hasGoogleLinked && (
-            <p className="px-4 py-2 text-sm text-[var(--brand-ink-soft)]">✓ {accountMenuCopy.googleLinked[locale]}</p>
-          )}
-
-          <div className="my-1 border-t border-[var(--brand-line)]" />
+          <div className="mx-4 border-t border-[var(--brand-line)]/70" />
 
           <form action={signOut}>
             <button
               type="submit"
-              className="block w-full px-4 py-2 text-left text-sm text-[var(--brand-ink-soft)] hover:bg-[var(--background)] hover:text-red-500"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-[var(--brand-ink-soft)] hover:bg-red-50 hover:text-red-500"
             >
+              <span aria-hidden="true">🚪</span>
               {signOutCopy.signOut[locale]}
             </button>
           </form>

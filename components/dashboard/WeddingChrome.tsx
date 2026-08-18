@@ -150,7 +150,6 @@ export function WeddingChrome({
   email,
   displayName,
   avatarUrl,
-  hasGoogleLinked,
   hasPassword,
 }: {
   weddingId: string;
@@ -166,7 +165,6 @@ export function WeddingChrome({
   email: string;
   displayName: string | null;
   avatarUrl: string | null;
-  hasGoogleLinked: boolean;
   hasPassword: boolean;
 }) {
   const locale = useLocale();
@@ -330,7 +328,6 @@ export function WeddingChrome({
                 email={email}
                 displayName={displayName}
                 avatarUrl={avatarUrl}
-                hasGoogleLinked={hasGoogleLinked}
                 hasPassword={hasPassword}
               />
             </div>

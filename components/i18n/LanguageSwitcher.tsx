@@ -5,7 +5,7 @@ import { useLocale } from "@/components/i18n/LocaleProvider";
 import { LOCALE_COOKIE, type Locale } from "@/lib/i18n/shared";
 import { marketingHref, type MarketingPath } from "@/lib/i18n/marketingPaths";
 
-const LABELS: Record<Locale, string> = { zh: "中文", en: "English" };
+export const LOCALE_LABELS: Record<Locale, string> = { zh: "中文", en: "English" };
 
 const MARKETING_PATHS: MarketingPath[] = ["/", "/terms", "/privacy"];
 
@@ -20,20 +20,14 @@ function marketingBasePath(pathname: string): MarketingPath | null {
   return MARKETING_PATHS.includes(stripped as MarketingPath) ? (stripped as MarketingPath) : null;
 }
 
-export function LanguageSwitcher({
-  className = "",
-  locale: localeProp,
-}: {
-  className?: string;
-  locale?: Locale;
-}) {
-  const contextLocale = useLocale();
-  const locale = localeProp ?? contextLocale;
+/** Shared by every locale-switching control (this component, AccountMenu's
+ * own language picker) so the cookie/marketing-path/refresh logic only
+ * lives in one place. Returns a setLocale(next) function bound to the
+ * current pathname. */
+export function useLocaleSwitch() {
   const pathname = usePathname();
   const router = useRouter();
-
-  function setLocale(next: Locale) {
-    if (next === locale) return;
+  return function setLocale(next: Locale) {
     // Always update the cookie, even on the marketing pages below - proxy.ts
     // redirects a bare "/", "/terms" or "/privacy" request back to "/en..."
     // whenever the cookie says "en", so switching en -> zh here without
@@ -46,6 +40,23 @@ export function LanguageSwitcher({
       return;
     }
     router.refresh();
+  };
+}
+
+export function LanguageSwitcher({
+  className = "",
+  locale: localeProp,
+}: {
+  className?: string;
+  locale?: Locale;
+}) {
+  const contextLocale = useLocale();
+  const locale = localeProp ?? contextLocale;
+  const setLocaleRaw = useLocaleSwitch();
+
+  function setLocale(next: Locale) {
+    if (next === locale) return;
+    setLocaleRaw(next);
   }
 
   return (
@@ -63,7 +74,7 @@ export function LanguageSwitcher({
                 : "text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
             }
           >
-            {LABELS[code]}
+            {LOCALE_LABELS[code]}
           </button>
         </span>
       ))}

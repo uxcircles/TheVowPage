@@ -7,7 +7,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!user) redirect("/login");
 
-  const hasGoogleLinked = user.identities?.some((i) => i.provider === "google") ?? false;
   const hasPassword = user.identities?.some((i) => i.provider === "email") ?? false;
 
   return (
@@ -16,7 +15,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
         email={user.email ?? ""}
         displayName={(user.user_metadata?.display_name as string | undefined) ?? null}
         avatarUrl={(user.user_metadata?.avatar_url as string | undefined) ?? null}
-        hasGoogleLinked={hasGoogleLinked}
         hasPassword={hasPassword}
       />
       {/* No vertical padding here - WeddingChrome (used under

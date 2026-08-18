@@ -242,12 +242,7 @@ export const accountMenuCopy = {
   // yet) has never had a password to *change*.
   changePassword: { zh: "修改密碼", en: "Change password" },
   setPassword: { zh: "設定密碼", en: "Set password" },
-  // Purely informational - no "link Google account" action. Supabase
-  // already auto-links an existing email/password account the first time
-  // its owner signs in with Google using that same (verified) email, so
-  // there's nothing for an explicit link button to do that isn't already
-  // covered by "Continue with Google" on the login page.
-  googleLinked: { zh: "已連結 Google 帳號", en: "Google account linked" },
+  language: { zh: "語言", en: "Language" },
 };
 
 export const loadingCopy = {

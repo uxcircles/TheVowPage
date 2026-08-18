@@ -23,7 +23,6 @@ export default async function WeddingLayout({
     { href: `/dashboard/${weddingId}/guests`, label: editTabs.guests[locale] },
     { href: `/dashboard/${weddingId}/rsvps`, label: editTabs.rsvps[locale] },
   ];
-  const hasGoogleLinked = user?.identities?.some((i) => i.provider === "google") ?? false;
   const hasPassword = user?.identities?.some((i) => i.provider === "email") ?? false;
 
   return (
@@ -40,7 +39,6 @@ export default async function WeddingLayout({
       email={user?.email ?? ""}
       displayName={(user?.user_metadata?.display_name as string | undefined) ?? null}
       avatarUrl={(user?.user_metadata?.avatar_url as string | undefined) ?? null}
-      hasGoogleLinked={hasGoogleLinked}
       hasPassword={hasPassword}
     >
       {children}
