@@ -13,6 +13,15 @@ import { momentsCopy } from "@/lib/i18n/dictionaries/dashboard";
 
 type BatchPhase = "compressing" | "uploading" | "processing";
 
+function reorderByIds<T extends { id: string }>(list: T[], orderedIds: string[]): T[] {
+  const byId = new Map(list.map((item) => [item.id, item]));
+  const ordered = orderedIds.map((id) => byId.get(id)).filter((item): item is T => Boolean(item));
+  for (const item of list) {
+    if (!orderedIds.includes(item.id)) ordered.push(item);
+  }
+  return ordered;
+}
+
 export function MomentsGallery({
   weddingId,
   photos,
@@ -51,17 +60,37 @@ export function MomentsGallery({
   // no need to separately guard these from being reordered/removed before
   // they have a real id.
   const [pendingPreviews, setPendingPreviews] = useState<{ id: string; url: string }[]>([]);
-  const displayedPhotos = [...visiblePhotos, ...pendingPreviews];
+  const baseDisplayedPhotos = [...visiblePhotos, ...pendingPreviews];
+
+  // Optimistic reorder: dnd-kit's own drag animation already snaps the
+  // dropped photo into its new slot, but the `items` array driving that
+  // layout was still server order until reorderMomentPhotos's round trip
+  // (and revalidation) caught up - without this, the very next re-render
+  // would snap the photo back to its old position, then jump again once
+  // the server confirmed. Cleared as soon as the `photos` prop itself
+  // changes, trusting the fresh server order at that point (whether the
+  // move succeeded, or - on failure - reverted).
+  const [orderOverride, setOrderOverride] = useState<string[] | null>(null);
+  useEffect(() => {
+    setOrderOverride(null);
+  }, [photos]);
+  const displayedPhotos = orderOverride ? reorderByIds(baseDisplayedPhotos, orderOverride) : baseDisplayedPhotos;
 
   // Once the server-confirmed photos prop catches up (after
   // router.refresh() resolves), the real rows have taken their place -
-  // drop the optimistic previews and release their object URLs.
+  // drop the optimistic previews and release their object URLs. Guarded
+  // on `!uploading`: `photos` can also change mid-upload now that adding
+  // is allowed to run alongside a delete (see the input's disabled prop
+  // below) - a delete's own revalidation would otherwise trip this
+  // effect and wipe out previews for files that are still uploading,
+  // making them blink out of the grid until the upload's *own* refresh
+  // (at the end of handleFilesChange) brings them back.
   useEffect(() => {
-    if (pendingPreviews.length === 0) return;
+    if (uploading || pendingPreviews.length === 0) return;
     pendingPreviews.forEach((p) => URL.revokeObjectURL(p.url));
     setPendingPreviews([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [photos]);
+  }, [photos, uploading]);
 
   // Revoke on unmount too, in case the user navigates away before the
   // refresh above ever lands.
@@ -74,6 +103,22 @@ export function MomentsGallery({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const pending = uploading || otherPending;
+
+  function handleReorder(orderedIds: string[]) {
+    setOrderOverride(orderedIds);
+    startOtherTransition(() => reorderMomentPhotos(weddingId, orderedIds));
+  }
+
+  function handleMove(id: string, direction: "up" | "down") {
+    const currentOrder = orderOverride ?? displayedPhotos.map((p) => p.id);
+    const index = currentOrder.indexOf(id);
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || swapIndex < 0 || swapIndex >= currentOrder.length) return;
+    const next = [...currentOrder];
+    [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
+    setOrderOverride(next);
+    startOtherTransition(() => moveMomentPhoto(weddingId, id, direction));
+  }
 
   function handleRemove(id: string) {
     setRemovedIds((prev) => new Set(prev).add(id));
@@ -165,8 +210,8 @@ export function MomentsGallery({
       <MomentsPhotoGrid
         items={displayedPhotos}
         disabled={pending}
-        onMove={(id, direction) => startOtherTransition(() => moveMomentPhoto(weddingId, id, direction))}
-        onReorder={(orderedIds) => startOtherTransition(() => reorderMomentPhotos(weddingId, orderedIds))}
+        onMove={handleMove}
+        onReorder={handleReorder}
         onRemove={handleRemove}
       />
       {batch && (
@@ -204,7 +249,7 @@ export function MomentsGallery({
           multiple
           className="hidden"
           onChange={handleFilesChange}
-          disabled={pending}
+          disabled={uploading}
         />
       </label>
     </div>
