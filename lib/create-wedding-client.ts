@@ -42,13 +42,17 @@ export type GeocodeApiResult = { lat: number; lng: number; timezone: string; add
  * lookup server-side. Pass either venueName/address (forward geocode) or
  * lat/lng (just resolves the timezone for an already-known point). */
 export async function fetchGeocode(
-  params: { venueName: string; address: string } | { lat: number; lng: number }
+  params: { venueName: string; venueNameEn?: string; address: string } | { lat: number; lng: number }
 ): Promise<GeocodeApiResult | null> {
   try {
     const query =
       "lat" in params
         ? new URLSearchParams({ lat: String(params.lat), lng: String(params.lng) })
-        : new URLSearchParams({ venueName: params.venueName, address: params.address });
+        : new URLSearchParams({
+            venueName: params.venueName,
+            venueNameEn: params.venueNameEn ?? "",
+            address: params.address,
+          });
     const res = await fetch(`/api/geocode?${query.toString()}`);
     if (!res.ok) return null;
     const { result } = (await res.json()) as { result: GeocodeApiResult | null };

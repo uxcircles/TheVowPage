@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { geocodeVenue, timezoneForCoords, type GeocodeResult } from "@/lib/geocode";
+import { getLocale } from "@/lib/i18n/locale";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -19,7 +20,9 @@ export async function GET(request: Request) {
   }
 
   const venueName = searchParams.get("venueName") ?? "";
+  const venueNameEn = searchParams.get("venueNameEn") ?? "";
   const address = searchParams.get("address") ?? "";
-  const result = await geocodeVenue(venueName, address);
+  const locale = await getLocale();
+  const result = await geocodeVenue([venueName, venueNameEn], address, locale);
   return NextResponse.json({ result });
 }

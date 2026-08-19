@@ -58,6 +58,11 @@ export function WeddingEditForm({
   momentPhotoUrls: string[];
 }) {
   const locale = useLocale();
+  // Same "which language renders on top" rule as BilingualField, for the
+  // one place (schedule rows) that hand-rolls its own pill markup instead
+  // of going through that shared component - see BilingualField's own
+  // comment for the full reasoning.
+  const zhFirst = locale !== "en";
   // Standard-label defaults follow site locale so a wedding started from
   // the English UI doesn't end up with Chinese-only labels/content - see
   // the matching defaultGroomLabel/defaultBrideLabel in lib/actions/weddings.ts,
@@ -109,15 +114,35 @@ export function WeddingEditForm({
     return () => setDirty(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const savedSchedule = wedding.schedule as ScheduleItem[] | null;
-  const [schedule, setSchedule] = useState<ScheduleItem[]>(
-    savedSchedule && savedSchedule.length > 0 ? savedSchedule : emptySchedule()
-  );
   const [manualCoords, setManualCoords] = useState(false);
   const [groomLabel, setGroomLabel] = useState(wedding.groom_label);
   const [brideLabel, setBrideLabel] = useState(wedding.bride_label);
   const [bilingual, setBilingual] = useState(wedding.bilingual_enabled);
   const contentEn = (wedding.content_en as ContentEn | null) ?? {};
+  // Zipped with contentEn.schedule by index once, at seed time, into a
+  // single row per item carrying both languages plus a stable client-only
+  // id - not the array *position*. Deleting/adding rows previously kept
+  // `key={i}`, which is a well-known trap for a list of *uncontrolled*
+  // inputs: React matches by position, so removing row 2 doesn't unmount
+  // that DOM node, it reuses it for what's now row 2 (the old row 3) -
+  // but an uncontrolled input's `defaultValue` only applies at actual
+  // mount, so the reused box kept showing the *old* row's leftover text
+  // instead of the new item's. Whatever was on screen (stale) is what got
+  // submitted on save, which is exactly the "reverts to what I typed
+  // before" bug this fixes. Keying by a stable id per row - and keeping
+  // its own EN text bundled with it - means React unmounts the right node
+  // on delete and never cross-wires a row's zh text with a *different*
+  // row's en text after a reorder either.
+  const [schedule, setSchedule] = useState(() => {
+    const savedSchedule = wedding.schedule as ScheduleItem[] | null;
+    const rows = savedSchedule && savedSchedule.length > 0 ? savedSchedule : emptySchedule();
+    return rows.map((item, i) => ({
+      id: crypto.randomUUID(),
+      time: item.time,
+      event: item.event,
+      eventEn: contentEn.schedule?.[i]?.event ?? "",
+    }));
+  });
   // Each pill row's default relation word is now fixed to that row's own
   // language (ZH-HANT always "之子"/"之女", EN always "Son of"/"Daughter
   // of") rather than following whichever locale the admin dashboard itself
@@ -135,6 +160,7 @@ export function WeddingEditForm({
   const [showRsvp, setShowRsvp] = useState(wedding.show_rsvp);
 
   const venueNameRef = useRef<HTMLInputElement>(null);
+  const venueNameEnRef = useRef<HTMLInputElement>(null);
   const venueAddressRef = useRef<HTMLInputElement>(null);
   const venueLatRef = useRef<HTMLInputElement>(null);
   const venueLngRef = useRef<HTMLInputElement>(null);
@@ -155,6 +181,7 @@ export function WeddingEditForm({
         })
       : await fetchGeocode({
           venueName: venueNameRef.current?.value ?? "",
+          venueNameEn: venueNameEnRef.current?.value ?? "",
           address: venueAddressRef.current?.value ?? "",
         });
     setLocating(false);
@@ -417,7 +444,9 @@ export function WeddingEditForm({
             label={editForm.venueName[locale]}
             bilingual={bilingual}
             zhInput={<input ref={venueNameRef} name="venueName" defaultValue={wedding.venue_name} className={inputClass} />}
-            enInput={<input name="en_venueName" defaultValue={contentEn.venueName ?? ""} className={inputClass} />}
+            enInput={
+              <input ref={venueNameEnRef} name="en_venueName" defaultValue={contentEn.venueName ?? ""} className={inputClass} />
+            }
           />
           <BilingualField
             label={editForm.venueHall[locale]}
@@ -534,68 +563,85 @@ export function WeddingEditForm({
             hidden, or a save while hidden would erase the schedule. */}
         <div className={showSchedule ? "" : "hidden"}>
           <div className="flex flex-col gap-3">
-            {schedule.map((item, i) => (
-              <div key={i} className="flex flex-col gap-1.5">
-                <div className="flex items-stretch gap-2">
-                  <input
-                    name="scheduleTime"
-                    defaultValue={item.time}
-                    placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).time.zh}
-                    className={`${inputClass} w-20 shrink-0 sm:w-28`}
-                  />
-                  <div className="flex min-w-0 flex-1 items-stretch">
-                    <span
-                      className={
-                        bilingual
-                          ? "flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
-                          : "hidden"
-                      }
+            {schedule.map((item, i) => {
+              const placeholders = SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK;
+              // Same primary/secondary swap as BilingualField (top row
+              // follows admin locale), applied by hand here since the
+              // time field + delete button share the top row with
+              // whichever event field is primary.
+              const zhEvent = (
+                <input
+                  key="zh"
+                  name="scheduleEvent"
+                  defaultValue={item.event}
+                  placeholder={placeholders.event.zh}
+                  className={`${inputClass} min-w-0 flex-1 rounded-l-none`}
+                />
+              );
+              const enEvent = (
+                <input
+                  key="en"
+                  name="en_scheduleEvent"
+                  defaultValue={item.eventEn}
+                  placeholder={placeholders.event.en}
+                  className={`${inputClass} min-w-0 flex-1 rounded-l-none`}
+                />
+              );
+              const primaryEvent = zhFirst ? zhEvent : enEvent;
+              const primaryTag = zhFirst ? "中" : "EN";
+              const secondaryEvent = zhFirst ? enEvent : zhEvent;
+              const secondaryTag = zhFirst ? "EN" : "中";
+              return (
+                <div key={item.id} className="flex flex-col gap-1.5">
+                  <div className="flex items-stretch gap-2">
+                    <input
+                      name="scheduleTime"
+                      defaultValue={item.time}
+                      placeholder={placeholders.time.zh}
+                      className={`${inputClass} w-20 shrink-0 sm:w-28`}
+                    />
+                    <div className="flex min-w-0 flex-1 items-stretch">
+                      <span
+                        className={
+                          bilingual
+                            ? "flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
+                            : "hidden"
+                        }
+                      >
+                        {primaryTag}
+                      </span>
+                      {primaryEvent}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSchedule((s) => s.filter((row) => row.id !== item.id))}
+                      aria-label={editForm.deleteAria[locale]}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)]"
                     >
-                      中
-                    </span>
-                    <input
-                      name="scheduleEvent"
-                      defaultValue={item.event}
-                      placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.zh}
-                      className={`${inputClass} min-w-0 flex-1 ${bilingual ? "rounded-l-none" : ""}`}
-                    />
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
-                    aria-label={editForm.deleteAria[locale]}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)]"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-                {/* Indented to align under the event column above - time is
-                    universal (no EN row for it), so the EN row's leading
-                    spacer only needs to match the time field's own width,
-                    not a pill's too, since the pill now marks "event" (the
-                    actual translatable text) on both rows instead of
-                    "time" (which has no language). */}
-                <div className={bilingual ? "flex items-stretch gap-2" : "hidden"}>
-                  <span className="w-20 shrink-0 sm:w-28" aria-hidden="true" />
-                  <div className="flex min-w-0 flex-1 items-stretch">
-                    <span className="flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
-                      EN
-                    </span>
-                    <input
-                      name="en_scheduleEvent"
-                      defaultValue={contentEn.schedule?.[i]?.event ?? ""}
-                      placeholder={(SCHEDULE_PLACEHOLDERS[i] ?? SCHEDULE_PLACEHOLDER_FALLBACK).event.en}
-                      className={`${inputClass} min-w-0 flex-1 rounded-l-none`}
-                    />
+                  {/* Indented to align under the event column above - time is
+                      universal (no second row for it), so the secondary
+                      row's leading spacer only needs to match the time
+                      field's own width, not a pill's too. */}
+                  <div className={bilingual ? "flex items-stretch gap-2" : "hidden"}>
+                    <span className="w-20 shrink-0 sm:w-28" aria-hidden="true" />
+                    <div className="flex min-w-0 flex-1 items-stretch">
+                      <span className="flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
+                        {secondaryTag}
+                      </span>
+                      {secondaryEvent}
+                    </div>
+                    <span className="w-10 shrink-0" aria-hidden="true" />
                   </div>
-                  <span className="w-10 shrink-0" aria-hidden="true" />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <button
             type="button"
-            onClick={() => setSchedule((s) => [...s, { time: "", event: "" }])}
+            onClick={() => setSchedule((s) => [...s, { id: crypto.randomUUID(), time: "", event: "", eventEn: "" }])}
             className="mt-2 rounded border border-[var(--brand-line)] px-3 py-1.5 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]"
           >
             {editForm.addScheduleItem[locale]}

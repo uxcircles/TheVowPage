@@ -418,6 +418,7 @@ export function DraftEditor() {
         })
       : await fetchGeocode({
           venueName: draft.venueName,
+          venueNameEn: draft.contentEn.venueName ?? "",
           address: draft.venueAddress,
         });
     setLocating(false);

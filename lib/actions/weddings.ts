@@ -110,8 +110,8 @@ export async function updateWeddingContent(
     if (venueLat !== null && venueLng !== null) {
       timezone = timezoneForCoords(venueLat, venueLng);
     }
-  } else if (venueName || venueAddress) {
-    const geocoded = await geocodeVenue(venueName, venueAddress);
+  } else if (venueName || contentEn.venueName || venueAddress) {
+    const geocoded = await geocodeVenue([venueName, contentEn.venueName ?? ""], venueAddress, locale);
     venueLat = geocoded?.lat ?? null;
     venueLng = geocoded?.lng ?? null;
     timezone = geocoded?.timezone ?? DEFAULT_TIMEZONE;

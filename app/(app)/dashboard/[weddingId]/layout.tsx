@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/supabase/server";
 import { WeddingChrome } from "@/components/dashboard/WeddingChrome";
 import { getLocale } from "@/lib/i18n/locale";
 import { editTabs } from "@/lib/i18n/dictionaries/dashboard";
+import type { ContentEn } from "@/components/templates/classic/types";
 
 export default async function WeddingLayout({
   children,
@@ -24,12 +25,16 @@ export default async function WeddingLayout({
     { href: `/dashboard/${weddingId}/rsvps`, label: editTabs.rsvps[locale] },
   ];
   const hasPassword = user?.identities?.some((i) => i.provider === "email") ?? false;
+  const contentEn = (wedding.content_en as ContentEn | null) ?? {};
 
   return (
     <WeddingChrome
       weddingId={weddingId}
       groomName={wedding.groom_name}
+      groomNameEn={contentEn.groomName ?? ""}
       brideName={wedding.bride_name}
+      brideNameEn={contentEn.brideName ?? ""}
+      bilingualEnabled={wedding.bilingual_enabled}
       groomLabel={wedding.groom_label}
       brideLabel={wedding.bride_label}
       status={wedding.status}

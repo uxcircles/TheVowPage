@@ -18,7 +18,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { setWeddingStatus } from "@/lib/actions/weddings";
 import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
-import type { ClassicTemplateData } from "@/components/templates/classic/types";
+import { localizedText, type ClassicTemplateData } from "@/components/templates/classic/types";
 import { AccountMenu } from "@/components/dashboard/AccountMenu";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
@@ -140,7 +140,10 @@ function CheckoutSuccessNotice() {
 export function WeddingChrome({
   weddingId,
   groomName,
+  groomNameEn,
   brideName,
+  brideNameEn,
+  bilingualEnabled,
   groomLabel,
   brideLabel,
   status,
@@ -155,7 +158,10 @@ export function WeddingChrome({
 }: {
   weddingId: string;
   groomName: string;
+  groomNameEn: string;
   brideName: string;
+  brideNameEn: string;
+  bilingualEnabled: boolean;
   groomLabel: string;
   brideLabel: string;
   status: string;
@@ -169,6 +175,11 @@ export function WeddingChrome({
   hasPassword: boolean;
 }) {
   const locale = useLocale();
+  // This is the admin's own dashboard header, not the guest-facing
+  // invitation - so it follows *this* locale (whichever language the
+  // admin is currently browsing the dashboard in), not a guest's.
+  const groomDisplay = localizedText(groomName, groomNameEn, locale, bilingualEnabled);
+  const brideDisplay = localizedText(brideName, brideNameEn, locale, bilingualEnabled);
   const pathname = usePathname();
   const router = useRouter();
   const showToast = useToast();
@@ -334,7 +345,7 @@ export function WeddingChrome({
               />
             </div>
             <h1 className="mt-1.5 text-2xl font-medium text-foreground">
-              {groomName || groomLabel} ＆ {brideName || brideLabel}
+              {groomDisplay || groomLabel} ＆ {brideDisplay || brideLabel}
             </h1>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
               <StatusBadge

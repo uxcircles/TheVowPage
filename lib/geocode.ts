@@ -21,7 +21,8 @@ const PRIMARY_MARKET_COUNTRY_CODES = "tw,gb";
  * browsers won't let client code set. */
 async function geocodeQuery(
   query: string,
-  countryCodes?: string
+  countryCodes: string | undefined,
+  acceptLanguage: string
 ): Promise<{ lat: number; lng: number; displayName: string } | null> {
   const trimmed = query.trim();
   if (!trimmed) return null;
@@ -32,7 +33,7 @@ async function geocodeQuery(
     const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
       headers: {
         "User-Agent": "wedding-invite-app (contact: designlcc@gmail.com)",
-        "Accept-Language": "zh-TW",
+        "Accept-Language": acceptLanguage,
       },
     });
     if (!res.ok) return null;
@@ -64,8 +65,12 @@ export function timezoneForCoords(lat: number, lng: number): string {
  * venues (hotels, restaurants) are almost always mapped as their own point
  * of interest in OpenStreetMap and geocode precisely by name, while raw
  * Taiwanese street addresses (with a "XX號" house number) very often return
- * nothing - so try the venue name first and only fall back to the street
- * address if that fails. When found by name, Nominatim's own formatted
+ * nothing - so try the venue name(s) first and only fall back to the
+ * street address if none of those match. Accepts multiple candidate names
+ * (e.g. a wedding's ZH-HANT and EN venue name, once bilingual content is
+ * in play) since a name that fails to match in one language can still
+ * geocode cleanly in the other - tried in order, first match wins, with
+ * exact duplicates skipped. When found by name, Nominatim's own formatted
  * address is returned too, so the caller can offer to fill in the address
  * field for someone who only typed a venue name.
  *
@@ -79,11 +84,24 @@ export function timezoneForCoords(lat: number, lng: number): string {
  * two markets returning null (which the caller already handles - the
  * venue form falls back to letting the user enter coordinates manually)
  * is far better than silently placing the pin on a random hotel in the
- * wrong country. */
-export async function geocodeVenue(venueName: string, address: string): Promise<GeocodeResult | null> {
-  const found =
-    (await geocodeQuery(venueName, PRIMARY_MARKET_COUNTRY_CODES)) ??
-    (await geocodeQuery(address, PRIMARY_MARKET_COUNTRY_CODES));
+ * wrong country.
+ *
+ * `locale` sets the Accept-Language Nominatim replies in - this used to
+ * be hardcoded to "zh-TW", which meant an English-locale admin searching
+ * for a UK venue got back an address with Chinese place names mixed in
+ * wherever OSM had no English translation for a component (a Scottish
+ * council area rendered as literal Chinese text, for instance). Passing
+ * the admin's own locale through fixes that for both directions. */
+export async function geocodeVenue(venueNames: string[], address: string, locale: "zh" | "en"): Promise<GeocodeResult | null> {
+  const acceptLanguage = locale === "en" ? "en" : "zh-TW";
+  const candidates = [...new Set(venueNames.map((n) => n.trim()).filter(Boolean))];
+
+  let found: { lat: number; lng: number; displayName: string } | null = null;
+  for (const name of candidates) {
+    found = await geocodeQuery(name, PRIMARY_MARKET_COUNTRY_CODES, acceptLanguage);
+    if (found) break;
+  }
+  found ??= await geocodeQuery(address, PRIMARY_MARKET_COUNTRY_CODES, acceptLanguage);
   if (!found) return null;
   return {
     lat: found.lat,

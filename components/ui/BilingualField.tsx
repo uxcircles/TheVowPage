@@ -1,13 +1,22 @@
-import type { ReactNode } from "react";
+"use client";
 
-// The 中/EN pill itself toggles hidden/visible with `bilingual` (so a
-// non-bilingual wedding's form looks exactly like a plain single-language
-// field, pill and all), but the row structure around zhInput never
-// changes shape - only a sibling <span>'s own `hidden` class flips. That
-// keeps zhInput's position in the tree constant across the toggle, so an
-// *uncontrolled* input (defaultValue, as in WeddingEditForm) never
-// remounts and loses whatever's been typed. The EN row uses the same
-// "stay mounted, just hidden" trick for the same reason.
+import type { ReactNode } from "react";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+
+// Which field is "primary" - rendered on top, and the one left visible
+// alone when bilingual is off - follows the admin's own dashboard locale
+// rather than always assuming Chinese. An English-locale admin (this
+// product's UK market too, not just Taiwan) types their real content into
+// the EN field first and expects that to stay visible and on top; a
+// Chinese-locale admin gets the original zh-first behavior. The
+// underlying save mapping (zh -> groomName, en -> contentEn.groomName)
+// never changes - this only decides which one the *editor* treats as
+// primary. Each row carries an explicit key ("zh"/"en") independent of
+// which position it renders in, so a locale change that swaps their order
+// makes React move each input's DOM node to its new slot instead of
+// reusing the *other* language's node in that slot - which would leave a
+// now-EN-named input still showing the old zh text, since defaultValue on
+// an uncontrolled input only applies at actual mount.
 export function BilingualField({
   label,
   bilingual,
@@ -21,22 +30,31 @@ export function BilingualField({
   enInput: ReactNode;
   className?: string;
 }) {
+  const locale = useLocale();
+  const zhFirst = locale !== "en";
+
   return (
     <div className={`flex flex-col gap-1.5 text-sm text-[var(--brand-ink-soft)] ${className}`}>
       {label && <span>{label}</span>}
-      {/* Fixed "中"/"EN" rather than a locale-tag like "ZH-HANT" - not
-          everyone reads BCP-47 tags, but the 中/EN pairing is a familiar
-          language-toggle convention on its own. Deliberately NOT
-          translated to match the admin's own UI locale either: these tags
-          label which language the *content* is in, not UI chrome, so they
-          should read the same regardless of which language someone
-          happens to be browsing the editor in. */}
-      <LangRow tag="中" tagHidden={!bilingual}>
-        {zhInput}
-      </LangRow>
-      <LangRow tag="EN" rowHidden={!bilingual}>
-        {enInput}
-      </LangRow>
+      {zhFirst ? (
+        <>
+          <LangRow key="zh" tag="中" tagHidden={!bilingual}>
+            {zhInput}
+          </LangRow>
+          <LangRow key="en" tag="EN" rowHidden={!bilingual}>
+            {enInput}
+          </LangRow>
+        </>
+      ) : (
+        <>
+          <LangRow key="en" tag="EN" tagHidden={!bilingual}>
+            {enInput}
+          </LangRow>
+          <LangRow key="zh" tag="中" rowHidden={!bilingual}>
+            {zhInput}
+          </LangRow>
+        </>
+      )}
     </div>
   );
 }

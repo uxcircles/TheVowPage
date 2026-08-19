@@ -8,6 +8,7 @@ import { DeletedNotice } from "@/components/dashboard/DeletedNotice";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { getLocale } from "@/lib/i18n/locale";
 import { dashboardPageCopy, chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
+import { localizedText, type ContentEn } from "@/components/templates/classic/types";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -16,7 +17,7 @@ export default async function DashboardPage() {
 
   const { data: weddings } = await supabase
     .from("weddings")
-    .select("id, slug, groom_name, bride_name, groom_label, bride_label, status, updated_at")
+    .select("id, slug, groom_name, bride_name, groom_label, bride_label, status, updated_at, bilingual_enabled, content_en")
     .eq("owner_id", user!.id)
     .order("updated_at", { ascending: false });
 
@@ -50,37 +51,45 @@ export default async function DashboardPage() {
       )}
 
       <ul className="mt-8 flex flex-col gap-3">
-        {weddings?.map((w) => (
-          <li
-            key={w.id}
-            className="relative flex items-start gap-3 rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)] sm:items-center"
-          >
-            <Link
-              href={`/dashboard/${w.id}/edit`}
-              className="absolute inset-0"
-              aria-label={`${w.groom_name || w.groom_label} ＆ ${w.bride_name || w.bride_label}`}
-            />
-            <div className="flex flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-              <span className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                <span className="font-medium">
-                  {w.groom_name || w.groom_label} ＆ {w.bride_name || w.bride_label}
+        {weddings?.map((w) => {
+          // Server component, so this follows the same admin-locale
+          // display as WeddingChrome's own header - not the guest locale,
+          // since this list is dashboard-only chrome.
+          const contentEn = (w.content_en as ContentEn | null) ?? {};
+          const groomDisplay = localizedText(w.groom_name, contentEn.groomName, locale, w.bilingual_enabled);
+          const brideDisplay = localizedText(w.bride_name, contentEn.brideName, locale, w.bilingual_enabled);
+          return (
+            <li
+              key={w.id}
+              className="relative flex items-start gap-3 rounded border border-[var(--brand-line)] bg-white px-5 py-4 transition-colors hover:border-[var(--brand-gold)] sm:items-center"
+            >
+              <Link
+                href={`/dashboard/${w.id}/edit`}
+                className="absolute inset-0"
+                aria-label={`${groomDisplay || w.groom_label} ＆ ${brideDisplay || w.bride_label}`}
+              />
+              <div className="flex flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <span className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+                  <span className="font-medium">
+                    {groomDisplay || w.groom_label} ＆ {brideDisplay || w.bride_label}
+                  </span>
+                  <span className="break-all text-sm text-[var(--brand-ink-soft)]">/w/{w.slug}</span>
                 </span>
-                <span className="break-all text-sm text-[var(--brand-ink-soft)]">/w/{w.slug}</span>
-              </span>
-              <span className="self-start sm:self-auto">
-                <StatusBadge
-                  published={w.status === "published"}
-                  label={w.status === "published" ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
-                />
-              </span>
-            </div>
-            {w.status !== "published" && (
-              <div className="relative z-10">
-                <WeddingRowMenu weddingId={w.id} />
+                <span className="self-start sm:self-auto">
+                  <StatusBadge
+                    published={w.status === "published"}
+                    label={w.status === "published" ? chromeCopy.published[locale] : chromeCopy.draft[locale]}
+                  />
+                </span>
               </div>
-            )}
-          </li>
-        ))}
+              {w.status !== "published" && (
+                <div className="relative z-10">
+                  <WeddingRowMenu weddingId={w.id} />
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
