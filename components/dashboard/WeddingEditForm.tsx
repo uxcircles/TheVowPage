@@ -167,6 +167,13 @@ export function WeddingEditForm({
   const [locating, setLocating] = useState(false);
   const [locationPreview, setLocationPreview] = useState<{ lat: number; lng: number } | null>(null);
   const [previewTimezone, setPreviewTimezone] = useState<string | null>(null);
+  // The map preview's popup label used to read wedding.venue_name - a
+  // server prop frozen at page load, not the live input - so re-searching
+  // after editing the venue name (e.g. replacing a UK venue with a new
+  // Taipei one) moved the pin correctly but left the *label* showing
+  // whatever venue name was saved last time. Captured here instead, from
+  // whichever field actually got searched.
+  const [locatedVenueName, setLocatedVenueName] = useState<string | null>(null);
   // Tracks the address we last auto-filled, so a re-search can still refresh
   // it - but only while it still matches what we set (i.e. the user hasn't
   // typed their own address over it since).
@@ -174,17 +181,22 @@ export function WeddingEditForm({
 
   async function locateVenue() {
     setLocating(true);
+    const venueNameVal = venueNameRef.current?.value ?? "";
+    const venueNameEnVal = venueNameEnRef.current?.value ?? "";
     const result = manualCoords
       ? await fetchGeocode({
           lat: Number(venueLatRef.current?.value ?? ""),
           lng: Number(venueLngRef.current?.value ?? ""),
         })
       : await fetchGeocode({
-          venueName: venueNameRef.current?.value ?? "",
-          venueNameEn: venueNameEnRef.current?.value ?? "",
+          venueName: venueNameVal,
+          venueNameEn: venueNameEnVal,
           address: venueAddressRef.current?.value ?? "",
         });
     setLocating(false);
+    // Whichever field renders first (follows admin locale) is the one
+    // most likely to be what was actually searched for.
+    setLocatedVenueName((zhFirst ? venueNameVal || venueNameEnVal : venueNameEnVal || venueNameVal) || null);
     if (!result) {
       setLocationPreview(null);
       showToast(editForm.locateFailed[locale], "error");
@@ -528,7 +540,7 @@ export function WeddingEditForm({
                   <VenueMap
                     lat={locationPreview.lat}
                     lng={locationPreview.lng}
-                    label={wedding.venue_name || "場地"}
+                    label={locatedVenueName || wedding.venue_name || "場地"}
                   />
                 </div>
               </div>
