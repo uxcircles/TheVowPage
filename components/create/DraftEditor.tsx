@@ -27,7 +27,9 @@ import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
-import { useLocale } from "@/components/i18n/LocaleProvider";
+import { LocaleProvider, useLocale } from "@/components/i18n/LocaleProvider";
+import { PreviewLocaleToggle } from "@/components/ui/PreviewLocaleToggle";
+import type { Locale } from "@/lib/i18n/shared";
 import { editForm, chromeCopy, momentsCopy, photoSlotCopy, draftEditorCopy } from "@/lib/i18n/dictionaries/dashboard";
 import { headingFont } from "@/lib/fonts";
 import { validatePhotoType, validatePhotoSize, MAX_MOMENT_PHOTOS } from "@/lib/photoLimits";
@@ -255,6 +257,10 @@ export function DraftEditor() {
   });
   const [showAuth, setShowAuth] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  // Independent from the visitor's own site locale (`locale` above) -
+  // overrides only the preview's own LocaleProvider below, same as
+  // WeddingChrome's own preview toggle.
+  const [previewLocale, setPreviewLocale] = useState<Locale>(locale);
   const [saving, setSaving] = useState(false);
   const [resumeUser, setResumeUser] = useState<User | null>(null);
   const momentsInputRef = useRef<HTMLInputElement>(null);
@@ -530,7 +536,16 @@ export function DraftEditor() {
         >
           {chromeCopy.backToEditing[locale]}
         </button>
-        <ClassicTemplate data={previewData} />
+        {previewData.bilingualEnabled && (
+          <PreviewLocaleToggle
+            value={previewLocale}
+            onChange={setPreviewLocale}
+            className="fixed right-4 top-16 z-[1001]"
+          />
+        )}
+        <LocaleProvider locale={previewLocale}>
+          <ClassicTemplate data={previewData} />
+        </LocaleProvider>
       </>
     );
   }

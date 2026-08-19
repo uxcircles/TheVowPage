@@ -20,7 +20,9 @@ import { createCheckoutSession } from "@/lib/actions/billing";
 import { ClassicTemplate } from "@/components/templates/classic/ClassicTemplate";
 import { localizedText, type ClassicTemplateData } from "@/components/templates/classic/types";
 import { AccountMenu } from "@/components/dashboard/AccountMenu";
-import { useLocale } from "@/components/i18n/LocaleProvider";
+import { LocaleProvider, useLocale } from "@/components/i18n/LocaleProvider";
+import { PreviewLocaleToggle } from "@/components/ui/PreviewLocaleToggle";
+import type { Locale } from "@/lib/i18n/shared";
 import { chromeCopy } from "@/lib/i18n/dictionaries/dashboard";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -194,6 +196,11 @@ export function WeddingChrome({
   const [previewData, setPreviewData] = useState<ClassicTemplateData | null>(
     null,
   );
+  // Independent from the admin's own site locale (`locale` above) -
+  // overrides only the preview's own LocaleProvider below, so switching
+  // it to see the English version never touches the dashboard's actual
+  // language setting.
+  const [previewLocale, setPreviewLocale] = useState<Locale>(locale);
   const [isPublished, setIsPublished] = useState(status === "published");
   const [publishPending, startPublishTransition] = useTransition();
   const isPaid = plan !== "draft";
@@ -314,7 +321,16 @@ export function WeddingChrome({
             >
               {chromeCopy.backToEditing[locale]}
             </button>
-            <ClassicTemplate data={previewData} />
+            {previewData.bilingualEnabled && (
+              <PreviewLocaleToggle
+                value={previewLocale}
+                onChange={setPreviewLocale}
+                className="fixed right-4 top-16 z-[1001]"
+              />
+            )}
+            <LocaleProvider locale={previewLocale}>
+              <ClassicTemplate data={previewData} />
+            </LocaleProvider>
           </div>,
           document.body,
         )}
