@@ -253,8 +253,8 @@ export const privacySections: Section[] = [
         en: "To provide and operate the Service, including storing and displaying your invitation content, processing payments, and sending necessary service notifications (such as payment confirmations and account-related notices).",
       },
       {
-        zh: "根據您輸入的場地地址，透過 Google 地圖服務轉換為地圖座標與時區，用於喜帖上的地圖顯示與活動時間換算。",
-        en: "To convert the venue address you enter into map coordinates and a time zone via Google's mapping service, used to display the map and convert the event time on your invitation.",
+        zh: "根據您輸入的場地地址，透過 OpenStreetMap（Nominatim）地理定位服務轉換為地圖座標與時區，用於喜帖上的地圖顯示與活動時間換算。",
+        en: "To convert the venue address you enter into map coordinates and a time zone via OpenStreetMap's Nominatim geolocation service, used to display the map and convert the event time on your invitation.",
       },
       {
         zh: "改善服務品質與排除技術問題。",
@@ -282,8 +282,12 @@ export const privacySections: Section[] = [
         en: "・Stripe: processes payment transactions - see Stripe's Privacy Policy for details.",
       },
       {
-        zh: "・Google：提供 Google 登入（OAuth）與地址轉地圖座標／時區之地理定位服務。",
-        en: "・Google: provides Google Sign-In (OAuth) and the geolocation service that converts addresses into map coordinates and time zones.",
+        zh: "・Google：提供 Google 登入（OAuth）服務。",
+        en: "・Google: provides Google Sign-In (OAuth).",
+      },
+      {
+        zh: "・OpenStreetMap（Nominatim）：提供地址轉地圖座標／時區之地理定位服務。",
+        en: "・OpenStreetMap (Nominatim): provides the geolocation service that converts addresses into map coordinates and time zones.",
       },
       {
         zh: "除法律要求或為保護本服務與使用者權益之必要情形外，我們不會將您的個人資料提供予其他第三方。",
