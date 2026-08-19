@@ -111,7 +111,11 @@ export async function updateWeddingContent(
       timezone = timezoneForCoords(venueLat, venueLng);
     }
   } else if (venueName || contentEn.venueName || venueAddress) {
-    const geocoded = await geocodeVenue([venueName, contentEn.venueName ?? ""], venueAddress, locale);
+    // Same "admin locale decides which name wins a conflict" rule as the
+    // /api/geocode route.
+    const venueNameCandidates =
+      locale === "en" ? [contentEn.venueName ?? "", venueName] : [venueName, contentEn.venueName ?? ""];
+    const geocoded = await geocodeVenue(venueNameCandidates, venueAddress, locale);
     venueLat = geocoded?.lat ?? null;
     venueLng = geocoded?.lng ?? null;
     timezone = geocoded?.timezone ?? DEFAULT_TIMEZONE;

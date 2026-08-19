@@ -23,6 +23,12 @@ export async function GET(request: Request) {
   const venueNameEn = searchParams.get("venueNameEn") ?? "";
   const address = searchParams.get("address") ?? "";
   const locale = await getLocale();
-  const result = await geocodeVenue([venueName, venueNameEn], address, locale);
+  // When the zh/en venue name fields disagree, search whichever one the
+  // admin's own locale treats as primary first - otherwise a stale zh
+  // name left over from before an edit could out-rank the en name that
+  // was actually just typed (or vice versa), matching a completely
+  // different, unintended venue.
+  const candidates = locale === "en" ? [venueNameEn, venueName] : [venueName, venueNameEn];
+  const result = await geocodeVenue(candidates, address, locale);
   return NextResponse.json({ result });
 }

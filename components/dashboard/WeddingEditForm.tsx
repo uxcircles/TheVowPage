@@ -174,10 +174,6 @@ export function WeddingEditForm({
   // whatever venue name was saved last time. Captured here instead, from
   // whichever field actually got searched.
   const [locatedVenueName, setLocatedVenueName] = useState<string | null>(null);
-  // Tracks the address we last auto-filled, so a re-search can still refresh
-  // it - but only while it still matches what we set (i.e. the user hasn't
-  // typed their own address over it since).
-  const lastAutoFilledAddressRef = useRef<string | null>(null);
 
   async function locateVenue() {
     setLocating(true);
@@ -204,15 +200,16 @@ export function WeddingEditForm({
     }
     setLocationPreview({ lat: result.lat, lng: result.lng });
     setPreviewTimezone(result.timezone);
-    // Offer Nominatim's own formatted address for free, but never overwrite
-    // an address the user typed themselves - only refresh it if it's still
-    // empty or still exactly what we auto-filled last time.
+    // Offer Nominatim's own formatted address for free. locateVenue only
+    // ever runs from this button's own onClick (never automatically), so
+    // clicking it again is itself the user's explicit request to refresh
+    // - always overwrite, rather than only when the field looks empty or
+    // untouched. That old guard meant a stale/wrong address (e.g. from
+    // before the Accept-Language fix) could never be refreshed by
+    // re-searching, since a previously-saved address is indistinguishable
+    // from a manually-typed one once the page has reloaded.
     if (result.address && venueAddressRef.current) {
-      const current = venueAddressRef.current.value.trim();
-      if (!current || current === lastAutoFilledAddressRef.current) {
-        venueAddressRef.current.value = result.address;
-        lastAutoFilledAddressRef.current = result.address;
-      }
+      venueAddressRef.current.value = result.address;
     }
   }
 

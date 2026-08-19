@@ -263,11 +263,6 @@ export function DraftEditor() {
     lat: number;
     lng: number;
   } | null>(null);
-  // Tracks the address we last auto-filled, so a re-search can still refresh
-  // it - but only while it still matches what we set (i.e. the user hasn't
-  // typed their own address over it since).
-  const lastAutoFilledAddressRef = useRef<string | null>(null);
-
   const [draftHydrated, setDraftHydrated] = useState(false);
 
   useEffect(() => {
@@ -429,15 +424,13 @@ export function DraftEditor() {
     }
     setLocationPreview({ lat: result.lat, lng: result.lng });
     setTimezone(result.timezone);
-    // Offer Nominatim's own formatted address for free, but never overwrite
-    // an address the user typed themselves - only refresh it if it's still
-    // empty or still exactly what we auto-filled last time.
+    // Offer Nominatim's own formatted address for free. locateVenue only
+    // ever runs from this button's own onClick (never automatically), so
+    // clicking it again is itself the user's explicit request to refresh
+    // - always overwrite, same reasoning as WeddingEditForm's own
+    // locateVenue.
     if (result.address) {
-      const current = draft.venueAddress.trim();
-      if (!current || current === lastAutoFilledAddressRef.current) {
-        update("venueAddress", result.address);
-        lastAutoFilledAddressRef.current = result.address;
-      }
+      update("venueAddress", result.address);
     }
   }
 
