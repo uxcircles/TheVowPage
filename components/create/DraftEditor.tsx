@@ -460,6 +460,13 @@ export function DraftEditor() {
       : null;
     const momentPhotoUrls = photos.moments.map((m) => URL.createObjectURL(m.file));
 
+    // Same "filter zh and en together, or their indices drift apart" fix
+    // as saveDraftAsWedding - contentEn.schedule[i] has to stay paired
+    // with schedule[i], so an empty row is dropped from both at once.
+    const scheduleRows = draft.schedule
+      .map((item, i) => ({ time: item.time, event: item.event, eventEn: draft.contentEn.schedule?.[i]?.event ?? "" }))
+      .filter((row) => row.time || row.event || row.eventEn);
+
     setPreviewData({
       weddingId: "",
       theme: draft.theme,
@@ -484,7 +491,7 @@ export function DraftEditor() {
       venueLng:
         locationPreview?.lng ??
         (draft.venueLng ? Number(draft.venueLng) : null),
-      schedule: draft.schedule.filter((item) => item.time || item.event),
+      schedule: scheduleRows.map((row) => ({ time: row.time, event: row.event })),
       dressCode: draft.dressCode,
       thanksMessage: draft.thanksMessage,
       heroPhotoUrl,
@@ -496,7 +503,7 @@ export function DraftEditor() {
       showDressCode: draft.showDressCode,
       showRsvp: draft.showRsvp,
       bilingualEnabled: draft.bilingualEnabled,
-      contentEn: draft.contentEn,
+      contentEn: { ...draft.contentEn, schedule: scheduleRows.map((row) => ({ event: row.eventEn })) },
     });
 
     return () => {

@@ -223,9 +223,14 @@ export function WeddingEditForm({
   const getPreviewSnapshot = useCallback((): ClassicTemplateData => {
     const fd = new FormData(formRef.current ?? undefined);
     const timezone = previewTimezone ?? wedding.timezone;
+    // Same "filter zh and en together, or their indices drift apart" fix
+    // as updateWeddingContent - see that function's own comment.
     const times = fd.getAll("scheduleTime") as string[];
     const events = fd.getAll("scheduleEvent") as string[];
     const enEvents = fd.getAll("en_scheduleEvent") as string[];
+    const scheduleRows = times
+      .map((time, i) => ({ time, event: events[i] ?? "", eventEn: enEvents[i] ?? "" }))
+      .filter((row) => row.time || row.event || row.eventEn);
     return {
       weddingId: wedding.id,
       theme: String(fd.get("theme") ?? wedding.theme),
@@ -246,9 +251,7 @@ export function WeddingEditForm({
       venueAddress: String(fd.get("venueAddress") ?? ""),
       venueLat: locationPreview?.lat ?? wedding.venue_lat,
       venueLng: locationPreview?.lng ?? wedding.venue_lng,
-      schedule: times
-        .map((time, i) => ({ time, event: events[i] ?? "" }))
-        .filter((item) => item.time || item.event),
+      schedule: scheduleRows.map((row) => ({ time: row.time, event: row.event })),
       dressCode: String(fd.get("dressCode") ?? ""),
       thanksMessage: String(fd.get("thanksMessage") ?? ""),
       heroPhotoUrl,
@@ -273,7 +276,7 @@ export function WeddingEditForm({
         venueHall: String(fd.get("en_venueHall") ?? ""),
         dressCode: String(fd.get("en_dressCode") ?? ""),
         thanksMessage: String(fd.get("en_thanksMessage") ?? ""),
-        schedule: enEvents.map((event) => ({ event })),
+        schedule: scheduleRows.map((row) => ({ event: row.eventEn })),
       },
     };
   }, [

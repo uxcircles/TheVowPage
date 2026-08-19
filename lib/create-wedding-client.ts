@@ -106,6 +106,14 @@ export async function saveDraftAsWedding(
     timezone = geocoded?.timezone ?? DEFAULT_TIMEZONE;
   }
 
+  // Same "filter zh and en together, or their indices drift apart" fix as
+  // updateWeddingContent (lib/actions/weddings.ts) - content_en.schedule[i]
+  // has to stay paired with schedule[i], so an empty row has to be dropped
+  // from both at once rather than filtering schedule alone.
+  const scheduleRows = draft.schedule
+    .map((item, i) => ({ time: item.time, event: item.event, eventEn: draft.contentEn.schedule?.[i]?.event ?? "" }))
+    .filter((row) => row.time || row.event || row.eventEn);
+
   const { data: wedding, error: insertError } = await supabase
     .from("weddings")
     .insert({
@@ -129,7 +137,7 @@ export async function saveDraftAsWedding(
       venue_address: draft.venueAddress,
       venue_lat: venueLat,
       venue_lng: venueLng,
-      schedule: draft.schedule.filter((item) => item.time || item.event),
+      schedule: scheduleRows.map((row) => ({ time: row.time, event: row.event })),
       dress_code: draft.dressCode,
       thanks_message: draft.thanksMessage,
       show_family: draft.showFamily,
@@ -137,7 +145,7 @@ export async function saveDraftAsWedding(
       show_dress_code: draft.showDressCode,
       show_rsvp: draft.showRsvp,
       bilingual_enabled: draft.bilingualEnabled,
-      content_en: draft.contentEn,
+      content_en: { ...draft.contentEn, schedule: scheduleRows.map((row) => ({ event: row.eventEn })) },
     })
     .select("id")
     .single();

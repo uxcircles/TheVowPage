@@ -69,13 +69,25 @@ export async function updateWeddingContent(
   const slug = String(formData.get("slug") ?? "").trim();
   const eventDateRaw = String(formData.get("eventDate") ?? "").trim();
 
+  // schedule and scheduleEn must stay index-aligned (contentEn.schedule[i]
+  // pairs with schedule[i], both at render time in ClassicTemplate and at
+  // rehydration time in the editor) - so an empty row has to be dropped
+  // from *both* arrays together, not filtered independently. Doing that
+  // used to filter only the zh side, which silently shifted zh rows to
+  // indices that no longer matched their own en text once any earlier row
+  // was blank, making saved English schedule text disappear on reload.
   const times = formData.getAll("scheduleTime") as string[];
   const events = formData.getAll("scheduleEvent") as string[];
-  const schedule: ScheduleItem[] = times
-    .map((time, i) => ({ time: time.trim(), event: (events[i] ?? "").trim() }))
-    .filter((item) => item.time || item.event);
   const enEvents = formData.getAll("en_scheduleEvent") as string[];
-  const scheduleEn = enEvents.map((event) => ({ event: event.trim() }));
+  const scheduleRows = times
+    .map((time, i) => ({
+      time: time.trim(),
+      event: (events[i] ?? "").trim(),
+      eventEn: (enEvents[i] ?? "").trim(),
+    }))
+    .filter((row) => row.time || row.event || row.eventEn);
+  const schedule: ScheduleItem[] = scheduleRows.map((row) => ({ time: row.time, event: row.event }));
+  const scheduleEn = scheduleRows.map((row) => ({ event: row.eventEn }));
 
   const contentEn: ContentEn = {
     groomName: String(formData.get("en_groomName") ?? "").trim(),
