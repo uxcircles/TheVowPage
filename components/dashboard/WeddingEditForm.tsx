@@ -547,11 +547,11 @@ export function WeddingEditForm({
                     <span
                       className={
                         bilingual
-                          ? "flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
+                          ? "flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
                           : "hidden"
                       }
                     >
-                      ZH-HANT
+                      中
                     </span>
                     <input
                       name="scheduleEvent"
@@ -564,7 +564,7 @@ export function WeddingEditForm({
                     type="button"
                     onClick={() => setSchedule((s) => s.filter((_, idx) => idx !== i))}
                     aria-label={editForm.deleteAria[locale]}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)]"
                   >
                     <TrashIcon className="h-4 w-4" />
                   </button>
@@ -578,7 +578,7 @@ export function WeddingEditForm({
                 <div className={bilingual ? "flex items-stretch gap-2" : "hidden"}>
                   <span className="w-20 shrink-0 sm:w-28" aria-hidden="true" />
                   <div className="flex min-w-0 flex-1 items-stretch">
-                    <span className="flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
+                    <span className="flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
                       EN
                     </span>
                     <input

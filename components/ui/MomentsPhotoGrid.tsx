@@ -54,7 +54,7 @@ function SortablePhoto({
         type="button"
         onClick={() => onRemove(item.id)}
         aria-label={momentsPhotoGridCopy.remove[locale]}
-        className="self-end rounded border border-[var(--brand-line)] p-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+        className="self-end rounded border border-[var(--brand-line)] p-1.5 text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)]"
       >
         <TrashIcon className="h-4 w-4" />
       </button>
@@ -107,7 +107,7 @@ function StaticPhoto({
           disabled={disabled}
           onClick={() => onRemove(item.id)}
           aria-label={momentsPhotoGridCopy.remove[locale]}
-          className="flex-1 rounded border border-[var(--brand-line)] py-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500 disabled:opacity-30"
+          className="flex-1 rounded border border-[var(--brand-line)] py-1.5 text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)] disabled:opacity-30"
         >
           <TrashIcon className="mx-auto h-4 w-4" />
         </button>

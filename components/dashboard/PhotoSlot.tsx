@@ -164,7 +164,7 @@ export function PhotoSlot({
             disabled={pending}
             onClick={handleDelete}
             aria-label={photoSlotCopy.removeAria[locale]}
-            className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+            className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)]"
           >
             <TrashIcon className="h-4 w-4" />
           </button>

@@ -168,7 +168,7 @@ export function GuestList({
                     disabled={pending}
                     onClick={() => handleDelete(guest.id)}
                     aria-label={editForm.deleteAria[locale]}
-                    className="text-[var(--brand-ink-soft)] hover:text-red-500"
+                    className="text-[var(--brand-ink-soft)] hover:text-[var(--brand-error)]"
                   >
                     <TrashIcon className="h-4 w-4" />
                   </button>

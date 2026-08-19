@@ -202,7 +202,7 @@ function PhotoPicker({
             type="button"
             onClick={() => onChange(null)}
             aria-label={photoSlotCopy.removeAria[locale]}
-            className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+            className="rounded border border-[var(--brand-line)] px-3 py-1.5 text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)]"
           >
             <TrashIcon className="h-4 w-4" />
           </button>
@@ -1050,11 +1050,11 @@ export function DraftEditor() {
                             <span
                               className={
                                 draft.bilingualEnabled
-                                  ? "flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
+                                  ? "flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
                                   : "hidden"
                               }
                             >
-                              ZH-HANT
+                              中
                             </span>
                             <input
                               value={item.event}
@@ -1080,7 +1080,7 @@ export function DraftEditor() {
                               }))
                             }
                             aria-label={editForm.deleteAria[locale]}
-                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-red-400 hover:text-red-500"
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--brand-line)] text-[var(--brand-ink-soft)] hover:border-[var(--brand-error)] hover:text-[var(--brand-error)]"
                           >
                             <TrashIcon className="h-4 w-4" />
                           </button>
@@ -1094,7 +1094,7 @@ export function DraftEditor() {
                         <div className={draft.bilingualEnabled ? "flex items-stretch gap-2" : "hidden"}>
                           <span className="w-20 shrink-0 sm:w-28" aria-hidden="true" />
                           <div className="flex min-w-0 flex-1 items-stretch">
-                            <span className="flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
+                            <span className="flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]">
                               EN
                             </span>
                             <input

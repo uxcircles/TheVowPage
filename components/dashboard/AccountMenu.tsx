@@ -132,7 +132,7 @@ export function AccountMenu({
           <form action={signOut}>
             <button
               type="submit"
-              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm leading-none text-[var(--brand-ink-soft)] hover:bg-red-50 hover:text-red-500"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm leading-none text-[var(--brand-ink-soft)] hover:bg-[var(--brand-error)]/10 hover:text-[var(--brand-error)]"
             >
               <SignOutIcon className="h-4 w-4 shrink-0" />
               <span>{signOutCopy.signOut[locale]}</span>

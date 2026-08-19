@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-// The ZH-HANT pill itself toggles hidden/visible with `bilingual` (so a
+// The 中/EN pill itself toggles hidden/visible with `bilingual` (so a
 // non-bilingual wedding's form looks exactly like a plain single-language
 // field, pill and all), but the row structure around zhInput never
 // changes shape - only a sibling <span>'s own `hidden` class flips. That
@@ -24,7 +24,14 @@ export function BilingualField({
   return (
     <div className={`flex flex-col gap-1.5 text-sm text-[var(--brand-ink-soft)] ${className}`}>
       {label && <span>{label}</span>}
-      <LangRow tag="ZH-HANT" tagHidden={!bilingual}>
+      {/* Fixed "中"/"EN" rather than a locale-tag like "ZH-HANT" - not
+          everyone reads BCP-47 tags, but the 中/EN pairing is a familiar
+          language-toggle convention on its own. Deliberately NOT
+          translated to match the admin's own UI locale either: these tags
+          label which language the *content* is in, not UI chrome, so they
+          should read the same regardless of which language someone
+          happens to be browsing the editor in. */}
+      <LangRow tag="中" tagHidden={!bilingual}>
         {zhInput}
       </LangRow>
       <LangRow tag="EN" rowHidden={!bilingual}>
@@ -74,7 +81,7 @@ function LangRow({
         className={
           tagHidden
             ? "hidden"
-            : "flex w-16 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
+            : "flex w-10 shrink-0 items-center justify-center rounded-l border border-r-0 border-[var(--brand-line)] bg-[var(--background)] text-[10px] font-medium tracking-wide text-[var(--brand-ink-soft)]"
         }
       >
         {tag}

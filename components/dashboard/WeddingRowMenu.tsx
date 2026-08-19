@@ -82,7 +82,7 @@ export function WeddingRowMenu({ weddingId }: { weddingId: string }) {
               setOpen(false);
               setConfirming(true);
             }}
-            className="block w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+            className="block w-full px-3 py-2 text-left text-sm text-[var(--brand-error)] hover:bg-[var(--brand-error)]/10 disabled:opacity-50"
           >
             {pending ? rowMenuCopy.deleting[locale] : rowMenuCopy.delete[locale]}
           </button>

@@ -40,7 +40,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             className={`rounded px-4 py-2 text-sm text-white transition-opacity hover:opacity-90 ${
-              danger ? "bg-red-500" : "bg-[var(--brand-gold)]"
+              danger ? "bg-[var(--brand-error)]" : "bg-[var(--brand-gold)]"
             }`}
           >
             {resolvedConfirmLabel}
