@@ -239,6 +239,11 @@ export function DraftEditor() {
   // that effect has run.
   const defaultGroomLabelText = locale === "en" ? "Groom" : "新郎";
   const defaultBrideLabelText = locale === "en" ? "Bride" : "新娘";
+  // Same "which language renders on top" rule as BilingualField/
+  // WeddingEditForm's own locateVenue - used below so the map preview's
+  // popup label follows whichever venue name field this admin actually
+  // treats as primary, instead of always the zh one.
+  const zhFirst = locale !== "en";
   const showToast = useToast();
   const [draft, setDraft] = useState<DraftContent>(EMPTY_DRAFT);
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
@@ -985,7 +990,11 @@ export function DraftEditor() {
                         <VenueMap
                           lat={locationPreview.lat}
                           lng={locationPreview.lng}
-                          label={draft.venueName || "場地"}
+                          label={
+                            (zhFirst
+                              ? draft.venueName || draft.contentEn.venueName
+                              : draft.contentEn.venueName || draft.venueName) || "場地"
+                          }
                         />
                       </div>
                     </div>
