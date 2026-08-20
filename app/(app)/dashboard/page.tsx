@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { createWedding } from "@/lib/actions/weddings";
 import { WeddingRowMenu } from "@/components/dashboard/WeddingRowMenu";
@@ -12,13 +13,14 @@ import { localizedText, type ContentEn } from "@/components/templates/classic/ty
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
+  if (!user) redirect("/login");
   const supabase = await createClient();
   const locale = await getLocale();
 
   const { data: weddings } = await supabase
     .from("weddings")
     .select("id, slug, groom_name, bride_name, groom_label, bride_label, status, updated_at, bilingual_enabled, content_en")
-    .eq("owner_id", user!.id)
+    .eq("owner_id", user.id)
     .order("updated_at", { ascending: false });
 
   return (
