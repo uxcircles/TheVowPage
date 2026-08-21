@@ -9,7 +9,7 @@ import { translateAuthError } from "@/lib/authErrors";
 import { useToast } from "@/components/ui/Toast";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useLocale } from "@/components/i18n/LocaleProvider";
-import { authCopy, authModalCopy } from "@/lib/i18n/dictionaries/auth";
+import { authCopy, authModalCopy, signupCopy } from "@/lib/i18n/dictionaries/auth";
 import { footerCopy } from "@/lib/i18n/dictionaries/common";
 import { marketingHref } from "@/lib/i18n/marketingPaths";
 import type { User } from "@supabase/supabase-js";
@@ -29,6 +29,12 @@ export function AuthModal({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
+  // Signup succeeded but there's no session yet (email confirmation
+  // required) - swaps the form for a persistent "check your email" panel
+  // instead of a toast, matching /signup's own treatment. A toast dismisses
+  // itself in a few seconds, which is easy to miss right as someone's about
+  // to switch away to their mail app.
+  const [needsConfirmation, setNeedsConfirmation] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,7 +62,7 @@ export function AuthModal({
         return;
       }
       if (!data.session) {
-        showToast(authModalCopy.confirmEmailFirst[locale], "error");
+        setNeedsConfirmation(email);
         setPending(false);
         return;
       }
@@ -76,6 +82,21 @@ export function AuthModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-sm rounded bg-white p-6 shadow-xl">
+        {needsConfirmation ? (
+          <div className="text-center">
+            <div className="mb-4 flex justify-end">
+              <button type="button" onClick={onClose} className="text-[var(--brand-ink-soft)]">
+                ✕
+              </button>
+            </div>
+            <h2 className="text-lg font-medium text-foreground">{signupCopy.confirmEmailTitle[locale]}</h2>
+            <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
+              {signupCopy.confirmEmailBody[locale](needsConfirmation)}
+            </p>
+            <p className="mt-4 text-xs text-[var(--brand-ink-soft)]">{signupCopy.confirmEmailHint[locale]}</p>
+          </div>
+        ) : (
+          <>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-medium text-[var(--brand-gold)]">
             {mode === "signup" ? authModalCopy.titleSignup[locale] : authModalCopy.titleLogin[locale]}
@@ -167,6 +188,8 @@ export function AuthModal({
           </Link>
           {locale === "en" ? "." : "。"}
         </p>
+          </>
+        )}
       </div>
     </div>
   );

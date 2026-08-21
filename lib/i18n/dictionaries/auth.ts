@@ -94,8 +94,4 @@ export const authModalCopy = {
   submitLogin: { zh: "登入並儲存喜帖", en: "Log in & save invitation" },
   switchToLogin: { zh: "已經有帳號了？改為登入", en: "Already have an account? Log in instead" },
   switchToSignup: { zh: "還沒有帳號？改為註冊", en: "Don't have an account? Sign up instead" },
-  confirmEmailFirst: {
-    zh: "請先到信箱完成驗證信確認，再回來登入一次即可繼續。",
-    en: "Please check your email to confirm your address, then come back and log in to continue.",
-  },
 };
