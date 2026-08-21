@@ -2,6 +2,7 @@
 
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { confirmDialogCopy } from "@/lib/i18n/dictionaries/dashboard";
+import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 
 export function ConfirmDialog({
   title,
@@ -21,6 +22,7 @@ export function ConfirmDialog({
   onCancel: () => void;
 }) {
   const locale = useLocale();
+  useLockBodyScroll();
   const resolvedConfirmLabel = confirmLabel ?? confirmDialogCopy.confirm[locale];
   const resolvedCancelLabel = cancelLabel ?? confirmDialogCopy.cancel[locale];
   return (

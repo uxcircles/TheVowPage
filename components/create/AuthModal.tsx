@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { translateAuthError } from "@/lib/authErrors";
 import { useToast } from "@/components/ui/Toast";
@@ -22,6 +23,7 @@ export function AuthModal({
 }) {
   const locale = useLocale();
   const showToast = useToast();
+  useLockBodyScroll();
   const [mode, setMode] = useState<"signup" | "login">("signup");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
