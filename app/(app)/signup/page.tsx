@@ -26,7 +26,11 @@ export default function SignupPage() {
             <h1 className={`${headingFont.className} text-2xl text-[var(--brand-gold)]`}>The Vow Page 摯頁</h1>
             <h2 className="mt-6 text-lg font-medium text-foreground">{signupCopy.confirmEmailTitle[locale]}</h2>
             <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
-              {signupCopy.confirmEmailBody[locale](state.needsConfirmation)}
+              {signupCopy.confirmEmailBodyPrefix[locale]}
+              <br />
+              <span className="font-medium text-foreground">{state.needsConfirmation}</span>
+              <br />
+              {signupCopy.confirmEmailBodySuffix[locale]}
             </p>
             <p className="mt-4 text-xs text-[var(--brand-ink-soft)]">{signupCopy.confirmEmailHint[locale]}</p>
           </div>

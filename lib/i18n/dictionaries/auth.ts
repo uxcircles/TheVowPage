@@ -68,10 +68,11 @@ export const signupCopy = {
   // is still required (no session yet) - replaces a silent redirect to
   // /dashboard that just bounced back to /login with no explanation.
   confirmEmailTitle: { zh: "請確認你的信箱", en: "Confirm your email" },
-  confirmEmailBody: {
-    zh: (email: string) => `我們已經寄出一封驗證信到 ${email}，請點擊信中連結完成註冊。`,
-    en: (email: string) => `We've sent a confirmation link to ${email}. Click it to finish creating your account.`,
-  },
+  // Split around the email address (rather than one interpolated sentence)
+  // so the caller can put it on its own line and emphasize it - the one
+  // thing worth double-checking here is "did I type the right address".
+  confirmEmailBodyPrefix: { zh: "我們已經寄出一封驗證信到", en: "We've sent a confirmation link to" },
+  confirmEmailBodySuffix: { zh: "請點擊信中連結完成註冊。", en: "Click it to finish creating your account." },
   confirmEmailHint: {
     zh: "沒收到信？請檢查垃圾郵件匣，或稍後再試一次。",
     en: "Didn't get it? Check your spam folder, or try again in a moment.",

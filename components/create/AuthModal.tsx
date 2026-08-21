@@ -93,7 +93,11 @@ export function AuthModal({
             </button>
             <h2 className="text-lg font-medium text-foreground">{signupCopy.confirmEmailTitle[locale]}</h2>
             <p className="mt-3 text-sm text-[var(--brand-ink-soft)]">
-              {signupCopy.confirmEmailBody[locale](needsConfirmation)}
+              {signupCopy.confirmEmailBodyPrefix[locale]}
+              <br />
+              <span className="font-medium text-foreground">{needsConfirmation}</span>
+              <br />
+              {signupCopy.confirmEmailBodySuffix[locale]}
             </p>
             <p className="mt-6 text-xs text-[var(--brand-ink-soft)]">{signupCopy.confirmEmailHint[locale]}</p>
           </div>
