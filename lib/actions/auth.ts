@@ -21,7 +21,12 @@ export async function signUp(_prevState: AuthActionState, formData: FormData): P
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName } },
+    // Without this, Supabase falls back to the project's dashboard-configured
+    // Site URL for the confirmation email's redirect_to - which was pointed
+    // at the bare marketing homepage, not this route. The PKCE `code` landed
+    // there unread (nothing on that page exchanges it for a session), so
+    // every real signup silently died right after the user clicked confirm.
+    options: { emailRedirectTo: `${SITE_URL}/auth/callback`, data: { display_name: displayName } },
   });
 
   if (error) {
