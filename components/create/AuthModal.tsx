@@ -83,17 +83,19 @@ export function AuthModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-sm rounded bg-white p-6 shadow-xl">
         {needsConfirmation ? (
-          <div className="text-center">
-            <div className="mb-4 flex justify-end">
-              <button type="button" onClick={onClose} className="text-[var(--brand-ink-soft)]">
-                ✕
-              </button>
-            </div>
+          <div className="relative text-center">
+            {/* Absolutely positioned (rather than a row of its own) so it
+                doesn't add extra height above the title - without this the
+                close button's own row made the top gap taller than the
+                bottom one, even with matching padding/margin values. */}
+            <button type="button" onClick={onClose} className="absolute right-0 top-0 text-[var(--brand-ink-soft)]">
+              ✕
+            </button>
             <h2 className="text-lg font-medium text-foreground">{signupCopy.confirmEmailTitle[locale]}</h2>
-            <p className="mt-2 text-sm text-[var(--brand-ink-soft)]">
+            <p className="mt-3 text-sm text-[var(--brand-ink-soft)]">
               {signupCopy.confirmEmailBody[locale](needsConfirmation)}
             </p>
-            <p className="mt-4 text-xs text-[var(--brand-ink-soft)]">{signupCopy.confirmEmailHint[locale]}</p>
+            <p className="mt-6 text-xs text-[var(--brand-ink-soft)]">{signupCopy.confirmEmailHint[locale]}</p>
           </div>
         ) : (
           <>
