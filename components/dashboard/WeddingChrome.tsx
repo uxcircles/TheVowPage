@@ -396,13 +396,13 @@ export function WeddingChrome({
           </div>
         </div>
 
-        <div className={`mx-auto max-w-4xl pt-8 ${showBottomBar ? "pb-28" : "pb-8"}`}>
+        <div className={`mx-auto max-w-4xl pt-8 ${showBottomBar ? "pb-44 sm:pb-28" : "pb-8"}`}>
           {children}
         </div>
 
         {showBottomBar && (
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
-            <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
+            <div className="mx-auto flex max-w-4xl flex-col items-center gap-1 px-6 py-3 sm:items-end">
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:gap-3">
                 {/* Save/Preview group as their own row on mobile (so the
                     long "Pay to publish" label below always gets the full
