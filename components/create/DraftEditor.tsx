@@ -277,11 +277,15 @@ export function DraftEditor() {
   const [draftHydrated, setDraftHydrated] = useState(false);
 
   useEffect(() => {
-    // Hydrating from sessionStorage (browser-only, absent during SSR) has to
+    // Hydrating from localStorage (browser-only, absent during SSR) has to
     // happen post-mount - doing it in the initial useState would either miss
     // window entirely on the server or cause a hydration mismatch when a
-    // draft exists.
-    const saved = sessionStorage.getItem(STORAGE_KEY);
+    // draft exists. localStorage rather than sessionStorage specifically so
+    // this survives the email-confirmation round trip: tapping the
+    // confirmation link (from Mail, especially on mobile) commonly opens a
+    // *new* browser tab, which starts with an empty sessionStorage but
+    // shares localStorage with the tab the draft was written from.
+    const saved = localStorage.getItem(STORAGE_KEY);
     let hydrated = EMPTY_DRAFT;
     if (saved) {
       try {
@@ -341,7 +345,7 @@ export function DraftEditor() {
   // session actually exists, then finish the save the same way the
   // in-modal form does. Gated on draftHydrated (rather than also using an
   // empty-deps effect) so this can't call getUser() - and from there
-  // finalizeSave() - before the sessionStorage draft above has actually
+  // finalizeSave() - before the localStorage draft above has actually
   // made it into `draft`; that race did happen and silently saved an
   // empty draft.
   useEffect(() => {
@@ -368,10 +372,10 @@ export function DraftEditor() {
     // - and the hydration effect can then re-read - a real saved draft
     // with that empty one before either settles.
     if (!draftHydrated) return;
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   }, [draft, draftHydrated]);
 
-  // Text content survives a refresh via sessionStorage above, but selected
+  // Text content survives a refresh via localStorage above, but selected
   // photos are plain File objects only held in memory - a refresh silently
   // loses them. Warn before that happens, but only when there's actually
   // something to lose (a lone text-only visitor gets no interruption).
@@ -554,7 +558,7 @@ export function DraftEditor() {
     setSaving(true);
     try {
       const weddingId = await saveDraftAsWedding(draft, photos, user.id, locale);
-      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
       router.push(`/dashboard/${weddingId}/edit`);
     } catch (err) {
       showToast(err instanceof Error ? err.message : draftEditorCopy.saveFailed[locale], "error");

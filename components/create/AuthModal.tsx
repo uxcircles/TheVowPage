@@ -34,10 +34,19 @@ export function AuthModal({
     const supabase = createClient();
 
     if (mode === "signup") {
+      // Without this, the confirmation email falls back to the Supabase
+      // project's default Site URL - the bare marketing homepage - instead
+      // of coming back here. That homepage does nothing with the auth code,
+      // so the click silently fails: no session, and this draft (which only
+      // ever lives in this tab's React state) never gets saved. Mirrors
+      // GoogleAuthButton's next=/create?resume=1, which DraftEditor already
+      // watches for to finish the save once a session exists.
+      const callbackUrl = new URL("/auth/callback", window.location.origin);
+      callbackUrl.searchParams.set("next", "/create?resume=1");
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { display_name: displayName } },
+        options: { data: { display_name: displayName }, emailRedirectTo: callbackUrl.toString() },
       });
       if (error) {
         showToast(translateAuthError(error.message, locale), "error");
