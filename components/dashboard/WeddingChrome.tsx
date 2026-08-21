@@ -342,7 +342,7 @@ export function WeddingChrome({
           the preview above still gets the real window scroll it needs for
           ClassicTemplate's scroll-driven animations. */}
       <div className={previewData ? "hidden" : ""}>
-        <div className="sticky top-0 z-30 -mx-6 border-b border-[var(--brand-line)] bg-[var(--background)]/95 px-6 backdrop-blur">
+        <div className="-mx-6 border-b border-[var(--brand-line)] bg-[var(--background)]/95 px-6 backdrop-blur sm:sticky sm:top-0 sm:z-30">
           <div className="mx-auto max-w-4xl pt-3">
             <div className="flex items-center justify-between">
               <Link
@@ -403,35 +403,38 @@ export function WeddingChrome({
         {showBottomBar && (
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-[var(--background)]/95 backdrop-blur">
             <div className="mx-auto flex max-w-4xl flex-col items-end gap-1 px-6 py-3">
-              {!isPaid && !isPublished && (
-                <p className="flex items-center gap-1.5 text-xs text-[var(--brand-ink-soft)]">
-                  <ShieldIcon />
-                  {chromeCopy.refundGuarantee[locale]}
-                </p>
-              )}
-              <div className="flex items-center justify-end gap-3">
-                {saveBar && (
-                  <button
-                    type="submit"
-                    form={saveBar.formId}
-                    disabled={saveBar.pending}
-                    className={
-                      isPublished
-                        ? "rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-                        : "rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
-                    }
-                  >
-                    {saveBar.pending ? chromeCopy.saving[locale] : chromeCopy.save[locale]}
-                  </button>
-                )}
-                {previewSnapshot && (
-                  <button
-                    type="button"
-                    onClick={handlePreviewClick}
-                    className="rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)]"
-                  >
-                    {chromeCopy.preview[locale]}
-                  </button>
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+                {/* Save/Preview group as their own row on mobile (so the
+                    long "Pay to publish" label below always gets the full
+                    width it needs and never wraps); sm:contents drops this
+                    wrapper from the box model at that breakpoint so both
+                    buttons rejoin the single right-aligned row instead. */}
+                {(saveBar || previewSnapshot) && (
+                  <div className="flex gap-2 sm:contents">
+                    {saveBar && (
+                      <button
+                        type="submit"
+                        form={saveBar.formId}
+                        disabled={saveBar.pending}
+                        className={
+                          isPublished
+                            ? "flex-1 rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60 sm:flex-none"
+                            : "flex-1 rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60 sm:flex-none"
+                        }
+                      >
+                        {saveBar.pending ? chromeCopy.saving[locale] : chromeCopy.save[locale]}
+                      </button>
+                    )}
+                    {previewSnapshot && (
+                      <button
+                        type="button"
+                        onClick={handlePreviewClick}
+                        className="flex-1 rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] sm:flex-none"
+                      >
+                        {chromeCopy.preview[locale]}
+                      </button>
+                    )}
+                  </div>
                 )}
                 <button
                   type="button"
@@ -439,8 +442,8 @@ export function WeddingChrome({
                   onClick={togglePublish}
                   className={
                     isPublished
-                      ? "rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60"
-                      : "rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                      ? "w-full rounded border border-[var(--brand-line)] px-6 py-2.5 text-[var(--brand-ink-soft)] transition-colors hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)] disabled:opacity-60 sm:w-auto"
+                      : "w-full rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60 sm:w-auto"
                   }
                 >
                   {publishPending
@@ -452,6 +455,12 @@ export function WeddingChrome({
                         : chromeCopy.payToPublish[locale]}
                 </button>
               </div>
+              {!isPaid && !isPublished && (
+                <p className="flex items-center gap-1.5 text-xs text-[var(--brand-ink-soft)]">
+                  <ShieldIcon />
+                  {chromeCopy.refundGuarantee[locale]}
+                </p>
+              )}
             </div>
           </div>
         )}
