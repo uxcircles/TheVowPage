@@ -224,7 +224,7 @@ export const rowMenuCopy = {
 
 export const createWeddingCopy = {
   creating: { zh: "建立中...", en: "Creating..." },
-  createNew: { zh: "+ 建立新喜帖", en: "+ Create new invitation" },
+  createNew: { zh: "+ 新增喜帖", en: "+ New invitation" },
 };
 
 export const deletedNoticeCopy = {
