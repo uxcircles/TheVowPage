@@ -202,18 +202,29 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         {/* How it works */}
         <section className="px-6 py-20 sm:px-10">
           <div className="mx-auto max-w-5xl">
-            <Reveal>
+            <Reveal className="text-center">
               <p className="text-sm uppercase tracking-[0.3em] text-[var(--brand-gold)]">{howItWorksSection.eyebrow[locale]}</p>
               <h2 className={`${headingFont.className} mt-3 text-3xl font-semibold text-foreground`}>{howItWorksSection.title[locale]}</h2>
             </Reveal>
-            <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
+            <div className="relative mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
+              <div
+                className="absolute top-7 hidden h-px bg-[var(--brand-gold)]/30 sm:block"
+                style={{ left: "16.6667%", right: "16.6667%" }}
+                aria-hidden="true"
+              />
               {steps.map((step, i) => (
-                <Reveal key={step.title.zh} delay={i * 120}>
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-gold)]/10">
+                <Reveal
+                  key={step.title.zh}
+                  delay={i * 120}
+                  className="relative flex flex-col items-center text-center sm:items-center"
+                >
+                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-gold)] bg-[var(--background)]">
                     <span className={`${headingFont.className} text-xl text-[var(--brand-gold)]`}>{`0${i + 1}`}</span>
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title[locale]}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--brand-ink-soft)]">{step.description[locale]}</p>
+                  <p className="mt-2 max-w-[26ch] text-sm leading-relaxed text-[var(--brand-ink-soft)]">
+                    {step.description[locale]}
+                  </p>
                 </Reveal>
               ))}
             </div>
