@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_TC } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { buildMetadata } from "@/lib/seo";
 import "../globals.css";
 
@@ -28,6 +29,7 @@ export default function MarketingZhLayout({ children }: { children: React.ReactN
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

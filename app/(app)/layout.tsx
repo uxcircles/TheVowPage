@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_TC } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ToastProvider } from "@/components/ui/Toast";
 import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { getLocale } from "@/lib/i18n/locale";
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ToastProvider>{children}</ToastProvider>
         </LocaleProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
