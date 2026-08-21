@@ -45,7 +45,7 @@ export function InfoTooltip({ text }: { text: string }) {
         onFocus={() => setHovering(true)}
         onBlur={() => setHovering(false)}
         aria-label={infoTooltipCopy.moreInfo[locale]}
-        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[var(--brand-ink-soft)]/35 text-[10px] leading-none text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)]"
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[var(--brand-line)] text-[10px] leading-none text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] hover:text-[var(--brand-gold)]"
       >
         i
       </button>
