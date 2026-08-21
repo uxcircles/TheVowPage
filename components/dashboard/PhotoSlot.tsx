@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteWeddingPhoto } from "@/lib/actions/weddings";
 import { uploadPhotoWithProgress } from "@/lib/uploadPhotoWithProgress";
@@ -25,6 +25,7 @@ export function PhotoSlot({
   photoUrl: string | null;
 }) {
   const router = useRouter();
+  const inputId = useId();
   const locale = useLocale();
   const showToast = useToast();
   const [compressing, setCompressing] = useState(false);
@@ -138,9 +139,12 @@ export function PhotoSlot({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm text-[var(--brand-ink-soft)]">{label}</p>
-      <div className="aspect-[4/5] overflow-hidden rounded border border-[var(--brand-line)] bg-[var(--cream-deep,#f1e9da)]">
+      <label
+        htmlFor={inputId}
+        className={`block aspect-[4/5] overflow-hidden rounded border border-[var(--brand-line)] bg-[var(--cream-deep,#f1e9da)] transition-colors ${pending ? "" : "cursor-pointer hover:border-[var(--brand-gold)]"}`}
+      >
         {hasPhoto && <img src={displayUrl!} alt={label} className="h-full w-full object-cover" />}
-      </div>
+      </label>
       {progress !== null && (
         <div className="h-1.5 overflow-hidden rounded-full bg-[var(--brand-line)]/40">
           {progress < 100 ? (
@@ -156,7 +160,15 @@ export function PhotoSlot({
       <div className="flex gap-2">
         <label className="flex-1 cursor-pointer rounded border border-[var(--brand-line)] px-3 py-1.5 text-center text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
           {buttonLabel}
-          <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={pending} />
+          <input
+            id={inputId}
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={pending}
+          />
         </label>
         {currentPhotoId && (
           <button

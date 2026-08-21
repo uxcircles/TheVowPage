@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthModal } from "./AuthModal";
@@ -154,6 +154,7 @@ function PhotoPicker({
   onChange: (file: File | null) => void;
 }) {
   const locale = useLocale();
+  const inputId = useId();
   const url = useObjectUrl(file);
   const showToast = useToast();
   const [compressing, setCompressing] = useState(false);
@@ -161,15 +162,19 @@ function PhotoPicker({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm text-[var(--brand-ink-soft)]">{label}</p>
-      <div className="aspect-[4/5] overflow-hidden rounded border border-[var(--brand-line)] bg-[var(--cream-deep,#f1e9da)]">
+      <label
+        htmlFor={inputId}
+        className={`block aspect-[4/5] overflow-hidden rounded border border-[var(--brand-line)] bg-[var(--cream-deep,#f1e9da)] transition-colors ${compressing ? "" : "cursor-pointer hover:border-[var(--brand-gold)]"}`}
+      >
         {url && (
           <img src={url} alt={label} className="h-full w-full object-cover" />
         )}
-      </div>
+      </label>
       <div className="flex gap-2">
         <label className="flex-1 cursor-pointer rounded border border-[var(--brand-line)] px-3 py-1.5 text-center text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)]">
           {compressing ? photoSlotCopy.compressing[locale] : file ? photoSlotCopy.change[locale] : photoSlotCopy.upload[locale]}
           <input
+            id={inputId}
             type="file"
             accept="image/*"
             className="hidden"
