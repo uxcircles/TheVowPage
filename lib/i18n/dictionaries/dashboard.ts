@@ -65,7 +65,7 @@ export const editForm = {
   latitude: { zh: "緯度", en: "Latitude" },
   longitude: { zh: "經度", en: "Longitude" },
   locating: { zh: "定位中...", en: "Locating..." },
-  confirmMapLocation: { zh: "📍 確認地圖位置", en: "📍 Confirm map location" },
+  confirmMapLocation: { zh: "確認地圖位置", en: "Confirm map location" },
   locatedTimezonePrefix: { zh: "已定位，判斷時區為：", en: "Located - detected time zone: " },
   locateFailed: {
     zh: "找不到這個地點，請確認場地名稱或地址，或改用手動輸入座標。",
@@ -254,7 +254,11 @@ export const loadingCopy = {
 // editor UI reused pre-signup), so this only holds the page-specific chrome
 // that isn't already covered by those.
 export const draftEditorCopy = {
-  alreadyHaveAccount: { zh: "已經有帳號？登入", en: "Already have an account? Log in" },
+  // Split so mobile can hide the "already have an account" lead-in (it
+  // wraps onto its own line next to the logo on narrow screens) while still
+  // always showing "Log in" on its own.
+  alreadyHaveAccountPrefix: { zh: "已經有帳號？", en: "Already have an account? " },
+  logIn: { zh: "登入", en: "Log in" },
   tryTitle: { zh: "試做你的喜帖", en: "Try building your invitation" },
   tryHint: {
     zh: "不用先註冊，直接填內容、選照片。準備好要儲存時再建立帳號，內容不會遺失。",
@@ -287,8 +291,6 @@ export const draftEditorCopy = {
     zh: "賓客可以直接在喜帖頁面回覆是否出席，回覆會顯示在後台的「RSVP 回覆」頁面",
     en: "Guests can RSVP directly on the invitation page - replies show up on the \"RSVP\" page in your dashboard",
   },
-  saveInvitation: { zh: "儲存喜帖", en: "Save invitation" },
-  previewInvitation: { zh: "預覽喜帖", en: "Preview invitation" },
   saveFailed: { zh: "儲存失敗，請稍後再試", en: "Couldn't save. Please try again" },
 };
 

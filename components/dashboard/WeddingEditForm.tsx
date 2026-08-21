@@ -8,6 +8,7 @@ import { Toggle } from "@/components/ui/Toggle";
 import { BilingualField } from "@/components/ui/BilingualField";
 import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { MapPinIcon } from "@/components/ui/MapPinIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
 import { VenueMap } from "@/components/templates/classic/VenueMap";
@@ -526,8 +527,9 @@ export function WeddingEditForm({
               type="button"
               onClick={locateVenue}
               disabled={locating}
-              className="rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] disabled:opacity-60"
             >
+              <MapPinIcon className="h-4 w-4 shrink-0" />
               {locating ? editForm.locating[locale] : editForm.confirmMapLocation[locale]}
             </button>
             {locationPreview && (

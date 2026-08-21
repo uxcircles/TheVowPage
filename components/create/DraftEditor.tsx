@@ -25,6 +25,7 @@ import { EditorCard, HiddenSectionHint } from "@/components/ui/EditorCard";
 import { BilingualField } from "@/components/ui/BilingualField";
 import { MomentsPhotoGrid } from "@/components/ui/MomentsPhotoGrid";
 import { TrashIcon } from "@/components/ui/TrashIcon";
+import { MapPinIcon } from "@/components/ui/MapPinIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useToast } from "@/components/ui/Toast";
 import { LocaleProvider, useLocale } from "@/components/i18n/LocaleProvider";
@@ -579,9 +580,10 @@ export function DraftEditor() {
         </Link>
         <Link
           href="/login"
-          className="text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
+          className="shrink-0 text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]"
         >
-          {draftEditorCopy.alreadyHaveAccount[locale]}
+          <span className="hidden sm:inline">{draftEditorCopy.alreadyHaveAccountPrefix[locale]}</span>
+          {draftEditorCopy.logIn[locale]}
         </Link>
       </header>
       <div className="mx-auto w-full max-w-4xl px-6 pt-10 pb-28">
@@ -1005,8 +1007,9 @@ export function DraftEditor() {
                     type="button"
                     onClick={locateVenue}
                     disabled={locating}
-                    className="rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] disabled:opacity-60"
+                    className="inline-flex items-center gap-1.5 rounded border border-[var(--brand-line)] px-4 py-2 text-sm text-[var(--brand-ink-soft)] hover:border-[var(--brand-gold)] disabled:opacity-60"
                   >
+                    <MapPinIcon className="h-4 w-4 shrink-0" />
                     {locating ? editForm.locating[locale] : editForm.confirmMapLocation[locale]}
                   </button>
                   {locationPreview && (
@@ -1253,7 +1256,7 @@ export function DraftEditor() {
                 onClick={() => setShowAuth(true)}
                 className="rounded border border-[var(--brand-gold)] px-6 py-2.5 text-[var(--brand-gold)] transition-colors hover:bg-[var(--brand-gold)] hover:text-white disabled:opacity-60"
               >
-                {saving ? chromeCopy.saving[locale] : draftEditorCopy.saveInvitation[locale]}
+                {saving ? chromeCopy.saving[locale] : chromeCopy.save[locale]}
               </button>
               <button
                 type="button"
@@ -1267,7 +1270,7 @@ export function DraftEditor() {
                 }}
                 className="rounded bg-[var(--brand-gold)] px-6 py-2.5 text-white transition-opacity hover:opacity-90"
               >
-                {draftEditorCopy.previewInvitation[locale]}
+                {chromeCopy.preview[locale]}
               </button>
             </div>
           </div>
