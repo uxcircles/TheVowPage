@@ -8,8 +8,8 @@ export const footerCopy = {
   // separate `copyright` key in from the JSX side.
   copyrightLine: {
     zh: (year: number) =>
-      `© ${year} The Vow Page 摯頁為 UX CIRCLES Ltd 旗下服務（公司註冊編號 15679514，於英格蘭與威爾斯註冊）。註冊地址：71-75 Shelton Street, Covent Garden, London, WC2H 9JQ`,
+      `© ${year} The Vow Page 摯頁。The Vow Page 摯頁由 UX CIRCLES Ltd（公司註冊編號 15679514，於英格蘭與威爾斯註冊）營運。註冊地址：71-75 Shelton Street, Covent Garden, London, WC2H 9JQ`,
     en: (year: number) =>
-      `© ${year} The Vow Page is a UX CIRCLES Ltd service (Company No. 15679514), registered in England & Wales. Registered office: 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ`,
+      `© ${year} The Vow Page. The Vow Page is operated by UX CIRCLES Ltd (Company No. 15679514), registered in England & Wales. Registered office: 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ`,
   },
 };
