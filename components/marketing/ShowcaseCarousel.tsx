@@ -101,19 +101,19 @@ export function ShowcaseCarousel({
                   {copy.popular[locale]}
                 </span>
               )}
-              {/* Hover-layer painted first (behind, by DOM order) - the
-                  polaroid photo below sits on top of it at rest and fades
-                  out on hover to reveal it, rather than this layer having
-                  to fade *in* over it - so hovering shows the exact flush,
-                  full-bleed scroll-through this card always has, with no
-                  photo-frame border of its own. */}
-              <div className="absolute inset-0 overflow-hidden">
+              {/* Hover-layer painted first (behind, by DOM order) - but it
+                  covers the *whole* card (inset-0), wider than the
+                  polaroid mat's own inset area below, so it also needs its
+                  own opacity toggle: without one it stayed visible at rest
+                  in the cream-tinted margin around the mat, peeking out
+                  from behind it instead of staying hidden until hover. */}
+              <div className="absolute inset-0 overflow-hidden opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   ref={showcaseImageRef}
                   src={`/showcase/demo-${theme.id}.webp`}
                   alt={theme.name[locale]}
-                  className="showcase-scroll-image absolute inset-x-0 top-[-11%] w-full translate-y-0"
+                  className="showcase-scroll-image absolute inset-x-0 top-[-11%] w-full translate-y-0 group-hover:translate-y-[var(--scroll-pct)]"
                 />
               </div>
               {/* Default: a polaroid-look photo inset within this same
