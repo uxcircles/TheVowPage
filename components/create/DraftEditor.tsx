@@ -37,6 +37,7 @@ import { validatePhotoType, validatePhotoSize, MAX_MOMENT_PHOTOS } from "@/lib/p
 import { compressImage } from "@/lib/compressImage";
 import {
   emptySchedule,
+  localizedText,
   SCHEDULE_PLACEHOLDERS,
   SCHEDULE_PLACEHOLDER_FALLBACK,
   THANKS_MESSAGE_FALLBACK,
@@ -276,6 +277,24 @@ export function DraftEditor() {
   const zhFirst = locale !== "en";
   const showToast = useToast();
   const [draft, setDraft] = useState<DraftContent>(EMPTY_DRAFT);
+  // Section headings/aria-labels below ("___'s Parents" etc.) need whichever
+  // role-label text matches the *site's own locale*, not draft.groomLabel/
+  // brideLabel directly - once bilingual is on those two are always the
+  // zh-slot value (see applyLocaleDefaults above), so reading them straight
+  // showed "新郎's Parents" instead of "Groom's Parents" on an en-locale,
+  // bilingual draft.
+  const groomLabelDisplay = localizedText(
+    draft.groomLabel || defaultGroomLabelText,
+    draft.contentEn.groomLabel,
+    locale,
+    draft.bilingualEnabled,
+  );
+  const brideLabelDisplay = localizedText(
+    draft.brideLabel || defaultBrideLabelText,
+    draft.contentEn.brideLabel,
+    locale,
+    draft.bilingualEnabled,
+  );
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
   const [photos, setPhotos] = useState<DraftPhotos>({
     hero: null,
@@ -805,7 +824,7 @@ export function DraftEditor() {
                   }
                 />
                 <BilingualField
-                  label={`${draft.groomLabel || defaultGroomLabelText}${editForm.nameSuffix[locale]}`}
+                  label={`${groomLabelDisplay}${editForm.nameSuffix[locale]}`}
                   bilingual={draft.bilingualEnabled}
                   zhInput={
                     <input
@@ -823,7 +842,7 @@ export function DraftEditor() {
                   }
                 />
                 <BilingualField
-                  label={`${draft.brideLabel || defaultBrideLabelText}${editForm.nameSuffix[locale]}`}
+                  label={`${brideLabelDisplay}${editForm.nameSuffix[locale]}`}
                   bilingual={draft.bilingualEnabled}
                   zhInput={
                     <input
@@ -856,7 +875,7 @@ export function DraftEditor() {
               {draft.showFamily ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <BilingualField
-                    label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsSuffix[locale]}`}
+                    label={`${groomLabelDisplay}${editForm.parentsSuffix[locale]}`}
                     bilingual={draft.bilingualEnabled}
                     zhInput={
                       <div className="flex gap-2">
@@ -870,7 +889,7 @@ export function DraftEditor() {
                           value={draft.groomParentsRelation}
                           onChange={(e) => update("groomParentsRelation", e.target.value)}
                           placeholder={editForm.sonOfDefault.zh}
-                          aria-label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                          aria-label={`${groomLabelDisplay}${editForm.parentsRelationAria[locale]}`}
                           className={`${inputClass} w-20 shrink-0`}
                         />
                       </div>
@@ -881,7 +900,7 @@ export function DraftEditor() {
                           value={draft.contentEn.groomParentsRelation ?? ""}
                           onChange={(e) => updateEn("groomParentsRelation", e.target.value)}
                           placeholder={editForm.sonOfDefault.en}
-                          aria-label={`${draft.groomLabel || defaultGroomLabelText}${editForm.parentsRelationAria[locale]}`}
+                          aria-label={`${groomLabelDisplay}${editForm.parentsRelationAria[locale]}`}
                           className={`${inputClass} w-28 shrink-0`}
                         />
                         <input
@@ -894,7 +913,7 @@ export function DraftEditor() {
                     }
                   />
                   <BilingualField
-                    label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsSuffix[locale]}`}
+                    label={`${brideLabelDisplay}${editForm.parentsSuffix[locale]}`}
                     bilingual={draft.bilingualEnabled}
                     zhInput={
                       <div className="flex gap-2">
@@ -908,7 +927,7 @@ export function DraftEditor() {
                           value={draft.brideParentsRelation}
                           onChange={(e) => update("brideParentsRelation", e.target.value)}
                           placeholder={editForm.daughterOfDefault.zh}
-                          aria-label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                          aria-label={`${brideLabelDisplay}${editForm.parentsRelationAria[locale]}`}
                           className={`${inputClass} w-20 shrink-0`}
                         />
                       </div>
@@ -919,7 +938,7 @@ export function DraftEditor() {
                           value={draft.contentEn.brideParentsRelation ?? ""}
                           onChange={(e) => updateEn("brideParentsRelation", e.target.value)}
                           placeholder={editForm.daughterOfDefault.en}
-                          aria-label={`${draft.brideLabel || defaultBrideLabelText}${editForm.parentsRelationAria[locale]}`}
+                          aria-label={`${brideLabelDisplay}${editForm.parentsRelationAria[locale]}`}
                           className={`${inputClass} w-32 shrink-0`}
                         />
                         <input
