@@ -10,7 +10,7 @@ export function TermsPageContent({ locale }: { locale: Locale }) {
     <div className="flex flex-1 flex-col">
       <header className="flex items-center justify-between border-b border-[var(--brand-line)]/60 px-6 py-5 sm:px-10">
         <Link href={marketingHref("/", locale)} className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>
-          The Vow Page 摯頁
+          {locale === "en" ? "The Vow Page" : "The Vow Page 摯頁"}
         </Link>
         <Link href={marketingHref("/", locale)} className="text-sm text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]">
           {legalPageCopy.backToHome[locale]}

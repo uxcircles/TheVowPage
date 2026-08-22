@@ -107,7 +107,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-[var(--brand-line)]/60 bg-[var(--background)]/90 px-6 py-5 backdrop-blur sm:px-10">
-        <span className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>The Vow Page 摯頁</span>
+        <span className={`${headingFont.className} text-lg text-[var(--brand-gold)]`}>
+          {locale === "en" ? "The Vow Page" : "The Vow Page 摯頁"}
+        </span>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/login" className="text-[var(--brand-ink-soft)] hover:text-[var(--brand-gold)]">
             {nav.login[locale]}
