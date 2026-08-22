@@ -55,11 +55,14 @@ function showcaseImageRef(img: HTMLImageElement | null) {
  * `@media (hover: hover)`, so the overlay is inert (not just invisible)
  * on touch - no double-tap-to-follow-the-link surprise.
  *
- * The card visual itself is a real, full-page screenshot of the matching
- * demo wedding (public/showcase/demo-{themeId}.webp, regenerate via
- * scripts/capture-showcase-screenshots.mjs if the demo content changes),
- * not the abstract InvitationCardVisual mockup - a real photo of the actual
- * product reads as more convincing than a generic placeholder. */
+ * The card shows a real engagement photo by default (public/showcase/
+ * show-{themeId}.webp) in a polaroid-style frame tinted with the theme's
+ * own cream color - on hover (hover-capable devices only) it crossfades to
+ * a real, full-page screenshot of the matching demo wedding
+ * (public/showcase/demo-{themeId}.webp, regenerate via
+ * scripts/capture-showcase-screenshots.mjs if the demo content changes)
+ * and starts the same slow scroll-through as before, so hovering still
+ * previews the actual product rather than just another static photo. */
 export function ShowcaseCarousel({
   themes,
   locale,
@@ -89,25 +92,39 @@ export function ShowcaseCarousel({
               active === i ? "-translate-y-2" : ""
             }`}
           >
-            <div className="relative aspect-[4/5] w-full rounded-lg shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]">
+            <div
+              className="relative rounded-2xl p-4 pb-3 shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)] sm:p-5 sm:pb-4"
+              style={{ backgroundColor: theme.cream }}
+            >
               {active === i && (
                 <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--brand-gold-dark)] px-3 py-1 text-xs text-white shadow-sm">
                   {copy.popular[locale]}
                 </span>
               )}
-              <div className="absolute inset-0 overflow-hidden rounded-lg">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  ref={showcaseImageRef}
-                  src={`/showcase/demo-${theme.id}.webp`}
-                  alt={theme.name[locale]}
-                  className="absolute inset-x-0 top-[-11%] w-full translate-y-0 transition-transform duration-[6000ms] ease-in-out group-hover:translate-y-[var(--scroll-pct)] group-hover:duration-[14000ms] group-hover:ease-linear"
-                />
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
-                <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
-                  {copy.viewExample[locale]}
-                </span>
+              {/* White polaroid mat, extra margin at the bottom (classic
+                  polaroid proportions) - the photo/screenshot window inside
+                  it is what actually crossfades on hover. */}
+              <div className="rounded-lg bg-white p-2 pb-6 shadow-sm sm:p-2.5 sm:pb-7">
+                <div className="relative aspect-[4/5] w-full overflow-hidden rounded">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/showcase/show-${theme.id}.webp`}
+                    alt={theme.name[locale]}
+                    className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out group-hover:opacity-0"
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    ref={showcaseImageRef}
+                    src={`/showcase/demo-${theme.id}.webp`}
+                    alt={theme.name[locale]}
+                    className="showcase-scroll-image absolute inset-x-0 top-[-11%] w-full translate-y-0 opacity-0 group-hover:translate-y-[var(--scroll-pct)] group-hover:opacity-100"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
+                    <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
+                      {copy.viewExample[locale]}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="mt-4">
