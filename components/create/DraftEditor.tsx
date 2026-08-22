@@ -113,6 +113,28 @@ const LOCALE_DEFAULT_FIELDS = [
 
 function applyLocaleDefaults(content: DraftContent, locale: "zh" | "en"): DraftContent {
   let next = content;
+  if (next.bilingualEnabled) {
+    // Once bilingual is on, groomLabel/brideLabel are BilingualField's
+    // actual zh/en content slots (rendered in the "中"/"EN" rows
+    // respectively) - not "whatever matches the admin's own locale" like
+    // in the single-language case below. Without this branch, an en-
+    // locale admin turning bilingual on would see "Groom"/"Bride" (this
+    // function's *en* default, applied while non-bilingual) sitting in
+    // the zh-tagged row instead of 新郎/新娘, because the field's value
+    // and the field's row-language silently drifted apart the moment
+    // bilingual got enabled.
+    for (const field of LOCALE_DEFAULT_FIELDS) {
+      const current = next[field.key];
+      if (current !== field.zh && (current === field.zh || current === field.en)) {
+        next = { ...next, [field.key]: field.zh };
+      }
+      const currentEn = next.contentEn[field.key];
+      if (!currentEn) {
+        next = { ...next, contentEn: { ...next.contentEn, [field.key]: field.en } };
+      }
+    }
+    return next;
+  }
   for (const field of LOCALE_DEFAULT_FIELDS) {
     const current = next[field.key];
     const target = field[locale];
@@ -331,18 +353,20 @@ export function DraftEditor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // If the visitor switches site language mid-session (footer switcher,
-  // no full reload) after the mount effect above already ran once, that
-  // one-time hydration never re-fires - without this, any of the
-  // LOCALE_DEFAULT_FIELDS still sitting at their *previous* locale's
-  // default would stay stuck in that language even though the rest of the
-  // editor chrome has switched, and could get saved that way. Only fires
-  // after the initial hydration (guarded on draftHydrated) so it can't
-  // race the mount effect's own setDraft above.
+  // Re-normalize LOCALE_DEFAULT_FIELDS whenever the site language changes
+  // mid-session (footer switcher, no full reload - the mount effect above
+  // only runs once) or bilingual gets toggled on/off. The bilingual case
+  // matters because applyLocaleDefaults' two branches disagree on what
+  // groomLabel/brideLabel should hold - flipping the toggle needs to move
+  // an already-applied single-language default (e.g. "Groom", written
+  // while non-bilingual) back into its correct zh/en slot, not leave it
+  // sitting in the wrong one. Only fires after the initial hydration
+  // (guarded on draftHydrated) so it can't race the mount effect's own
+  // setDraft above.
   useEffect(() => {
     if (!draftHydrated) return;
     setDraft((d) => applyLocaleDefaults(d, locale));
-  }, [locale, draftHydrated]);
+  }, [locale, draft.bilingualEnabled, draftHydrated]);
 
   // Google sign-in from the AuthModal is a full-page redirect (unlike the
   // email/password form in that same modal, which authenticates in place
