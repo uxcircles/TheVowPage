@@ -8,7 +8,7 @@ export const termsMeta = {
   metaTitle: { zh: "服務條款｜The Vow Page 摯頁", en: "Terms of Service | The Vow Page" },
   eyebrow: { zh: "terms of service", en: "terms of service" },
   title: { zh: "服務條款", en: "Terms of Service" },
-  lastUpdated: { zh: "最後更新日期：2026 年 8 月 15 日", en: "Last updated: 15 August 2026" },
+  lastUpdated: { zh: "最後更新日期：2026 年 8 月 22 日", en: "Last updated: 22 August 2026" },
 };
 
 export const termsSections: Section[] = [
@@ -20,8 +20,8 @@ export const termsSections: Section[] = [
         en: "The Vow Page (the \"Service\") is an online digital wedding invitation platform that lets couples choose an invitation template, edit its content, upload photos, and manage their guest list and RSVP replies.",
       },
       {
-        zh: "本服務由 UX CIRCLES Ltd（於英格蘭與威爾斯註冊之公司，以下稱「我們」）提供，聯絡信箱為 thevowpage@gmail.com。",
-        en: "The Service is provided by UX CIRCLES Ltd (a company registered in England & Wales, \"we\" or \"us\"). You can contact us at thevowpage@gmail.com.",
+        zh: "本服務由 UX CIRCLES Ltd（公司註冊編號 15679514，於英格蘭與威爾斯註冊，以下稱「我們」）提供，註冊地址為 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ，聯絡信箱為 thevowpage@gmail.com。",
+        en: "The Service is provided by UX CIRCLES Ltd (Company No. 15679514, a company registered in England & Wales, \"we\" or \"us\"), registered office 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ. You can contact us at thevowpage@gmail.com.",
       },
     ],
   },
@@ -203,7 +203,7 @@ export const privacyMeta = {
   metaTitle: { zh: "隱私權政策｜The Vow Page 摯頁", en: "Privacy Policy | The Vow Page" },
   eyebrow: { zh: "privacy policy", en: "privacy policy" },
   title: { zh: "隱私權政策", en: "Privacy Policy" },
-  lastUpdated: { zh: "最後更新日期：2026 年 8 月 14 日", en: "Last updated: 14 August 2026" },
+  lastUpdated: { zh: "最後更新日期：2026 年 8 月 22 日", en: "Last updated: 22 August 2026" },
 };
 
 export const privacySections: Section[] = [
@@ -211,8 +211,8 @@ export const privacySections: Section[] = [
     title: { zh: "一、適用範圍", en: "1. Scope" },
     body: [
       {
-        zh: "本隱私權政策說明 The Vow Page 摯頁（以下稱「本服務」，由 UX CIRCLES Ltd 提供）如何蒐集、使用、儲存與保護您的個人資料，適用於所有使用本服務的帳號擁有者（新人）以及透過公開喜帖頁面填寫 RSVP 的賓客。",
-        en: "This Privacy Policy explains how The Vow Page (the \"Service\", provided by UX CIRCLES Ltd) collects, uses, stores and protects your personal data. It applies to all account holders (couples) using the Service, as well as guests who submit an RSVP through a public invitation page.",
+        zh: "本隱私權政策說明 The Vow Page 摯頁（以下稱「本服務」，由 UX CIRCLES Ltd【公司註冊編號 15679514，於英格蘭與威爾斯註冊，註冊地址為 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ】提供）如何蒐集、使用、儲存與保護您的個人資料，適用於所有使用本服務的帳號擁有者（新人）以及透過公開喜帖頁面填寫 RSVP 的賓客。",
+        en: "This Privacy Policy explains how The Vow Page (the \"Service\", provided by UX CIRCLES Ltd, Company No. 15679514, a company registered in England & Wales, registered office 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ) collects, uses, stores and protects your personal data. It applies to all account holders (couples) using the Service, as well as guests who submit an RSVP through a public invitation page.",
       },
       {
         zh: "使用本服務即表示您已閱讀並同意本政策之內容。",
