@@ -162,21 +162,3 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
-
-/* ShowcaseCarousel's demo image layer needs two transitions running on
-   independent schedules: a quick opacity crossfade in from the static
-   photo, and the slow scroll-through pan (asymmetric duration - slower
-   revealing on hover-in than settling back on hover-out). Tailwind's
-   duration utilities can only set one duration for the whole element's
-   transition-property list, so this can't be expressed with utility
-   classes alone once both properties are involved on the same element. */
-.showcase-scroll-image {
-  transition:
-    opacity 500ms ease-out,
-    transform 6000ms ease-in-out;
-}
-.group:hover .showcase-scroll-image {
-  transition:
-    opacity 500ms ease-out,
-    transform 14000ms linear;
-}
