@@ -93,7 +93,7 @@ export function ShowcaseCarousel({
             }`}
           >
             <div
-              className="relative rounded-2xl p-4 pb-3 shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)] sm:p-5 sm:pb-4"
+              className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]"
               style={{ backgroundColor: theme.cream }}
             >
               {active === i && (
@@ -101,30 +101,38 @@ export function ShowcaseCarousel({
                   {copy.popular[locale]}
                 </span>
               )}
-              {/* White polaroid mat, extra margin at the bottom (classic
-                  polaroid proportions) - the photo/screenshot window inside
-                  it is what actually crossfades on hover. */}
-              <div className="rounded-lg bg-white p-2 pb-6 shadow-sm sm:p-2.5 sm:pb-7">
-                <div className="relative aspect-[4/5] w-full overflow-hidden rounded">
+              {/* Hover-layer painted first (behind, by DOM order) - the
+                  polaroid photo below sits on top of it at rest and fades
+                  out on hover to reveal it, rather than this layer having
+                  to fade *in* over it - so hovering shows the exact flush,
+                  full-bleed scroll-through this card always has, with no
+                  photo-frame border of its own. */}
+              <div className="absolute inset-0 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  ref={showcaseImageRef}
+                  src={`/showcase/demo-${theme.id}.webp`}
+                  alt={theme.name[locale]}
+                  className="showcase-scroll-image absolute inset-x-0 top-[-11%] w-full translate-y-0"
+                />
+              </div>
+              {/* Default: a polaroid-look photo inset within this same
+                  fixed aspect-[4/5] footprint (white mat, extra margin at
+                  the bottom). */}
+              <div className="absolute inset-4 bottom-3 rounded-lg bg-white p-2 shadow-sm transition-opacity duration-500 ease-out group-hover:opacity-0 sm:inset-5 sm:bottom-4">
+                <div className="h-full w-full overflow-hidden rounded">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`/showcase/show-${theme.id}.webp`}
                     alt={theme.name[locale]}
-                    className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out group-hover:opacity-0"
+                    className="h-full w-full object-cover"
                   />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    ref={showcaseImageRef}
-                    src={`/showcase/demo-${theme.id}.webp`}
-                    alt={theme.name[locale]}
-                    className="showcase-scroll-image absolute inset-x-0 top-[-11%] w-full translate-y-0 opacity-0 group-hover:translate-y-[var(--scroll-pct)] group-hover:opacity-100"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
-                    <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
-                      {copy.viewExample[locale]}
-                    </span>
-                  </div>
                 </div>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
+                <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
+                  {copy.viewExample[locale]}
+                </span>
               </div>
             </div>
             <div className="mt-4">
