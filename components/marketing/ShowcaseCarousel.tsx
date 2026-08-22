@@ -92,47 +92,55 @@ export function ShowcaseCarousel({
               active === i ? "-translate-y-2" : ""
             }`}
           >
-            <div
-              className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]"
-              style={{ backgroundColor: theme.cream }}
-            >
+            <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[0_20px_45px_-25px_rgba(60,53,44,0.45)]">
               {active === i && (
                 <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--brand-gold-dark)] px-3 py-1 text-xs text-white shadow-sm">
                   {copy.popular[locale]}
                 </span>
               )}
-              {/* Hover-layer painted first (behind, by DOM order) - but it
-                  covers the *whole* card (inset-0), wider than the
-                  polaroid mat's own inset area below, so it also needs its
-                  own opacity toggle: without one it stayed visible at rest
-                  in the cream-tinted margin around the mat, peeking out
-                  from behind it instead of staying hidden until hover. */}
-              <div className="absolute inset-0 overflow-hidden opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  ref={showcaseImageRef}
-                  src={`/showcase/demo-${theme.id}.webp`}
-                  alt={theme.name[locale]}
-                  className="showcase-scroll-image absolute inset-x-0 top-[-11%] w-full translate-y-0 group-hover:translate-y-[var(--scroll-pct)]"
-                />
-              </div>
-              {/* Default: a polaroid-look photo inset within this same
-                  fixed aspect-[4/5] footprint (white mat, extra margin at
-                  the bottom). */}
-              <div className="absolute inset-4 bottom-3 rounded-lg bg-white p-2 shadow-sm transition-opacity duration-500 ease-out group-hover:opacity-0 sm:inset-5 sm:bottom-4">
-                <div className="h-full w-full overflow-hidden rounded">
+              {/* Everything that needs clipping to the card's rounded
+                  corners lives in this one wrapper - kept separate from the
+                  outer card div so the "Popular" pill (which floats above
+                  the top edge via -top-3) doesn't get clipped along with
+                  it. */}
+              <div
+                className="absolute inset-0 overflow-hidden rounded-2xl"
+                style={{ backgroundColor: theme.cream }}
+              >
+                {/* Hover-layer painted first (behind, by DOM order) - but it
+                    covers the *whole* card (inset-0), wider than the
+                    polaroid mat's own inset area below, so it also needs
+                    its own opacity toggle: without one it stayed visible
+                    at rest in the cream-tinted margin around the mat,
+                    peeking out from behind it instead of staying hidden
+                    until hover. */}
+                <div className="absolute inset-0 overflow-hidden opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`/showcase/show-${theme.id}.webp`}
+                    ref={showcaseImageRef}
+                    src={`/showcase/demo-${theme.id}.webp`}
                     alt={theme.name[locale]}
-                    className="h-full w-full object-cover"
+                    className="showcase-scroll-image absolute inset-x-0 top-[-11%] w-full translate-y-0 group-hover:translate-y-[var(--scroll-pct)]"
                   />
                 </div>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
-                <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
-                  {copy.viewExample[locale]}
-                </span>
+                {/* Default: a polaroid-look photo inset within this same
+                    fixed aspect-[4/5] footprint (white mat, extra margin
+                    at the bottom). */}
+                <div className="absolute inset-4 bottom-3 rounded-lg bg-white p-2 shadow-sm transition-opacity duration-500 ease-out group-hover:opacity-0 sm:inset-5 sm:bottom-4">
+                  <div className="h-full w-full overflow-hidden rounded">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/showcase/show-${theme.id}.webp`}
+                      alt={theme.name[locale]}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 px-6 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
+                  <span className="rounded-full bg-white px-5 py-2.5 text-center text-sm font-medium text-foreground shadow-sm">
+                    {copy.viewExample[locale]}
+                  </span>
+                </div>
               </div>
             </div>
             <div className="mt-4">
